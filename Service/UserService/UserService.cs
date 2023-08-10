@@ -19,13 +19,13 @@ namespace Service.UserService
             var user = _context.Users.SingleOrDefaultAsync(a => a.Email == request.Mail && a.Password == request.Password);
 
             if (user == null) return null;
-
+            var role = _context.Roles.FindAsync(user.Result.RoleId);
             UserResponse result = new UserResponse
             {
                 UserId = user.Result.UserId,
                 FullName = user.Result.FullName,
                 Email = user.Result.Email,
-                Role = _context.Roles.FindAsync(user.Result.RoleId).Result.RoleName,
+                Role = role.Result.RoleName,
                 IsBan = user.Result.IsBan
             };
 

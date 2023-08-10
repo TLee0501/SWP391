@@ -9,9 +9,9 @@ namespace BusinessObjects.ResponseModel
     public class UserResponse
     {
         public Guid UserId { get; set; }
-        public string FullName { get; set; }
-        public string Email { get; set; }
-        public string Role { get; set; }
+        public string FullName { get; set; } = null!;
+        public string Email { get; set; } = null!;
+        public string Role { get; set; } = null!;
         public bool IsBan { get; set; }
     }
 }

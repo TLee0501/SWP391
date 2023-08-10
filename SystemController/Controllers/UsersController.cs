@@ -38,7 +38,7 @@ namespace SystemController.Controllers
             return await _context.Users.ToListAsync();
         }
 
-        [HttpGet]
+        [HttpPost]
         public async Task<IActionResult> Login(LoginRequest request)
         {
             if (request.Mail == "" || request.Mail == null)
@@ -51,7 +51,7 @@ namespace SystemController.Controllers
             if (result == null)
                 return NotFound("Vui lòng kiểm tả lại số điện thoại/mật khẩu!");
             else if (result.IsBan == true)
-                return Unauthorized("Tài khaonr đã bị Ban!");
+                return Unauthorized("Tài khoản đã bị Ban!");
 
             var token = CreateToken(result);
             return Ok(new LoginResponse<UserResponse>(200, "Đăng nhập thành công.", result, token));

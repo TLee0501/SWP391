@@ -27,11 +27,11 @@ public partial class Swp391onGoingReportContext : DbContext
     {
         modelBuilder.Entity<Role>(entity =>
         {
-            entity
-                .HasNoKey()
-                .ToTable("Role");
+            entity.ToTable("Role");
 
-            entity.Property(e => e.RoleId).HasColumnName("roleID");
+            entity.Property(e => e.RoleId)
+                .ValueGeneratedNever()
+                .HasColumnName("roleID");
             entity.Property(e => e.RoleName)
                 .HasMaxLength(50)
                 .HasColumnName("roleName");
