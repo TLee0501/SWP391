@@ -15,9 +15,17 @@ public partial class Swp391onGoingReportContext : DbContext
     {
     }
 
+    public virtual DbSet<Class> Classes { get; set; }
+
     public virtual DbSet<Course> Courses { get; set; }
 
+    public virtual DbSet<Project> Projects { get; set; }
+
+    public virtual DbSet<ProjectTeam> ProjectTeams { get; set; }
+
     public virtual DbSet<Role> Roles { get; set; }
+
+    public virtual DbSet<StudentClass> StudentClasses { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
 
@@ -29,6 +37,28 @@ public partial class Swp391onGoingReportContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Class>(entity =>
+        {
+            entity.ToTable("Class");
+
+            entity.Property(e => e.ClassId)
+                .ValueGeneratedNever()
+                .HasColumnName("classID");
+            entity.Property(e => e.ClassName)
+                .HasMaxLength(100)
+                .HasColumnName("className");
+            entity.Property(e => e.CourseId).HasColumnName("courseID");
+            entity.Property(e => e.IsCompleted).HasColumnName("isCompleted");
+            entity.Property(e => e.IsDeleted).HasColumnName("isDeleted");
+            entity.Property(e => e.TimeEnd)
+                .HasColumnType("datetime")
+                .HasColumnName("timeEnd");
+            entity.Property(e => e.TimeStart)
+                .HasColumnType("datetime")
+                .HasColumnName("timeStart");
+            entity.Property(e => e.UserId).HasColumnName("userID");
+        });
+
         modelBuilder.Entity<Course>(entity =>
         {
             entity.ToTable("Course");
@@ -36,6 +66,10 @@ public partial class Swp391onGoingReportContext : DbContext
             entity.Property(e => e.CourseId)
                 .ValueGeneratedNever()
                 .HasColumnName("courseID");
+            entity.Property(e => e.CourseCode)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("courseCode");
             entity.Property(e => e.CourseName)
                 .HasMaxLength(100)
                 .HasColumnName("courseName");
@@ -45,6 +79,43 @@ public partial class Swp391onGoingReportContext : DbContext
                 .HasColumnType("datetime")
                 .HasColumnName("timeCreated");
             entity.Property(e => e.UserId).HasColumnName("userID");
+        });
+
+        modelBuilder.Entity<Project>(entity =>
+        {
+            entity.ToTable("Project");
+
+            entity.Property(e => e.ProjectId)
+                .ValueGeneratedNever()
+                .HasColumnName("projectID");
+            entity.Property(e => e.CourseId).HasColumnName("courseID");
+            entity.Property(e => e.Description)
+                .HasMaxLength(500)
+                .HasColumnName("description");
+            entity.Property(e => e.IsDeleted).HasColumnName("isDeleted");
+            entity.Property(e => e.ProjectName)
+                .HasMaxLength(100)
+                .HasColumnName("projectName");
+        });
+
+        modelBuilder.Entity<ProjectTeam>(entity =>
+        {
+            entity.ToTable("ProjectTeam");
+
+            entity.Property(e => e.ProjectTeamId)
+                .ValueGeneratedNever()
+                .HasColumnName("projectTeamID");
+            entity.Property(e => e.ProjectId).HasColumnName("projectID");
+            entity.Property(e => e.Status).HasColumnName("status");
+            entity.Property(e => e.TeamName)
+                .HasMaxLength(50)
+                .HasColumnName("teamName");
+            entity.Property(e => e.TimeEnd)
+                .HasColumnType("datetime")
+                .HasColumnName("timeEnd");
+            entity.Property(e => e.TimeStart)
+                .HasColumnType("datetime")
+                .HasColumnName("timeStart");
         });
 
         modelBuilder.Entity<Role>(entity =>
@@ -57,6 +128,17 @@ public partial class Swp391onGoingReportContext : DbContext
             entity.Property(e => e.RoleName)
                 .HasMaxLength(50)
                 .HasColumnName("roleName");
+        });
+
+        modelBuilder.Entity<StudentClass>(entity =>
+        {
+            entity.ToTable("StudentClass");
+
+            entity.Property(e => e.StudentClassId)
+                .ValueGeneratedNever()
+                .HasColumnName("studentClassID");
+            entity.Property(e => e.ClassId).HasColumnName("classID");
+            entity.Property(e => e.UserId).HasColumnName("userID");
         });
 
         modelBuilder.Entity<User>(entity =>

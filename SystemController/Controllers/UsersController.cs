@@ -58,22 +58,17 @@ namespace SystemController.Controllers
         }
 
         // GET: api/Users/5
-        /*[HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetUser(Guid id)
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<UserListResponse>>> GetListTeacher()
         {
-          if (_context.Users == null)
-          {
-              return NotFound();
-          }
-            var user = await _context.Users.FindAsync(id);
-
-            if (user == null)
+            try
             {
-                return NotFound();
+                var result = await _userService.ListTeacher();
+                if (result == null) return BadRequest("Không có giảng viên!");
+                return Ok(result);
             }
-
-            return user;
-        }*/
+            catch (Exception ex) { return BadRequest(ex.Message); }
+        }
 
         // PUT: api/Users/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754

@@ -157,5 +157,19 @@ namespace SystemController.Controllers
                 return BadRequest("Không thành công!");
             }
         }
+
+        [HttpGet("{courseID}")]
+        public async Task<ActionResult<CourseResponse>> GetCourseByID(Guid courseID)
+        {
+            if (courseID == null) return BadRequest("Không nhận được dữ liệu!");
+            var result = await _courseService.GetCourseByID(courseID);
+
+            if (result == null)
+            {
+                return NotFound("Không tìm thấy!");
+            }
+
+            return result;
+        }
     }
 }

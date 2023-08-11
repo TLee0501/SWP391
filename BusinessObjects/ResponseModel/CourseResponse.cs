@@ -10,7 +10,8 @@ namespace BusinessObjects.ResponseModel
     {
         public Guid CourseId { get; set; }
         public Guid UserId { get; set; }
-        public string userFullname { get; set; }
+        public string createdBy { get; set; }
+        public string CourseCode { get; set; } = null!;
         public string CourseName { get; set; } = null!;
         public DateTime TimeCreated { get; set; }
     }

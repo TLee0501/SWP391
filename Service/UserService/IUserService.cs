@@ -6,5 +6,6 @@ namespace Service.UserService
     public interface IUserService
     {
         Task<UserResponse> Login(LoginRequest request);
+        Task<List<UserListResponse>> ListTeacher();
     }
 }
