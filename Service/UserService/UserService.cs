@@ -14,6 +14,23 @@ namespace Service.UserService
             _context = context;
         }
 
+        public async Task<List<UserListResponse>> ListTeacher()
+        {
+            var role = await _context.Roles.FirstOrDefaultAsync(a => a.RoleName == "Teacher");
+            var users = await _context.Users.Where(a => a.RoleId == role.RoleId).ToListAsync();
+            List<UserListResponse> result = new List<UserListResponse>();
+            foreach (var user in users)
+            {
+                var tmp = new UserListResponse();
+                tmp.UserId = user.UserId;
+                tmp.FullName = user.FullName;
+                tmp.Email = user.Email;
+                result.Add(tmp);
+            }
+            if (result.Count == 0) return null;
+            return result;
+        }
+
         public async Task<UserResponse> Login(LoginRequest request)
         {
             var user = _context.Users.SingleOrDefaultAsync(a => a.Email == request.Mail && a.Password == request.Password);

@@ -1,6 +1,7 @@
 using BusinessObjects.Models;
 using Microsoft.EntityFrameworkCore;
 using Service.CourseService;
+using Service.ProjectService;
 using Service.UserService;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,6 +20,7 @@ builder.Services.AddDbContext<Swp391onGoingReportContext>(options =>
 
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICourseService, CourseService>();
+builder.Services.AddScoped<IProjectService, ProjectService>();
 
 var app = builder.Build();
 

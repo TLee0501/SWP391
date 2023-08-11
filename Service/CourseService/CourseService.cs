@@ -70,6 +70,7 @@ namespace Service.CourseService
             var course = new Course
             {
                 CourseId = id,
+                CourseCode = request.CourseCode,
                 CourseName = request.CourseName,
                 UserId = request.UserId,
                 TimeCreated = DateTime.Now,
@@ -102,9 +103,10 @@ namespace Service.CourseService
                 var courseTemp = new CourseResponse
                 {
                     CourseId = item.CourseId,
+                    CourseCode = course.CourseCode,
                     CourseName = course.CourseName,
                     UserId = course.UserId,
-                    userFullname = user.FullName,
+                    createdBy = user.FullName,
                     TimeCreated = course.TimeCreated
                 };
                 result.Add(courseTemp);
@@ -160,6 +162,23 @@ namespace Service.CourseService
             {
                 return 0;
             }
+        }
+
+        public async Task<CourseResponse> GetCourseByID(Guid courseID)
+        {
+            var course = await _context.Courses.FindAsync(courseID);
+            if (course == null) return null;
+            var user = await _context.Users.FindAsync(course.UserId);
+            var courseResponse = new CourseResponse
+            {
+                CourseId = courseID,
+                CourseCode = course.CourseCode,
+                CourseName = course.CourseName,
+                TimeCreated = course.TimeCreated,
+                UserId = course.UserId,
+                createdBy = user.FullName
+            };
+            return courseResponse;
         }
     }
 }

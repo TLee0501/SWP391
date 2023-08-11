@@ -12,6 +12,7 @@ namespace Service.CourseService
     {
         Task<int> CreateCourse(CourseCreateRequest request);
         Task<List<CourseResponse>> GetCourseForTeacher(Guid teacherID);
+        Task<CourseResponse> GetCourseByID(Guid courseID);
         Task<int> AssignCourseToTeacher(AssignCourseRequest request);
         Task<int> UnassignCourseToTeacher(AssignCourseRequest request);
         Task<int> ActiveCourse(Guid courseID);

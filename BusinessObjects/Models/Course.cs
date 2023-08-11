@@ -9,6 +9,8 @@ public partial class Course
 
     public Guid UserId { get; set; }
 
+    public string CourseCode { get; set; } = null!;
+
     public string CourseName { get; set; } = null!;
 
     public DateTime TimeCreated { get; set; }
