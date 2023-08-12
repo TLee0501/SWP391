@@ -3,13 +3,17 @@ using System.Collections.Generic;
 
 namespace BusinessObjects.Models;
 
-public partial class StudentClass
+public partial class TeamRequest
 {
-    public Guid StudentClassId { get; set; }
+    public Guid RequestId { get; set; }
 
     public Guid UserId { get; set; }
 
     public Guid ClassId { get; set; }
+
+    public Guid Team { get; set; }
+
+    public string Status { get; set; } = null!;
 
     public virtual Class Class { get; set; } = null!;
 
