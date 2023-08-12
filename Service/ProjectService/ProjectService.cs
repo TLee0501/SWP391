@@ -77,6 +77,27 @@ namespace Service.ProjectService
             return result;
         }
 
+        public async Task<List<ProjectResponse>> SearchProjectInClass(Guid classID, string searchName)
+        {
+            var project = await _context.Projects.Where(a => a.ClassId == classID && a.IsDeleted == false).ToListAsync();
+            if (project == null) return null;
+
+            var classTmp = await _context.Classes.FindAsync(classID);
+            var result = new List<ProjectResponse>();
+            foreach (var item in project)
+            {
+                var projectTmp = new ProjectResponse
+                {
+                    ProjectId = item.ProjectId,
+                    ProjectName = item.ProjectName,
+                    ClassID = item.ClassId,
+                    ClassName = classTmp.ClassName
+                };
+                result.Add(projectTmp);
+            }
+            return result;
+        }
+
         public async Task<int> UpdateProject(ProjectUpdateRequest request)
         {
             var project = await _context.Projects.FindAsync(request.ProjectId);
