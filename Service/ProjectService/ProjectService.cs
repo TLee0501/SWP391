@@ -70,9 +70,49 @@ namespace Service.ProjectService
                     ProjectId = item.ProjectId,
                     ProjectName = item.ProjectName,
                     ClassID = item.ClassId,
-                    ClassName = classTmp.ClassName
+                    ClassName = classTmp.ClassName,
+                    Description = item.Description
                 };
                 result.Add(tmp);
+            }
+            return result;
+        }
+
+        public async Task<List<ProjectResponse>> GetProjectsByClassIDandUserID(Guid classID, Guid userID)
+        {
+            var result = new List<ProjectResponse>();
+            var projects = await _context.Projects.Where(a => a.ClassId == classID && a.IsDeleted == false).ToListAsync();
+            if (projects == null) return null;
+
+            foreach (var item in projects)
+            {
+                var projectTeam = await _context.ProjectTeams.Where(a => a.ProjectId == item.ProjectId && a.Status == 1).ToListAsync();
+                if (projectTeam != null)
+                {
+                    foreach (var item1 in projectTeam)
+                    {
+                        var teamMember = await _context.TeamMembers.Where(a => a.ProjectTeamId == item1.ProjectTeamId).ToListAsync();
+                        if (teamMember != null)
+                        {
+                            foreach (var item2 in teamMember)
+                            {
+                                if (item2.UserId == userID)
+                                {
+                                    var classTmp = await _context.Classes.FindAsync(classID);
+                                    var tmp = new ProjectResponse
+                                    {
+                                        ProjectId = item.ProjectId,
+                                        ProjectName = item.ProjectName,
+                                        ClassID = item.ClassId,
+                                        ClassName = classTmp.ClassName,
+                                        Description = item.Description
+                                    };
+                                    result.Add(tmp);
+                                }
+                            }
+                        }
+                    }
+                }                
             }
             return result;
         }
@@ -86,14 +126,18 @@ namespace Service.ProjectService
             var result = new List<ProjectResponse>();
             foreach (var item in project)
             {
-                var projectTmp = new ProjectResponse
+                if (item.ProjectName.Contains(searchName))
                 {
-                    ProjectId = item.ProjectId,
-                    ProjectName = item.ProjectName,
-                    ClassID = item.ClassId,
-                    ClassName = classTmp.ClassName
-                };
-                result.Add(projectTmp);
+                    var projectTmp = new ProjectResponse
+                    {
+                        ProjectId = item.ProjectId,
+                        ProjectName = item.ProjectName,
+                        ClassID = item.ClassId,
+                        ClassName = classTmp.ClassName,
+                        Description = item.Description
+                    };
+                    result.Add(projectTmp);
+                }
             }
             return result;
         }
