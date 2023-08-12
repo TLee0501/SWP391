@@ -7,10 +7,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BusinessObjects.Models;
 using Service.ProjectService;
+using BusinessObjects.RequestModel;
 
 namespace SystemController.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class ProjectsController : ControllerBase
     {
@@ -43,36 +44,36 @@ namespace SystemController.Controllers
             return Ok(result);
         }
 
+        [HttpPost]
+        public async Task<ActionResult> CreateProject(ProjectCreateRequest request)
+        {
+            if (request.ClassId == Guid.Empty) return BadRequest("Không nhận được dữ liệu!");
+            if (request.ProjectName == null || request.ProjectName == "") return BadRequest("Không nhận được dữ liệu!");
+            if (request.Description == null || request.Description == "") return BadRequest("Không nhận được dữ liệu!");
+            var result = await _projectService.CreateProject(request);
+            if (result == 0) return BadRequest("Thất bại!");
+            return Ok("Thành công!");
+        }
+
         // PUT: api/Projects/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        /*[HttpPut("{id}")]
-        public async Task<IActionResult> PutProject(Guid id, Project project)
+        [HttpPut]
+        public async Task<IActionResult> UpdateProject(ProjectUpdateRequest request)
         {
-            if (id != project.ProjectId)
-            {
-                return BadRequest();
-            }
+            var result = await _projectService.UpdateProject(request);
+            if (result == 1) return BadRequest("Project không tồn tại!");
+            else if (result == 0) return BadRequest("Thất bại!");
+            else return Ok("Thành công!");
+        }
 
-            _context.Entry(project).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ProjectExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }*/
+        [HttpGet("{classID}")]
+        public async Task<ActionResult<Project>> GetProjectsByClassID(Guid classID)
+        {
+            if (classID == Guid.Empty || classID == null) return BadRequest("Không nhận được dữ liệu!");
+            var result = await _projectService.GetProjectsByClassID(classID);
+            if (result == null) return BadRequest("Không tùm thấy Project!");
+            return Ok(result);
+        }
 
         // POST: api/Projects
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754

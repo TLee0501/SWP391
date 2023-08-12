@@ -7,7 +7,7 @@ public partial class Project
 {
     public Guid ProjectId { get; set; }
 
-    public Guid CourseId { get; set; }
+    public Guid ClassId { get; set; }
 
     public string ProjectName { get; set; } = null!;
 
@@ -15,7 +15,7 @@ public partial class Project
 
     public bool IsDeleted { get; set; }
 
-    public virtual Course Course { get; set; } = null!;
+    public virtual Class Class { get; set; } = null!;
 
     public virtual ICollection<ProjectTeam> ProjectTeams { get; set; } = new List<ProjectTeam>();
 

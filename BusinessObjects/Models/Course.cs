@@ -21,7 +21,5 @@ public partial class Course
 
     public virtual ICollection<Class> Classes { get; set; } = new List<Class>();
 
-    public virtual ICollection<Project> Projects { get; set; } = new List<Project>();
-
     public virtual User User { get; set; } = null!;
 }

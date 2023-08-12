@@ -23,6 +23,8 @@ public partial class Class
 
     public virtual Course Course { get; set; } = null!;
 
+    public virtual ICollection<Project> Projects { get; set; } = new List<Project>();
+
     public virtual ICollection<StudentClass> StudentClasses { get; set; } = new List<StudentClass>();
 
     public virtual ICollection<TeamRequest> TeamRequests { get; set; } = new List<TeamRequest>();
