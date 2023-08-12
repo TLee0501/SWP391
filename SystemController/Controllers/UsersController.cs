@@ -71,6 +71,18 @@ namespace SystemController.Controllers
             catch (Exception ex) { return BadRequest("Thất bại!"); }
         }
 
+        [HttpGet, Authorize]
+        public async Task<ActionResult<UserResponse>> GetUser(Guid userID)
+        {
+            try
+            {
+                var result = await _userService.GetUser(userID);
+                if (result == null) return BadRequest("Tài khoản không tồn tại!");
+                return Ok(result);
+            }
+            catch (Exception ex) { return BadRequest("Thất bại!"); }
+        }
+
         // PUT: api/Users/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         /*[HttpPut("{id}")]

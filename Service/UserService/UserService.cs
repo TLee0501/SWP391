@@ -2,6 +2,7 @@
 using BusinessObjects.RequestModel;
 using BusinessObjects.ResponseModel;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 
 namespace Service.UserService
 {
@@ -31,6 +32,22 @@ namespace Service.UserService
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
             return 2;
+        }
+
+        public async Task<UserResponse> GetUser(Guid userID)
+        {
+            var user = await _context.Users.FindAsync(userID);
+            if (user == null) return null;
+            var role = await _context.Roles.FindAsync(user.RoleId);
+            UserResponse result = new UserResponse
+            {
+                UserId = user.UserId,
+                FullName = user.FullName,
+                Email = user.Email,
+                Role = role.RoleName,
+                IsBan = user.IsBan
+            };
+            return result;
         }
 
         public async Task<List<UserListResponse>> ListTeacher()
@@ -64,7 +81,6 @@ namespace Service.UserService
                 Role = role.RoleName,
                 IsBan = user.IsBan
             };
-
             return result;
         }
     }
