@@ -4,13 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BusinessObjects.ResponseModel
+namespace BusinessObjects.RequestModel
 {
-    public class ProjectResponse
+    public class ProjectUpdateRequest
     {
         public Guid ProjectId { get; set; }
-        public Guid ClassID { get; set; }
-        public string ClassName { get; set; }
         public string ProjectName { get; set; } = null!;
         public string Description { get; set; } = null!;
     }

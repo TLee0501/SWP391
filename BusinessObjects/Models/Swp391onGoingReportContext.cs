@@ -111,7 +111,7 @@ public partial class Swp391onGoingReportContext : DbContext
             entity.Property(e => e.ProjectId)
                 .ValueGeneratedNever()
                 .HasColumnName("projectID");
-            entity.Property(e => e.CourseId).HasColumnName("courseID");
+            entity.Property(e => e.ClassId).HasColumnName("classID");
             entity.Property(e => e.Description)
                 .HasMaxLength(500)
                 .HasColumnName("description");
@@ -120,10 +120,10 @@ public partial class Swp391onGoingReportContext : DbContext
                 .HasMaxLength(100)
                 .HasColumnName("projectName");
 
-            entity.HasOne(d => d.Course).WithMany(p => p.Projects)
-                .HasForeignKey(d => d.CourseId)
+            entity.HasOne(d => d.Class).WithMany(p => p.Projects)
+                .HasForeignKey(d => d.ClassId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Project_Course");
+                .HasConstraintName("FK_Project_Class");
         });
 
         modelBuilder.Entity<ProjectTeam>(entity =>
