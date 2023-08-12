@@ -14,6 +14,25 @@ namespace Service.UserService
             _context = context;
         }
 
+        public async Task<int> CreateStudent(UserCreateRequest request)
+        {
+            var check = await _context.Users.SingleOrDefaultAsync(a => a.Email == request.Email);
+            if (check != null) return 1;
+            var role = await _context.Roles.SingleOrDefaultAsync(a => a.RoleName == "Student");
+            var user = new User
+            {
+                UserId = Guid.NewGuid(),
+                FullName = request.FullName,
+                Email = request.Email,
+                Password = request.Password,
+                RoleId = role.RoleId,
+                IsBan = false
+            };
+            await _context.Users.AddAsync(user);
+            await _context.SaveChangesAsync();
+            return 2;
+        }
+
         public async Task<List<UserListResponse>> ListTeacher()
         {
             var role = await _context.Roles.FirstOrDefaultAsync(a => a.RoleName == "Teacher");

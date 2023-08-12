@@ -34,18 +34,18 @@ namespace SystemController.Controllers
         }
 
         // GET: api/Projects/5
-        /*[HttpGet("{projectID}")]
+        [HttpGet("{projectID}")]
         public async Task<ActionResult<Project>> GetProjectByID(Guid projectID)
         {
-            if(projectID == null) return BadRequest("Không nhận được dữ liệu!");
+            if (projectID == Guid.Empty) return BadRequest("Không nhận được dữ liệu!");
             var result = await _projectService.GetProjectByID(projectID);
             if (result == null) return BadRequest("Không tùm thấy Project!");
             return Ok(result);
-        }*/
+        }
 
         // PUT: api/Projects/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
+        /*[HttpPut("{id}")]
         public async Task<IActionResult> PutProject(Guid id, Project project)
         {
             if (id != project.ProjectId)
@@ -72,39 +72,18 @@ namespace SystemController.Controllers
             }
 
             return NoContent();
-        }
+        }*/
 
         // POST: api/Projects
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<Project>> PostProject(Project project)
+        /*[HttpPost]
+        public async Task<ActionResult> PostProject(Project project)
         {
-          if (_context.Projects == null)
-          {
-              return Problem("Entity set 'Swp391onGoingReportContext.Projects'  is null.");
-          }
-            _context.Projects.Add(project);
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
-            {
-                if (ProjectExists(project.ProjectId))
-                {
-                    return Conflict();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return CreatedAtAction("GetProject", new { id = project.ProjectId }, project);
-        }
+            
+        }*/
 
         // DELETE: api/Projects/5
-        [HttpDelete("{id}")]
+        /*[HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProject(Guid id)
         {
             if (_context.Projects == null)
@@ -121,11 +100,6 @@ namespace SystemController.Controllers
             await _context.SaveChangesAsync();
 
             return NoContent();
-        }
-
-        private bool ProjectExists(Guid id)
-        {
-            return (_context.Projects?.Any(e => e.ProjectId == id)).GetValueOrDefault();
-        }
+        }*/
     }
 }
