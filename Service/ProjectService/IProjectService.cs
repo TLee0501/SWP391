@@ -9,5 +9,6 @@ namespace Service.ProjectService
         Task<int> CreateProject(ProjectCreateRequest request);
         Task<int> UpdateProject(ProjectUpdateRequest request);
         Task<List<ProjectResponse>> GetProjectsByClassID(Guid classID);
+        Task<List<ProjectResponse>> SearchProjectInClass(Guid classID, string searchName);
     }
 }

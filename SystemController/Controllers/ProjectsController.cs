@@ -71,17 +71,18 @@ namespace SystemController.Controllers
         {
             if (classID == Guid.Empty || classID == null) return BadRequest("Không nhận được dữ liệu!");
             var result = await _projectService.GetProjectsByClassID(classID);
-            if (result == null) return BadRequest("Không tùm thấy Project!");
+            if (result == null) return BadRequest("Không tìm thấy Project!");
             return Ok(result);
         }
 
-        // POST: api/Projects
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        /*[HttpPost]
-        public async Task<ActionResult> PostProject(Project project)
+        [HttpGet("{classID}")]
+        public async Task<ActionResult<Project>> SearchProjectInClass(Guid classID, string searchName)
         {
-            
-        }*/
+            if (classID == Guid.Empty || classID == null) return BadRequest("Không nhận được dữ liệu!");
+            var result = await _projectService.SearchProjectInClass(classID, searchName);
+            if (result == null || result.Count == 0) return BadRequest("Không tìm thấy Project!");
+            return Ok(result);
+        }
 
         // DELETE: api/Projects/5
         /*[HttpDelete("{id}")]
