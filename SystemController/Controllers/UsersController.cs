@@ -71,7 +71,7 @@ namespace SystemController.Controllers
             catch (Exception ex) { return BadRequest("Thất bại!"); }
         }
 
-        [HttpGet, Authorize]
+        [HttpGet]
         public async Task<ActionResult<UserResponse>> GetUser(Guid userID)
         {
             try
