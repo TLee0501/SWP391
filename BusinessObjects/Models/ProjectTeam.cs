@@ -16,4 +16,8 @@ public partial class ProjectTeam
     public DateTime TimeEnd { get; set; }
 
     public int Status { get; set; }
+
+    public virtual Project Project { get; set; } = null!;
+
+    public virtual ICollection<TeamMember> TeamMembers { get; set; } = new List<TeamMember>();
 }

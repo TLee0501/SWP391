@@ -7,5 +7,6 @@ namespace Service.UserService
     {
         Task<UserResponse> Login(LoginRequest request);
         Task<List<UserListResponse>> ListTeacher();
+        Task<int> CreateStudent(UserCreateRequest request);
     }
 }

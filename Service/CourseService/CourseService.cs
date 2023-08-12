@@ -180,5 +180,31 @@ namespace Service.CourseService
             };
             return courseResponse;
         }
+
+        public async Task<List<CourseResponse>> SearchCourse(string searchText)
+        {
+            var result = new List<CourseResponse>();
+            var courses = await _context.Courses.Where(a => a.IsDelete ==  false).ToListAsync();
+            if (courses == null || courses.Count == 0) return null;
+
+            foreach (var item in courses)
+            {
+                if (item.CourseName.ToLower().Contains(searchText.ToLower()))
+                {
+                    var creator = await _context.Users.FindAsync(item.UserId);
+                    var tmp = new CourseResponse
+                    {
+                        CourseId = item.CourseId,
+                        CourseName = item.CourseName,
+                        CourseCode = item.CourseCode,
+                        UserId = item.UserId,
+                        createdBy = creator.FullName,
+                        TimeCreated = item.TimeCreated,
+                    };
+                    result.Add(tmp);
+                }
+            }
+            return result;
+        }
     }
 }

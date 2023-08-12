@@ -27,6 +27,14 @@ public partial class Swp391onGoingReportContext : DbContext
 
     public virtual DbSet<StudentClass> StudentClasses { get; set; }
 
+    public virtual DbSet<StudentTask> StudentTasks { get; set; }
+
+    public virtual DbSet<Task> Tasks { get; set; }
+
+    public virtual DbSet<TeamMember> TeamMembers { get; set; }
+
+    public virtual DbSet<TeamRequest> TeamRequests { get; set; }
+
     public virtual DbSet<User> Users { get; set; }
 
     public virtual DbSet<UserCourse> UserCourses { get; set; }
@@ -57,6 +65,16 @@ public partial class Swp391onGoingReportContext : DbContext
                 .HasColumnType("datetime")
                 .HasColumnName("timeStart");
             entity.Property(e => e.UserId).HasColumnName("userID");
+
+            entity.HasOne(d => d.Course).WithMany(p => p.Classes)
+                .HasForeignKey(d => d.CourseId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Class_Course");
+
+            entity.HasOne(d => d.User).WithMany(p => p.Classes)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Class_User");
         });
 
         modelBuilder.Entity<Course>(entity =>
@@ -79,6 +97,11 @@ public partial class Swp391onGoingReportContext : DbContext
                 .HasColumnType("datetime")
                 .HasColumnName("timeCreated");
             entity.Property(e => e.UserId).HasColumnName("userID");
+
+            entity.HasOne(d => d.User).WithMany(p => p.Courses)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Course_User");
         });
 
         modelBuilder.Entity<Project>(entity =>
@@ -96,6 +119,11 @@ public partial class Swp391onGoingReportContext : DbContext
             entity.Property(e => e.ProjectName)
                 .HasMaxLength(100)
                 .HasColumnName("projectName");
+
+            entity.HasOne(d => d.Course).WithMany(p => p.Projects)
+                .HasForeignKey(d => d.CourseId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Project_Course");
         });
 
         modelBuilder.Entity<ProjectTeam>(entity =>
@@ -116,6 +144,11 @@ public partial class Swp391onGoingReportContext : DbContext
             entity.Property(e => e.TimeStart)
                 .HasColumnType("datetime")
                 .HasColumnName("timeStart");
+
+            entity.HasOne(d => d.Project).WithMany(p => p.ProjectTeams)
+                .HasForeignKey(d => d.ProjectId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_ProjectTeam_Project");
         });
 
         modelBuilder.Entity<Role>(entity =>
@@ -139,6 +172,114 @@ public partial class Swp391onGoingReportContext : DbContext
                 .HasColumnName("studentClassID");
             entity.Property(e => e.ClassId).HasColumnName("classID");
             entity.Property(e => e.UserId).HasColumnName("userID");
+
+            entity.HasOne(d => d.Class).WithMany(p => p.StudentClasses)
+                .HasForeignKey(d => d.ClassId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_StudentClass_Class");
+
+            entity.HasOne(d => d.User).WithMany(p => p.StudentClasses)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_StudentClass_User");
+        });
+
+        modelBuilder.Entity<StudentTask>(entity =>
+        {
+            entity.ToTable("StudentTask");
+
+            entity.Property(e => e.StudentTaskId)
+                .ValueGeneratedNever()
+                .HasColumnName("studentTaskID");
+            entity.Property(e => e.TaskId).HasColumnName("taskID");
+            entity.Property(e => e.UserId).HasColumnName("userID");
+
+            entity.HasOne(d => d.Task).WithMany(p => p.StudentTasks)
+                .HasForeignKey(d => d.TaskId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_StudentTask_Task");
+
+            entity.HasOne(d => d.User).WithMany(p => p.StudentTasks)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_StudentTask_User");
+        });
+
+        modelBuilder.Entity<Task>(entity =>
+        {
+            entity.ToTable("Task");
+
+            entity.Property(e => e.TaskId)
+                .ValueGeneratedNever()
+                .HasColumnName("taskID");
+            entity.Property(e => e.Description)
+                .HasMaxLength(500)
+                .HasColumnName("description");
+            entity.Property(e => e.IsDeleted).HasColumnName("isDeleted");
+            entity.Property(e => e.ProjectId).HasColumnName("projectID");
+            entity.Property(e => e.Status)
+                .HasMaxLength(10)
+                .IsUnicode(false)
+                .IsFixedLength()
+                .HasColumnName("status");
+            entity.Property(e => e.TaskName)
+                .HasMaxLength(100)
+                .HasColumnName("taskName");
+
+            entity.HasOne(d => d.Project).WithMany(p => p.Tasks)
+                .HasForeignKey(d => d.ProjectId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Task_Project");
+        });
+
+        modelBuilder.Entity<TeamMember>(entity =>
+        {
+            entity.ToTable("TeamMember");
+
+            entity.Property(e => e.TeamMemberId)
+                .ValueGeneratedNever()
+                .HasColumnName("teamMemberID");
+            entity.Property(e => e.ProjectTeamId).HasColumnName("projectTeamID");
+            entity.Property(e => e.UserId).HasColumnName("userID");
+
+            entity.HasOne(d => d.ProjectTeam).WithMany(p => p.TeamMembers)
+                .HasForeignKey(d => d.ProjectTeamId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_TeamMember_ProjectTeam");
+
+            entity.HasOne(d => d.User).WithMany(p => p.TeamMembers)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_TeamMember_User");
+        });
+
+        modelBuilder.Entity<TeamRequest>(entity =>
+        {
+            entity.HasKey(e => e.RequestId);
+
+            entity.ToTable("TeamRequest");
+
+            entity.Property(e => e.RequestId)
+                .ValueGeneratedNever()
+                .HasColumnName("requestID");
+            entity.Property(e => e.ClassId).HasColumnName("classID");
+            entity.Property(e => e.Status)
+                .HasMaxLength(10)
+                .IsUnicode(false)
+                .IsFixedLength()
+                .HasColumnName("status");
+            entity.Property(e => e.Team).HasColumnName("team");
+            entity.Property(e => e.UserId).HasColumnName("userID");
+
+            entity.HasOne(d => d.Class).WithMany(p => p.TeamRequests)
+                .HasForeignKey(d => d.ClassId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_TeamRequest_Class");
+
+            entity.HasOne(d => d.User).WithMany(p => p.TeamRequests)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_TeamRequest_User");
         });
 
         modelBuilder.Entity<User>(entity =>
@@ -161,6 +302,11 @@ public partial class Swp391onGoingReportContext : DbContext
                 .IsUnicode(false)
                 .HasColumnName("password");
             entity.Property(e => e.RoleId).HasColumnName("roleID");
+
+            entity.HasOne(d => d.Role).WithMany(p => p.Users)
+                .HasForeignKey(d => d.RoleId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_User_Role");
         });
 
         modelBuilder.Entity<UserCourse>(entity =>

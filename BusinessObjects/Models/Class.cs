@@ -20,4 +20,12 @@ public partial class Class
     public bool IsDeleted { get; set; }
 
     public bool IsCompleted { get; set; }
+
+    public virtual Course Course { get; set; } = null!;
+
+    public virtual ICollection<StudentClass> StudentClasses { get; set; } = new List<StudentClass>();
+
+    public virtual ICollection<TeamRequest> TeamRequests { get; set; } = new List<TeamRequest>();
+
+    public virtual User User { get; set; } = null!;
 }

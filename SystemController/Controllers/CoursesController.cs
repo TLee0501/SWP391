@@ -10,6 +10,7 @@ using BusinessObjects.RequestModel;
 using Service.CourseService;
 using BusinessObjects.ResponseModel;
 using Azure.Core;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SystemController.Controllers
 {
@@ -44,6 +45,20 @@ namespace SystemController.Controllers
         {
             if (teacherID == null) return BadRequest("Không nhận được dữ liệu!");
             var result = await _courseService.GetCourseForTeacher(teacherID);
+
+            if (result == null || result.Count == 0)
+            {
+                return NotFound("Không tìm thấy!");
+            }
+
+            return result;
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<CourseResponse>>> SearchCourse(string searchText)
+        {
+            if (searchText == null) return BadRequest("Không nhận được dữ liệu!");
+            var result = await _courseService.SearchCourse(searchText);
 
             if (result == null || result.Count == 0)
             {

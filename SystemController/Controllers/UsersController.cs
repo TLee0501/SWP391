@@ -8,6 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SystemController.Controllers
 {
@@ -58,7 +59,7 @@ namespace SystemController.Controllers
         }
 
         // GET: api/Users/5
-        [HttpGet]
+        [HttpGet, Authorize]
         public async Task<ActionResult<IEnumerable<UserListResponse>>> GetListTeacher()
         {
             try
@@ -67,7 +68,7 @@ namespace SystemController.Controllers
                 if (result == null) return BadRequest("Không có giảng viên!");
                 return Ok(result);
             }
-            catch (Exception ex) { return BadRequest(ex.Message); }
+            catch (Exception ex) { return BadRequest("Thất bại!"); }
         }
 
         // PUT: api/Users/5
@@ -103,32 +104,18 @@ namespace SystemController.Controllers
 
         // POST: api/Users
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        /*[HttpPost]
-        public async Task<ActionResult<User>> PostUser(User user)
+        [HttpPost]
+        public async Task<ActionResult> CreateStudent(UserCreateRequest request)
         {
-          if (_context.Users == null)
-          {
-              return Problem("Entity set 'Swp391onGoingReportContext.Users'  is null.");
-          }
-            _context.Users.Add(user);
             try
             {
-                await _context.SaveChangesAsync();
+                var result = await _userService.CreateStudent(request);
+                if (result == 0) return BadRequest("Thất bại!");
+                else if (result == 1) return BadRequest("Email đã được sử dụng!");
+                return Ok("Thành công!");
             }
-            catch (DbUpdateException)
-            {
-                if (UserExists(user.UserId))
-                {
-                    return Conflict();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return CreatedAtAction("GetUser", new { id = user.UserId }, user);
-        }*/
+            catch (Exception ex) { return BadRequest("Thất bại!"); }
+        }
 
         // DELETE: api/Users/5
         /*[HttpDelete("{id}")]

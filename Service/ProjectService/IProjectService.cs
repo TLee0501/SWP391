@@ -9,6 +9,7 @@ namespace Service.ProjectService
 {
     public interface IProjectService
     {
-        //Task<ProjectResponse> GetProjectByID(Guid projectID);
+        Task<ProjectResponse> GetProjectByID(Guid projectID);
+        Task<int> CreateProject();
     }
 }
