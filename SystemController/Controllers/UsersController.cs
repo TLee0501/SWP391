@@ -43,16 +43,16 @@ namespace SystemController.Controllers
         public async Task<IActionResult> Login(LoginRequest request)
         {
             if (request.Mail == "" || request.Mail == null)
-                return BadRequest("Vui lòng kiểm tả lại Mail!");
+                return BadRequest("Vui lòng kiểm tra lại Mail!");
             if (request.Password == "" || request.Password == null)
-                return BadRequest("Vui lòng kiểm tả lại mật khẩu!");
+                return BadRequest("Vui lòng kiểm tra lại mật khẩu!");
 
             var result = await _userService.Login(request);
 
             if (result == null)
-                return NotFound("Vui lòng kiểm tả lại số điện thoại/mật khẩu!");
+                return NotFound("Vui lòng kiểm tra lại số điện thoại/mật khẩu!");
             else if (result.IsBan == true)
-                return Unauthorized("Tài khoản đã bị Ban!");
+                return Unauthorized("Tài khoản đã bị khóa!");
 
             var token = CreateToken(result);
             return Ok(new LoginResponse<UserResponse>(200, "Đăng nhập thành công.", result, token));
