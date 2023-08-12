@@ -76,6 +76,15 @@ namespace SystemController.Controllers
         }
 
         [HttpGet("{classID}")]
+        public async Task<ActionResult<Project>> GetProjectsByClassIDandUserID(Guid classID, Guid userID)
+        {
+            if (classID == Guid.Empty || classID == null) return BadRequest("Không nhận được dữ liệu!");
+            var result = await _projectService.GetProjectsByClassIDandUserID(classID, userID);
+            if (result == null || result.Count == 0) return BadRequest("Không tìm thấy Project!");
+            return Ok(result);
+        }
+
+        [HttpGet("{classID}")]
         public async Task<ActionResult<Project>> SearchProjectInClass(Guid classID, string searchName)
         {
             if (classID == Guid.Empty || classID == null) return BadRequest("Không nhận được dữ liệu!");

@@ -15,7 +15,7 @@ public partial class Class
 
     public DateTime TimeStart { get; set; }
 
-    public DateTime TimeEnd { get; set; }
+    public DateTime? TimeEnd { get; set; }
 
     public bool IsDeleted { get; set; }
 
