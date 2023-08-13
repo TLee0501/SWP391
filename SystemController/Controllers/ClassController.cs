@@ -1,0 +1,99 @@
+﻿using BusinessObjects.Models;
+using BusinessObjects.RequestModel;
+using BusinessObjects.ResponseModel;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Service.ClassService;
+using Service.CourseService;
+using System.Data.Common;
+
+// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+
+namespace SystemController.Controllers
+{
+    [Route("api/[controller]/[action]")]
+    [ApiController]
+    public class ClassController : ControllerBase
+    {
+        private readonly Swp391onGoingReportContext _context;
+        private readonly IClassService _classService;
+        public ClassController(Swp391onGoingReportContext context, IClassService classService)
+        {
+            _context = context;
+            _classService = classService;
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Class>>> GetClassforTest()
+        {
+            if (_context.Classes == null)
+            {
+                return NotFound();
+            }
+            return await _context.Classes.ToListAsync();
+        }
+
+        // GET api/<ClassController>/5
+        [HttpPost]
+        public async Task<ActionResult> CreateClass(CreateClassRequest request)
+        {
+            if (request == null) return BadRequest("Không nhận được dữ liệu.");
+            try
+            {
+                var result = await _classService.CreateClass(request);
+                if (result == 0) return BadRequest("Không thành công.");
+                else if (result == 1) return BadRequest("Lớp đã tồn tại.");
+                else return Ok("Lớp học đã được tạo thành công.");
+            }
+            catch (DbUpdateException)
+            {
+                return BadRequest("Không thành công.");
+            }
+        }
+
+        [HttpGet("{classID}")]
+        public async Task<ActionResult<ClassResponse>> GetClassByID(Guid classID)
+        {
+            if (classID == null) return BadRequest("Không nhận được dữ liệu.");
+            var result = await _classService.GetClassByID(classID);
+
+            if (result == null)
+            {
+                return NotFound("Không tìm thấy.");
+            }
+
+            return result;
+        }
+
+        [HttpDelete("{classID}")]
+        public async Task<IActionResult> DeleteClass(Guid classID)
+        {
+            if (classID == null) return BadRequest("Không nhận được dữ liệu.");
+            try
+            {
+                var result = await _classService.DeleteClass(classID);
+                if (result == 0) return BadRequest("Không thành công!");
+                else if (result == 1) return BadRequest("Không tìm thấy lớp học.");
+                else return Ok("Thành công!");
+            }
+            catch (DbUpdateException)
+            {
+                return BadRequest("Không thành công.");
+            }
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<ClassResponse>>> SearchClass(string searchText)
+        {
+            if (searchText == null) return BadRequest("Không nhận được dữ liệu.");
+            var result = await _classService.SearchClass(searchText);
+
+            if (result == null || result.Count == 0)
+            {
+                return NotFound("Không tìm thấy.");
+            }
+
+            return result;
+        }
+    }
+}
