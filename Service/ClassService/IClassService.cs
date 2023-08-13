@@ -13,6 +13,6 @@ namespace Service.ClassService
         Task<int> CreateClass(CreateClassRequest request);
         Task<ClassResponse> GetClassByID(Guid classID);
         Task<int> DeleteClass(Guid classID);
-        Task<List<ClassResponse>> SearchClass(string searchText);
+        Task<List<ClassResponse>> SearchClass(Guid courseID, string searchText);
     }
 }
