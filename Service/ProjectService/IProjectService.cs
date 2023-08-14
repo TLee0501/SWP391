@@ -5,11 +5,11 @@ namespace Service.ProjectService
 {
     public interface IProjectService
     {
-        Task<ProjectResponse> GetProjectByID(Guid projectID);
+        Task<ProjectResponse> GetProjectByID(Guid projectId);
         Task<int> CreateProject(ProjectCreateRequest request);
         Task<int> UpdateProject(ProjectUpdateRequest request);
-        Task<List<ProjectResponse>> GetProjectsByClassID(Guid classID);
-        Task<List<ProjectResponse>> SearchProjectInClass(Guid classID, string searchName);
-        Task<List<ProjectResponse>> GetProjectsByClassIDandUserID(Guid classID, Guid userID);
+        Task<List<ProjectResponse>> GetProjectsByClassID(Guid classId);
+        Task<List<ProjectResponse>> SearchProjectInClass(Guid classId, string searchName);
+        Task<List<ProjectResponse>> GetProjectsByClassIDandUserID(Guid classId, Guid userId);
     }
 }
