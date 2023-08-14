@@ -142,7 +142,7 @@ namespace SystemController.Controllers
 
         // POST: api/Courses
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
+        [HttpPost, Authorize]
         public async Task<ActionResult> CreateCourse(CourseCreateRequest request)
         {
             var roleClaim = User?.FindAll(ClaimTypes.Name);
