@@ -34,9 +34,9 @@ namespace Service.UserService
             return 2;
         }
 
-        public async Task<UserResponse> GetUser(Guid userID)
+        public async Task<UserResponse> GetUser(Guid userId)
         {
-            var user = await _context.Users.FindAsync(userID);
+            var user = await _context.Users.FindAsync(userId);
             if (user == null) return null;
             var role = await _context.Roles.FindAsync(user.RoleId);
             UserResponse result = new UserResponse
@@ -69,7 +69,7 @@ namespace Service.UserService
 
         public async Task<UserResponse> Login(LoginRequest request)
         {
-            var user = await _context.Users.SingleOrDefaultAsync(a => a.Email == request.Mail && a.Password == request.Password);
+            var user = await _context.Users.SingleOrDefaultAsync(a => a.Email == request.Email && a.Password == request.Password);
 
             if (user == null) return null;
             var role = await _context.Roles.FindAsync(user.RoleId);

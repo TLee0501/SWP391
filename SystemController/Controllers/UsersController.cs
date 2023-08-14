@@ -42,8 +42,8 @@ namespace SystemController.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(LoginRequest request)
         {
-            if (request.Mail == "" || request.Mail == null)
-                return BadRequest("Vui lòng kiểm tra lại Mail!");
+            if (request.Email == "" || request.Email == null)
+                return BadRequest("Vui lòng kiểm tra lại Email!");
             if (request.Password == "" || request.Password == null)
                 return BadRequest("Vui lòng kiểm tra lại mật khẩu!");
 
@@ -72,11 +72,11 @@ namespace SystemController.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<UserResponse>> GetUser(Guid userID)
+        public async Task<ActionResult<UserResponse>> GetUser(Guid userId)
         {
             try
             {
-                var result = await _userService.GetUser(userID);
+                var result = await _userService.GetUser(userId);
                 if (result == null) return BadRequest("Tài khoản không tồn tại!");
                 return Ok(result);
             }

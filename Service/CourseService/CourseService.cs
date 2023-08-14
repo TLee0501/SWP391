@@ -89,11 +89,11 @@ namespace Service.CourseService
             }
         }
 
-        public async Task<List<CourseResponse>> GetCourseForTeacher(Guid teacherID)
+        public async Task<List<CourseResponse>> GetCourseForTeacher(Guid teacherId)
         {
             var result = new List<CourseResponse>();
 
-            var uc = await _context.UserCourses.Where(a => a.UserId == teacherID).ToListAsync();
+            var uc = await _context.UserCourses.Where(a => a.UserId == teacherId).ToListAsync();
             if (uc == null) return null;
 
             foreach (var item in uc)
@@ -114,9 +114,9 @@ namespace Service.CourseService
             return result;
         }
 
-        public async Task<int> ActiveCourse(Guid courseID)
+        public async Task<int> ActiveCourse(Guid courseId)
         {
-            var checkExist = await _context.Courses.FindAsync(courseID);
+            var checkExist = await _context.Courses.FindAsync(courseId);
             if (checkExist == null) return 3;
             if (checkExist.IsActive == true) return 1;
             try
@@ -131,9 +131,9 @@ namespace Service.CourseService
             }
         }
 
-        public async Task<int> DeactiveCourse(Guid courseID)
+        public async Task<int> DeactiveCourse(Guid courseId)
         {
-            var checkExist = await _context.Courses.FindAsync(courseID);
+            var checkExist = await _context.Courses.FindAsync(courseId);
             if (checkExist == null) return 3;
             if (checkExist.IsActive == false) return 1;
             try
@@ -148,9 +148,9 @@ namespace Service.CourseService
             }
         }
 
-        public async Task<int> DeleteCourse(Guid courseID)
+        public async Task<int> DeleteCourse(Guid courseId)
         {
-            var checkExist = await _context.Courses.FindAsync(courseID);
+            var checkExist = await _context.Courses.FindAsync(courseId);
             if (checkExist == null) return 1;
             try
             {
@@ -164,14 +164,14 @@ namespace Service.CourseService
             }
         }
 
-        public async Task<CourseResponse> GetCourseByID(Guid courseID)
+        public async Task<CourseResponse> GetCourseByID(Guid courseId)
         {
-            var course = await _context.Courses.FindAsync(courseID);
+            var course = await _context.Courses.FindAsync(courseId);
             if (course == null) return null;
             var user = await _context.Users.FindAsync(course.UserId);
             var courseResponse = new CourseResponse
             {
-                CourseId = courseID,
+                CourseId = courseId,
                 CourseCode = course.CourseCode,
                 CourseName = course.CourseName,
                 TimeCreated = course.TimeCreated,

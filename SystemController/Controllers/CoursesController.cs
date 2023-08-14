@@ -40,11 +40,11 @@ namespace SystemController.Controllers
         }
 
         // GET: api/Courses/5
-        [HttpGet("{teacherID}")]
-        public async Task<ActionResult<IEnumerable<CourseResponse>>> GetCourseForTeacher(Guid teacherID)
+        [HttpGet("{teacherId}")]
+        public async Task<ActionResult<IEnumerable<CourseResponse>>> GetCourseForTeacher(Guid teacherId)
         {
-            if (teacherID == null) return BadRequest("Không nhận được dữ liệu!");
-            var result = await _courseService.GetCourseForTeacher(teacherID);
+            if (teacherId == null) return BadRequest("Không nhận được dữ liệu!");
+            var result = await _courseService.GetCourseForTeacher(teacherId);
 
             if (result == null || result.Count == 0)
             {
@@ -102,15 +102,15 @@ namespace SystemController.Controllers
             }
         }
 
-        [HttpPut("{courseID}")]
-        public async Task<IActionResult> ActiveCourse(Guid courseID)
+        [HttpPut("{courseId}")]
+        public async Task<IActionResult> ActiveCourse(Guid courseId)
         {
             try
             {
-                var result = await _courseService.ActiveCourse(courseID);
+                var result = await _courseService.ActiveCourse(courseId);
                 if (result == 0) return BadRequest("Không thành công!");
                 else if (result == 1) return BadRequest("Khóa học đã kích hoạt!");
-                else if (result == 3) return BadRequest("Không tìm thấy gói!");
+                else if (result == 3) return BadRequest("Không tìm thấy khoá!");
                 else return Ok("Kích hoạt thành công!");
             }
             catch (DbUpdateConcurrencyException)
@@ -119,15 +119,15 @@ namespace SystemController.Controllers
             }
         }
 
-        [HttpPut("{courseID}")]
-        public async Task<IActionResult> DeactiveCourse(Guid courseID)
+        [HttpPut("{courseId}")]
+        public async Task<IActionResult> DeactiveCourse(Guid courseId)
         {
             try
             {
-                var result = await _courseService.DeactiveCourse(courseID);
+                var result = await _courseService.DeactiveCourse(courseId);
                 if (result == 0) return BadRequest("Không thành công!");
                 else if (result == 1) return BadRequest("Khóa học đã hủy kích hoạt!");
-                else if (result == 3) return BadRequest("Không tìm thấy gói!");
+                else if (result == 3) return BadRequest("Không tìm thấy khoá!");
                 else return Ok("Hủy kích hoạt thành công!");
             }
             catch (DbUpdateConcurrencyException)
@@ -156,13 +156,13 @@ namespace SystemController.Controllers
         }
 
         // DELETE: api/Courses/5
-        [HttpDelete("{courseID}")]
-        public async Task<IActionResult> DeleteCourse(Guid courseID)
+        [HttpDelete("{courseId}")]
+        public async Task<IActionResult> DeleteCourse(Guid courseId)
         {
-            if (courseID == null) return BadRequest("Không nhận được dữ liệu!");
+            if (courseId == null) return BadRequest("Không nhận được dữ liệu!");
             try
             {
-                var result = await _courseService.DeleteCourse(courseID);
+                var result = await _courseService.DeleteCourse(courseId);
                 if (result == 0) return BadRequest("Không thành công!");
                 else if (result == 1) return BadRequest("Không tìm thấy khóa học đã tồn tại!");
                 else return Ok("Thành công!");  //2
@@ -173,11 +173,11 @@ namespace SystemController.Controllers
             }
         }
 
-        [HttpGet("{courseID}")]
-        public async Task<ActionResult<CourseResponse>> GetCourseByID(Guid courseID)
+        [HttpGet("{courseId}")]
+        public async Task<ActionResult<CourseResponse>> GetCourseByID(Guid courseId)
         {
-            if (courseID == null) return BadRequest("Không nhận được dữ liệu!");
-            var result = await _courseService.GetCourseByID(courseID);
+            if (courseId == null) return BadRequest("Không nhận được dữ liệu!");
+            var result = await _courseService.GetCourseByID(courseId);
 
             if (result == null)
             {

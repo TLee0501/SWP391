@@ -35,11 +35,11 @@ namespace SystemController.Controllers
         }
 
         // GET: api/Projects/5
-        [HttpGet("{projectID}")]
-        public async Task<ActionResult<Project>> GetProjectByID(Guid projectID)
+        [HttpGet("{projectId}")]
+        public async Task<ActionResult<Project>> GetProjectByID(Guid projectId)
         {
-            if (projectID == Guid.Empty) return BadRequest("Không nhận được dữ liệu!");
-            var result = await _projectService.GetProjectByID(projectID);
+            if (projectId == Guid.Empty) return BadRequest("Không nhận được dữ liệu!");
+            var result = await _projectService.GetProjectByID(projectId);
             if (result == null) return BadRequest("Không tùm thấy Project!");
             return Ok(result);
         }
@@ -66,29 +66,29 @@ namespace SystemController.Controllers
             else return Ok("Thành công!");
         }
 
-        [HttpGet("{classID}")]
-        public async Task<ActionResult<Project>> GetProjectsByClassID(Guid classID)
+        [HttpGet("{classId}")]
+        public async Task<ActionResult<Project>> GetProjectsByClassID(Guid classId)
         {
-            if (classID == Guid.Empty || classID == null) return BadRequest("Không nhận được dữ liệu!");
-            var result = await _projectService.GetProjectsByClassID(classID);
+            if (classId == Guid.Empty || classId == null) return BadRequest("Không nhận được dữ liệu!");
+            var result = await _projectService.GetProjectsByClassID(classId);
             if (result == null) return BadRequest("Không tìm thấy Project!");
             return Ok(result);
         }
 
-        [HttpGet("{classID}")]
-        public async Task<ActionResult<Project>> GetProjectsByClassIDandUserID(Guid classID, Guid userID)
+        [HttpGet("{classId}")]
+        public async Task<ActionResult<Project>> GetProjectsByClassIDandUserID(Guid classId, Guid userId)
         {
-            if (classID == Guid.Empty || classID == null) return BadRequest("Không nhận được dữ liệu!");
-            var result = await _projectService.GetProjectsByClassIDandUserID(classID, userID);
+            if (classId == Guid.Empty || classId == null) return BadRequest("Không nhận được dữ liệu!");
+            var result = await _projectService.GetProjectsByClassIDandUserID(classId, userId);
             if (result == null || result.Count == 0) return BadRequest("Không tìm thấy Project!");
             return Ok(result);
         }
 
-        [HttpGet("{classID}")]
-        public async Task<ActionResult<Project>> SearchProjectInClass(Guid classID, string searchName)
+        [HttpGet("{classId}")]
+        public async Task<ActionResult<Project>> SearchProjectInClass(Guid classId, string searchName)
         {
-            if (classID == Guid.Empty || classID == null) return BadRequest("Không nhận được dữ liệu!");
-            var result = await _projectService.SearchProjectInClass(classID, searchName);
+            if (classId == Guid.Empty || classId == null) return BadRequest("Không nhận được dữ liệu!");
+            var result = await _projectService.SearchProjectInClass(classId, searchName);
             if (result == null || result.Count == 0) return BadRequest("Không tìm thấy Project!");
             return Ok(result);
         }

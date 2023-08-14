@@ -8,6 +8,6 @@ namespace Service.UserService
         Task<UserResponse> Login(LoginRequest request);
         Task<List<UserListResponse>> ListTeacher();
         Task<int> CreateStudent(UserCreateRequest request);
-        Task<UserResponse> GetUser(Guid userID);
+        Task<UserResponse> GetUser(Guid userId);
     }
 }
