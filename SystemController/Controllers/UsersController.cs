@@ -129,6 +129,14 @@ namespace SystemController.Controllers
             catch (Exception ex) { return BadRequest("Thất bại!"); }
         }
 
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<UserListResponse>>> SearchUser(string txtSearch)
+        {
+            var result = await _userService.SearchUser(txtSearch);
+            if (result == null || result.Count == 0) return BadRequest("Không có tài khoản t=cần tìm!");
+            return Ok(result);
+        }
+
         // DELETE: api/Users/5
         /*[HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(Guid id)

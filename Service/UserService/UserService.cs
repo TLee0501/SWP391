@@ -83,5 +83,25 @@ namespace Service.UserService
             };
             return result;
         }
+
+        public async Task<List<UserListResponse>> SearchUser(string txtSearch)
+        {
+            var result = new List<UserListResponse>();
+            var users = await _context.Users.ToListAsync();
+            foreach (var item in users)
+            {
+                if (item.FullName.ToLower().Contains(txtSearch.ToLower()))
+                {
+                    var tmp = new UserListResponse
+                    {
+                        UserId = item.UserId,
+                        FullName = item.FullName,
+                        Email = item.Email
+                    };
+                    result.Add(tmp);
+                }
+            }
+            return result;
+        }
     }
 }
