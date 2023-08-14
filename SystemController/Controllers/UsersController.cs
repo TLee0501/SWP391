@@ -42,7 +42,7 @@ namespace SystemController.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(LoginRequest request)
         {
-            if (request.Mail == "" || request.Mail == null)
+            if (request.Email == "" || request.Email == null)
                 return BadRequest("Vui lòng kiểm tra lại Mail!");
             if (request.Password == "" || request.Password == null)
                 return BadRequest("Vui lòng kiểm tra lại mật khẩu!");

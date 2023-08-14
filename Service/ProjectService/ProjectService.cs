@@ -41,14 +41,14 @@ namespace Service.ProjectService
             }
         }
 
-        public async Task<ProjectResponse> GetProjectByID(Guid projectID)
+        public async Task<ProjectResponse> GetProjectByID(Guid projectId)
         {
-            var project = await _context.Projects.FindAsync(projectID);
+            var project = await _context.Projects.FindAsync(projectId);
             var classTmp = await _context.Classes.FindAsync(project.ClassId);
             if (project == null) return null;
             var result = new ProjectResponse
             {
-                ProjectId = projectID,
+                ProjectId = projectId,
                 ProjectName = project.ProjectName,
                 ClassID = project.ClassId,
                 ClassName = classTmp.ClassName
@@ -56,10 +56,10 @@ namespace Service.ProjectService
             return result;
         }
 
-        public async Task<List<ProjectResponse>> GetProjectsByClassID(Guid classID)
+        public async Task<List<ProjectResponse>> GetProjectsByClassID(Guid classId)
         {
             var result = new List<ProjectResponse>();
-            var projects = await _context.Projects.Where(a => a.ClassId == classID && a.IsDeleted == false).ToListAsync();
+            var projects = await _context.Projects.Where(a => a.ClassId == classId && a.IsDeleted == false).ToListAsync();
             if (projects == null) return null;
 
             foreach (var item in projects)
@@ -78,10 +78,10 @@ namespace Service.ProjectService
             return result;
         }
 
-        public async Task<List<ProjectResponse>> GetProjectsByClassIDandUserID(Guid classID, Guid userID)
+        public async Task<List<ProjectResponse>> GetProjectsByClassIDandUserID(Guid classId, Guid userId)
         {
             var result = new List<ProjectResponse>();
-            var projects = await _context.Projects.Where(a => a.ClassId == classID && a.IsDeleted == false).ToListAsync();
+            var projects = await _context.Projects.Where(a => a.ClassId == classId && a.IsDeleted == false).ToListAsync();
             if (projects == null) return null;
 
             foreach (var item in projects)
@@ -96,9 +96,9 @@ namespace Service.ProjectService
                         {
                             foreach (var item2 in teamMember)
                             {
-                                if (item2.UserId == userID)
+                                if (item2.UserId == userId)
                                 {
-                                    var classTmp = await _context.Classes.FindAsync(classID);
+                                    var classTmp = await _context.Classes.FindAsync(classId);
                                     var tmp = new ProjectResponse
                                     {
                                         ProjectId = item.ProjectId,
@@ -117,12 +117,12 @@ namespace Service.ProjectService
             return result;
         }
 
-        public async Task<List<ProjectResponse>> SearchProjectInClass(Guid classID, string searchName)
+        public async Task<List<ProjectResponse>> SearchProjectInClass(Guid classId, string searchName)
         {
-            var project = await _context.Projects.Where(a => a.ClassId == classID && a.IsDeleted == false).ToListAsync();
+            var project = await _context.Projects.Where(a => a.ClassId == classId && a.IsDeleted == false).ToListAsync();
             if (project == null) return null;
 
-            var classTmp = await _context.Classes.FindAsync(classID);
+            var classTmp = await _context.Classes.FindAsync(classId);
             var result = new List<ProjectResponse>();
             foreach (var item in project)
             {
