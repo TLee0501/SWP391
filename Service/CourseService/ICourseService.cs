@@ -10,7 +10,7 @@ namespace Service.CourseService
 {
     public interface ICourseService
     {
-        Task<int> CreateCourse(CourseCreateRequest request);
+        Task<int> CreateCourse(Guid userID, CourseCreateRequest request);
         Task<List<CourseResponse>> GetCourseForTeacher(Guid teacherID);
         Task<CourseResponse> GetCourseByID(Guid courseID);
         Task<int> AssignCourseToTeacher(AssignCourseRequest request);

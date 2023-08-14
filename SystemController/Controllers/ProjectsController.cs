@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using BusinessObjects.Models;
 using Service.ProjectService;
 using BusinessObjects.RequestModel;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SystemController.Controllers
 {
@@ -75,9 +77,12 @@ namespace SystemController.Controllers
             return Ok(result);
         }
 
-        [HttpGet("{classID}")]
-        public async Task<ActionResult<Project>> GetProjectsByClassIDandUserID(Guid classID, Guid userID)
+        [HttpGet("{classID}"), Authorize]
+        public async Task<ActionResult<Project>> GetProjectsByClassIDandUserID(Guid classID)
         {
+            var roleClaim = User?.FindAll(ClaimTypes.Name);
+            var userID = new Guid(roleClaim?.Select(c => c.Value).SingleOrDefault().ToString());
+
             if (classID == Guid.Empty || classID == null) return BadRequest("Không nhận được dữ liệu!");
             var result = await _projectService.GetProjectsByClassIDandUserID(classID, userID);
             if (result == null || result.Count == 0) return BadRequest("Không tìm thấy Project!");
