@@ -11,6 +11,7 @@ using Service.CourseService;
 using BusinessObjects.ResponseModel;
 using Azure.Core;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace SystemController.Controllers
 {
@@ -40,9 +41,12 @@ namespace SystemController.Controllers
         }
 
         // GET: api/Courses/5
-        [HttpGet("{teacherID}")]
-        public async Task<ActionResult<IEnumerable<CourseResponse>>> GetCourseForTeacher(Guid teacherID)
+        [HttpGet , Authorize]
+        public async Task<ActionResult<IEnumerable<CourseResponse>>> GetCourseForTeacher()
         {
+            var roleClaim = User?.FindAll(ClaimTypes.Name);
+            var teacherID = new Guid(roleClaim?.Select(c => c.Value).SingleOrDefault().ToString());
+
             if (teacherID == null) return BadRequest("Không nhận được dữ liệu!");
             var result = await _courseService.GetCourseForTeacher(teacherID);
 
@@ -141,10 +145,13 @@ namespace SystemController.Controllers
         [HttpPost]
         public async Task<ActionResult> CreateCourse(CourseCreateRequest request)
         {
+            var roleClaim = User?.FindAll(ClaimTypes.Name);
+            var userID = new Guid(roleClaim?.Select(c => c.Value).SingleOrDefault().ToString());
+
             if (request == null) return BadRequest("Không nhận được dữ liệu!");
             try
             {
-                var result = await _courseService.CreateCourse(request);
+                var result = await _courseService.CreateCourse(userID, request);
                 if (result == 0) return BadRequest("Không thành công!");
                 else if (result == 1) return BadRequest("Tên khóa học đã tồn tại!");
                 else return Ok("Tạo thành công!");  //2

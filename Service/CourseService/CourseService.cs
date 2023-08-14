@@ -61,7 +61,7 @@ namespace Service.CourseService
             }
         }
 
-        public async Task<int> CreateCourse(CourseCreateRequest request)
+        public async Task<int> CreateCourse(Guid userID, CourseCreateRequest request)
         {
             var courses = await _context.Courses.SingleOrDefaultAsync(a => a.CourseName.ToLower() == request.CourseName.ToLower() && a.IsDelete == false);
             if (courses != null) return 1;
@@ -72,7 +72,7 @@ namespace Service.CourseService
                 CourseId = id,
                 CourseCode = request.CourseCode,
                 CourseName = request.CourseName,
-                UserId = request.UserId,
+                UserId = userID,
                 TimeCreated = DateTime.Now,
                 IsActive = true,
                 IsDelete = false
