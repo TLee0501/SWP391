@@ -59,9 +59,8 @@ namespace SystemController.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<CourseResponse>>> SearchCourse(string searchText)
+        public async Task<ActionResult<IEnumerable<CourseResponse>>> SearchCourse(string? searchText)
         {
-            if (searchText == null) return BadRequest("Không nhận được dữ liệu!");
             var result = await _courseService.SearchCourse(searchText);
 
             if (result == null || result.Count == 0)

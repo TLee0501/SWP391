@@ -18,6 +18,6 @@ namespace Service.CourseService
         Task<int> ActiveCourse(Guid courseId);
         Task<int> DeactiveCourse(Guid courseId);
         Task<int> DeleteCourse(Guid courseId);
-        Task<List<CourseResponse>> SearchCourse(string searchText);
+        Task<List<CourseResponse>> SearchCourse(string? searchText);
     }
 }
