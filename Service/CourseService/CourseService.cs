@@ -3,6 +3,7 @@ using BusinessObjects.Models;
 using BusinessObjects.RequestModel;
 using BusinessObjects.ResponseModel;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -184,15 +185,36 @@ namespace Service.CourseService
             return courseResponse;
         }
 
-        public async Task<List<CourseResponse>> SearchCourse(string searchText)
+        public async Task<List<CourseResponse>> SearchCourse(string? searchText)
         {
             var result = new List<CourseResponse>();
             var courses = await _context.Courses.Where(a => a.IsDelete ==  false).ToListAsync();
             if (courses == null || courses.Count == 0) return null;
 
-            foreach (var item in courses)
+            if (!searchText.IsNullOrEmpty())
             {
-                if (item.CourseName.ToLower().Contains(searchText.ToLower()))
+                foreach (var item in courses)
+                {
+                    if (item.CourseName.ToLower().Contains(searchText.ToLower()))
+                    {
+                        var creator = await _context.Users.FindAsync(item.UserId);
+                        var tmp = new CourseResponse
+                        {
+                            CourseId = item.CourseId,
+                            CourseName = item.CourseName,
+                            CourseCode = item.CourseCode,
+                            UserId = item.UserId,
+                            createdBy = creator.FullName,
+                            TimeCreated = item.TimeCreated,
+                        };
+                        result.Add(tmp);
+                    }
+                }
+                return result;
+            }
+            else
+            {
+                foreach (var item in courses)
                 {
                     var creator = await _context.Users.FindAsync(item.UserId);
                     var tmp = new CourseResponse
@@ -206,8 +228,9 @@ namespace Service.CourseService
                     };
                     result.Add(tmp);
                 }
+                return result;
             }
-            return result;
+
         }
     }
 }
