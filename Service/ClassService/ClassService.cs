@@ -63,9 +63,9 @@ namespace Service.ClassService
             }
         }
 
-        public async Task<ClassResponse> GetClassByID(Guid classID)
+        public async Task<ClassResponse> GetClassByID(Guid classId)
         {
-            var classes = await _context.Classes.FindAsync(classID);
+            var classes = await _context.Classes.FindAsync(classId);
             if (classes == null) return null;
 
             var user = await _context.Users.FindAsync(classes.UserId);
@@ -75,7 +75,7 @@ namespace Service.ClassService
             {
                 classResponse = new ClassResponse
                 {
-                    ClassId = classID,
+                    ClassId = classId,
                     ClassName = classes.ClassName,
                     UserId = classes.UserId,
                     CourseCode = course.CourseCode,
@@ -86,7 +86,7 @@ namespace Service.ClassService
             {
                 classResponse = new ClassResponse
                 {
-                    ClassId = classID,
+                    ClassId = classId,
                     ClassName = classes.ClassName,
                     UserId = classes.UserId,
                     CourseCode = course.CourseCode,
@@ -97,12 +97,12 @@ namespace Service.ClassService
             return classResponse;
         }
 
-        public async Task<List<ClassResponse>> SearchClass(Guid courseID, string searchText)
+        public async Task<List<ClassResponse>> SearchClass(Guid courseId, string searchText)
         {
             var result = new List<ClassResponse>();
             var classes = await _context.Classes.Where(x => x.IsDeleted == false).ToListAsync();
             if (classes == null || classes.Count == 0) return null;
-            var course = await _context.Courses.FindAsync(courseID);
+            var course = await _context.Courses.FindAsync(courseId);
             foreach (var item in classes)
             {
                 if (item.ClassName.ToLower().Contains(searchText.ToLower()))

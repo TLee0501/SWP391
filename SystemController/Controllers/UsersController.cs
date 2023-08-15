@@ -42,7 +42,7 @@ namespace SystemController.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(LoginRequest request)
         {
-            if (request.Mail == "" || request.Mail == null)
+            if (request.Email == "" || request.Email == null)
                 return BadRequest("Vui lòng kiểm tra lại Mail!");
             if (request.Password == "" || request.Password == null)
                 return BadRequest("Vui lòng kiểm tra lại mật khẩu!");
@@ -71,11 +71,14 @@ namespace SystemController.Controllers
             catch (Exception ex) { return BadRequest("Thất bại!"); }
         }
 
-        [HttpGet]
-        public async Task<ActionResult<UserResponse>> GetUser(Guid userID)
+        [HttpGet, Authorize]
+        public async Task<ActionResult<UserResponse>> GetUser()
         {
             try
             {
+                var roleClaim = User?.FindAll(ClaimTypes.Name);
+                var userID = new Guid(roleClaim?.Select(c => c.Value).SingleOrDefault().ToString());
+
                 var result = await _userService.GetUser(userID);
                 if (result == null) return BadRequest("Tài khoản không tồn tại!");
                 return Ok(result);
@@ -161,7 +164,8 @@ namespace SystemController.Controllers
         {
             List<Claim> claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, request.Email),
+                //new Claim(ClaimTypes.Name, request.Email),
+                new Claim(ClaimTypes.Name, request.UserId.ToString()),
                 new Claim(ClaimTypes.Role, request.Role)
             };
 
@@ -178,5 +182,14 @@ namespace SystemController.Controllers
 
             return jwt;
         }
+
+        /*[HttpGet, Authorize]
+        public ActionResult<string> getUserID()
+        {
+            var roleClaim = User?.FindAll(ClaimTypes.Name);
+            
+            var id = roleClaim?.Select(c => c.Value).SingleOrDefault().ToString();
+            return Ok(id);
+        }*/
     }
 }

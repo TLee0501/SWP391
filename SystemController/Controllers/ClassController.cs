@@ -51,11 +51,11 @@ namespace SystemController.Controllers
             }
         }
 
-        [HttpGet("{classID}")]
-        public async Task<ActionResult<ClassResponse>> GetClassByID(Guid classID)
+        [HttpGet("{classId}")]
+        public async Task<ActionResult<ClassResponse>> GetClassByID(Guid classId)
         {
-            if (classID == null) return BadRequest("Không nhận được dữ liệu.");
-            var result = await _classService.GetClassByID(classID);
+            if (classId == null) return BadRequest("Không nhận được dữ liệu.");
+            var result = await _classService.GetClassByID(classId);
 
             if (result == null)
             {
@@ -65,13 +65,13 @@ namespace SystemController.Controllers
             return result;
         }
 
-        [HttpDelete("{classID}")]
-        public async Task<IActionResult> DeleteClass(Guid classID)
+        [HttpDelete("{classId}")]
+        public async Task<IActionResult> DeleteClass(Guid classId)
         {
-            if (classID == null) return BadRequest("Không nhận được dữ liệu.");
+            if (classId == null) return BadRequest("Không nhận được dữ liệu.");
             try
             {
-                var result = await _classService.DeleteClass(classID);
+                var result = await _classService.DeleteClass(classId);
                 if (result == 0) return BadRequest("Không thành công!");
                 else if (result == 1) return BadRequest("Không tìm thấy lớp học.");
                 else return Ok("Thành công!");
@@ -83,10 +83,10 @@ namespace SystemController.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ClassResponse>>> SearchClass(Guid courseID, string searchText)
+        public async Task<ActionResult<IEnumerable<ClassResponse>>> SearchClass(Guid courseId, string searchText)
         {
             if (searchText == null) return BadRequest("Không nhận được dữ liệu.");
-            var result = await _classService.SearchClass(courseID, searchText);
+            var result = await _classService.SearchClass(courseId, searchText);
 
             if (result == null || result.Count == 0)
             {

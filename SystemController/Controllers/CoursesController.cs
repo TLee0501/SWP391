@@ -11,6 +11,7 @@ using Service.CourseService;
 using BusinessObjects.ResponseModel;
 using Azure.Core;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace SystemController.Controllers
 {
@@ -40,9 +41,12 @@ namespace SystemController.Controllers
         }
 
         // GET: api/Courses/5
-        [HttpGet("{teacherID}")]
-        public async Task<ActionResult<IEnumerable<CourseResponse>>> GetCourseForTeacher(Guid teacherID)
+        [HttpGet , Authorize]
+        public async Task<ActionResult<IEnumerable<CourseResponse>>> GetCourseForTeacher()
         {
+            var roleClaim = User?.FindAll(ClaimTypes.Name);
+            var teacherID = new Guid(roleClaim?.Select(c => c.Value).SingleOrDefault().ToString());
+
             if (teacherID == null) return BadRequest("Không nhận được dữ liệu!");
             var result = await _courseService.GetCourseForTeacher(teacherID);
 
@@ -102,15 +106,15 @@ namespace SystemController.Controllers
             }
         }
 
-        [HttpPut("{courseID}")]
-        public async Task<IActionResult> ActiveCourse(Guid courseID)
+        [HttpPut("{courseId}")]
+        public async Task<IActionResult> ActiveCourse(Guid courseId)
         {
             try
             {
-                var result = await _courseService.ActiveCourse(courseID);
+                var result = await _courseService.ActiveCourse(courseId);
                 if (result == 0) return BadRequest("Không thành công!");
                 else if (result == 1) return BadRequest("Khóa học đã kích hoạt!");
-                else if (result == 3) return BadRequest("Không tìm thấy gói!");
+                else if (result == 3) return BadRequest("Không tìm thấy khoá!");
                 else return Ok("Kích hoạt thành công!");
             }
             catch (DbUpdateConcurrencyException)
@@ -119,15 +123,15 @@ namespace SystemController.Controllers
             }
         }
 
-        [HttpPut("{courseID}")]
-        public async Task<IActionResult> DeactiveCourse(Guid courseID)
+        [HttpPut("{courseId}")]
+        public async Task<IActionResult> DeactiveCourse(Guid courseId)
         {
             try
             {
-                var result = await _courseService.DeactiveCourse(courseID);
+                var result = await _courseService.DeactiveCourse(courseId);
                 if (result == 0) return BadRequest("Không thành công!");
                 else if (result == 1) return BadRequest("Khóa học đã hủy kích hoạt!");
-                else if (result == 3) return BadRequest("Không tìm thấy gói!");
+                else if (result == 3) return BadRequest("Không tìm thấy khoá!");
                 else return Ok("Hủy kích hoạt thành công!");
             }
             catch (DbUpdateConcurrencyException)
@@ -138,13 +142,16 @@ namespace SystemController.Controllers
 
         // POST: api/Courses
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
+        [HttpPost, Authorize]
         public async Task<ActionResult> CreateCourse(CourseCreateRequest request)
         {
+            var roleClaim = User?.FindAll(ClaimTypes.Name);
+            var userID = new Guid(roleClaim?.Select(c => c.Value).SingleOrDefault().ToString());
+
             if (request == null) return BadRequest("Không nhận được dữ liệu!");
             try
             {
-                var result = await _courseService.CreateCourse(request);
+                var result = await _courseService.CreateCourse(userID, request);
                 if (result == 0) return BadRequest("Không thành công!");
                 else if (result == 1) return BadRequest("Tên khóa học đã tồn tại!");
                 else return Ok("Tạo thành công!");  //2
@@ -156,13 +163,13 @@ namespace SystemController.Controllers
         }
 
         // DELETE: api/Courses/5
-        [HttpDelete("{courseID}")]
-        public async Task<IActionResult> DeleteCourse(Guid courseID)
+        [HttpDelete("{courseId}")]
+        public async Task<IActionResult> DeleteCourse(Guid courseId)
         {
-            if (courseID == null) return BadRequest("Không nhận được dữ liệu!");
+            if (courseId == null) return BadRequest("Không nhận được dữ liệu!");
             try
             {
-                var result = await _courseService.DeleteCourse(courseID);
+                var result = await _courseService.DeleteCourse(courseId);
                 if (result == 0) return BadRequest("Không thành công!");
                 else if (result == 1) return BadRequest("Không tìm thấy khóa học đã tồn tại!");
                 else return Ok("Thành công!");  //2
@@ -173,11 +180,11 @@ namespace SystemController.Controllers
             }
         }
 
-        [HttpGet("{courseID}")]
-        public async Task<ActionResult<CourseResponse>> GetCourseByID(Guid courseID)
+        [HttpGet("{courseId}")]
+        public async Task<ActionResult<CourseResponse>> GetCourseByID(Guid courseId)
         {
-            if (courseID == null) return BadRequest("Không nhận được dữ liệu!");
-            var result = await _courseService.GetCourseByID(courseID);
+            if (courseId == null) return BadRequest("Không nhận được dữ liệu!");
+            var result = await _courseService.GetCourseByID(courseId);
 
             if (result == null)
             {
