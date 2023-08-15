@@ -154,6 +154,7 @@ namespace SystemController.Controllers
                 var result = await _courseService.CreateCourse(userID, request);
                 if (result == 0) return BadRequest("Không thành công!");
                 else if (result == 1) return BadRequest("Tên khóa học đã tồn tại!");
+                else if (result == 3) return BadRequest("Mã khóa học đã tồn tại!");
                 else return Ok("Tạo thành công!");  //2
             }
             catch (DbUpdateException)
