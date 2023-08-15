@@ -63,8 +63,11 @@ namespace Service.CourseService
 
         public async Task<int> CreateCourse(Guid userId, CourseCreateRequest request)
         {
-            var courses = await _context.Courses.SingleOrDefaultAsync(a => a.CourseName.ToLower() == request.CourseName.ToLower() && a.IsDelete == false);
-            if (courses != null) return 1;
+            var checkname = await _context.Courses.SingleOrDefaultAsync(a => a.CourseName.ToLower() == request.CourseName.ToLower() && a.IsDelete == false);
+            if (checkname != null) return 1;
+
+            var checkcode = await _context.Courses.SingleOrDefaultAsync(a => a.CourseCode.ToLower() == request.CourseCode.ToLower() && a.IsDelete == false);
+            if (checkcode != null) return 3;
 
             var id = Guid.NewGuid();
             var course = new Course
