@@ -195,7 +195,7 @@ namespace Service.CourseService
             {
                 foreach (var item in courses)
                 {
-                    if (item.CourseName.ToLower().Contains(searchText.ToLower()))
+                    if (item.CourseName.ToLower().Contains(searchText.ToLower()) || item.CourseCode.ToLower().Contains(searchText.ToLower()))
                     {
                         var creator = await _context.Users.FindAsync(item.UserId);
                         var tmp = new CourseResponse
