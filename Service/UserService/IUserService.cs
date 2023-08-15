@@ -9,6 +9,6 @@ namespace Service.UserService
         Task<List<UserListResponse>> ListTeacher();
         Task<int> CreateStudent(UserCreateRequest request);
         Task<UserResponse> GetUser(Guid userId);
-        Task<List<UserListResponse>> SearchUser(string txtSearch);
+        Task<List<UserListResponse>> SearchUser(string? txtSearch);
     }
 }

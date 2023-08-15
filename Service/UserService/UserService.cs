@@ -2,6 +2,7 @@
 using BusinessObjects.RequestModel;
 using BusinessObjects.ResponseModel;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System.Data;
 
 namespace Service.UserService
@@ -84,13 +85,29 @@ namespace Service.UserService
             return result;
         }
 
-        public async Task<List<UserListResponse>> SearchUser(string txtSearch)
+        public async Task<List<UserListResponse>> SearchUser(string? txtSearch)
         {
             var result = new List<UserListResponse>();
             var users = await _context.Users.ToListAsync();
-            foreach (var item in users)
+            if (!txtSearch.IsNullOrEmpty())
             {
-                if (item.FullName.ToLower().Contains(txtSearch.ToLower()))
+                foreach (var item in users)
+                {
+                    if (item.FullName.ToLower().Contains(txtSearch.ToLower()) || item.Email.ToLower().Contains(txtSearch.ToLower()))
+                    {
+                        var tmp = new UserListResponse
+                        {
+                            UserId = item.UserId,
+                            FullName = item.FullName,
+                            Email = item.Email
+                        };
+                        result.Add(tmp);
+                    }
+                }
+            }
+            else
+            {
+                foreach (var item in users)
                 {
                     var tmp = new UserListResponse
                     {
