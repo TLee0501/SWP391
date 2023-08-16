@@ -2,11 +2,7 @@
 using BusinessObjects.RequestModel;
 using BusinessObjects.ResponseModel;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Service.ProjectService
 {
@@ -51,7 +47,8 @@ namespace Service.ProjectService
                 ProjectId = projectId,
                 ProjectName = project.ProjectName,
                 ClassID = project.ClassId,
-                ClassName = classTmp.ClassName
+                ClassName = classTmp.ClassName,
+                IsSelected = project.IsSelected
             };
             return result;
         }
@@ -71,7 +68,8 @@ namespace Service.ProjectService
                     ProjectName = item.ProjectName,
                     ClassID = item.ClassId,
                     ClassName = classTmp.ClassName,
-                    Description = item.Description
+                    Description = item.Description,
+                    IsSelected = item.IsSelected
                 };
                 result.Add(tmp);
             }
@@ -105,7 +103,8 @@ namespace Service.ProjectService
                                         ProjectName = item.ProjectName,
                                         ClassID = item.ClassId,
                                         ClassName = classTmp.ClassName,
-                                        Description = item.Description
+                                        Description = item.Description,
+                                        IsSelected = item.IsSelected
                                     };
                                     result.Add(tmp);
                                 }
@@ -117,16 +116,16 @@ namespace Service.ProjectService
             return result;
         }
 
-        public async Task<List<ProjectResponse>> SearchProjectInClass(Guid classId, string searchName)
+        public async Task<List<ProjectResponse>> SearchProjectInClass(Guid classId, string? searchName)
         {
             var project = await _context.Projects.Where(a => a.ClassId == classId && a.IsDeleted == false).ToListAsync();
             if (project == null) return null;
 
             var classTmp = await _context.Classes.FindAsync(classId);
             var result = new List<ProjectResponse>();
-            foreach (var item in project)
+            if (searchName.IsNullOrEmpty())
             {
-                if (item.ProjectName.Contains(searchName))
+                foreach (var item in project)
                 {
                     var projectTmp = new ProjectResponse
                     {
@@ -134,9 +133,29 @@ namespace Service.ProjectService
                         ProjectName = item.ProjectName,
                         ClassID = item.ClassId,
                         ClassName = classTmp.ClassName,
-                        Description = item.Description
+                        Description = item.Description,
+                        IsSelected = item.IsSelected
                     };
                     result.Add(projectTmp);
+                }
+            }
+            else
+            {
+                foreach (var item in project)
+                {
+                    if (item.ProjectName.ToLower().Contains(searchName.ToLower()))
+                    {
+                        var projectTmp = new ProjectResponse
+                        {
+                            ProjectId = item.ProjectId,
+                            ProjectName = item.ProjectName,
+                            ClassID = item.ClassId,
+                            ClassName = classTmp.ClassName,
+                            Description = item.Description,
+                            IsSelected = item.IsSelected
+                        };
+                        result.Add(projectTmp);
+                    }
                 }
             }
             return result;
