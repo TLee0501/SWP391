@@ -1,6 +1,7 @@
 ﻿using BusinessObjects.RequestModel;
 using BusinessObjects.ResponseModel;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,6 +14,7 @@ namespace Service.ClassService
         Task<int> CreateClass(CreateClassRequest request);
         Task<ClassResponse> GetClassByID(Guid classId);
         Task<int> DeleteClass(Guid classId);
-        Task<List<ClassResponse>> SearchClass(Guid courseID, string searchText);
+        Task<List<ClassResponse>> GetAllClasses(Guid? courseId);
+        Task<List<ClassResponse>> SearchClass(Guid courseID, string? searchText);
     }
 }
