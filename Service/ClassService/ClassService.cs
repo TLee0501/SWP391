@@ -3,6 +3,7 @@ using BusinessObjects.RequestModel;
 using BusinessObjects.ResponseModel;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -95,6 +96,34 @@ namespace Service.ClassService
                 };
             }
             return classResponse;
+        }
+
+        public async Task<List<ClassResponse>> GetAllClasses(Guid courseId)
+        {
+            var course = await _context.Courses.FindAsync(courseId);
+            var check = await _context.Classes.Where(x => x.CourseId == courseId).ToListAsync();
+            var list = new List<ClassResponse>();
+            if (check.Count == 0)
+            {
+                return null;
+            }
+            else
+            {
+                foreach (var item in check)
+                {
+                    var classes = new ClassResponse()
+                    {
+                        ClassId = item.ClassId,
+                        ClassName = item.ClassName,
+                        UserId = item.UserId,
+                        CourseCode = course.CourseCode,
+                        StartTime = item.TimeStart,
+                        EndTime = item.TimeEnd,
+                    };
+                    list.Add(classes);
+                }
+            }
+            return list;
         }
 
         public async Task<List<ClassResponse>> SearchClass(Guid courseId, string searchText)

@@ -65,6 +65,18 @@ namespace SystemController.Controllers
             return result;
         }
 
+        [HttpGet]
+        public async Task<ActionResult<List<ClassResponse>>> GetAllClasses(Guid courseId)
+        {
+            if (courseId == null) return BadRequest("Không nhận được dữ liệu.");
+            var result = await _classService.GetAllClasses(courseId);
+            if (result == null || result.Count == 0)
+            {
+                return NotFound("Không có có khoá học này.");
+            }
+            return result;
+        }
+
         [HttpDelete("{classId}")]
         public async Task<IActionResult> DeleteClass(Guid classId)
         {
