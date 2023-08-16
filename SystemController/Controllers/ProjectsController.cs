@@ -90,7 +90,7 @@ namespace SystemController.Controllers
         }
 
         [HttpGet("{classId}")]
-        public async Task<ActionResult<Project>> SearchProjectInClass(Guid classId, string searchName)
+        public async Task<ActionResult<Project>> SearchProjectInClass(Guid classId, string? searchName)
         {
             if (classId == Guid.Empty || classId == null) return BadRequest("Không nhận được dữ liệu!");
             var result = await _projectService.SearchProjectInClass(classId, searchName);
