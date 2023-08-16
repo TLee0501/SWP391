@@ -13,6 +13,8 @@ public partial class Project
 
     public string Description { get; set; } = null!;
 
+    public bool IsSelected { get; set; }
+
     public bool IsDeleted { get; set; }
 
     public virtual Class Class { get; set; } = null!;

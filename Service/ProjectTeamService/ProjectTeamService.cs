@@ -1,4 +1,5 @@
 ﻿using BusinessObjects.Models;
+using BusinessObjects.RequestModel;
 using BusinessObjects.ResponseModel;
 using System;
 using System.Collections.Generic;
@@ -33,6 +34,34 @@ namespace Service.ProjectTeamService
                 Status = pt.Status
             };
             return result;
+        }
+
+        public async Task<int> StudentCreateTeamRequest(StudentCreateTeamRequest request)
+        {
+            var checkclass = await _context.Classes.FindAsync(request.ClassID);
+            if (checkclass == null) return 1;
+
+            var team = Guid.NewGuid();
+            foreach (var item in request.ListStudent)
+            {
+                var tmp = new TeamRequest
+                {
+                    RequestId = Guid.NewGuid(),
+                    UserId = item,
+                    ClassId = request.ClassID,
+                    Team = team,
+                    Status = "Chờ duyệt"
+                };
+                await _context.TeamRequests.AddAsync(tmp);
+            }
+            try
+            {
+                await _context.SaveChangesAsync();
+                return 2;
+            } catch (Exception ex)
+            {
+                return 0;
+            }
         }
     }
 }

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BusinessObjects.Models;
 using Service.ProjectTeamService;
+using BusinessObjects.RequestModel;
 
 namespace SystemController.Controllers
 {
@@ -77,32 +78,21 @@ namespace SystemController.Controllers
 
         // POST: api/ProjectTeams
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        /*[HttpPost]
-        public async Task<ActionResult<ProjectTeam>> PostProjectTeam(ProjectTeam projectTeam)
+        [HttpPost]
+        public async Task<ActionResult> StudentCreateTeamRequest(StudentCreateTeamRequest request)
         {
-          if (_context.ProjectTeams == null)
-          {
-              return Problem("Entity set 'Swp391onGoingReportContext.ProjectTeams'  is null.");
-          }
-            _context.ProjectTeams.Add(projectTeam);
             try
             {
-                await _context.SaveChangesAsync();
+                var result = await _projectTeamServise.StudentCreateTeamRequest(request);
+                if (result == 1) return BadRequest("Không tìm thấy lớp học!");
+                else if (result == 2) return Ok("Thành công!");
+                else return BadRequest("Thất bại!");
             }
             catch (DbUpdateException)
             {
-                if (ProjectTeamExists(projectTeam.ProjectTeamId))
-                {
-                    return Conflict();
-                }
-                else
-                {
-                    throw;
-                }
+                return BadRequest("Thất bại!");
             }
-
-            return CreatedAtAction("GetProjectTeam", new { id = projectTeam.ProjectTeamId }, projectTeam);
-        }*/
+        }
 
         // DELETE: api/ProjectTeams/5
         /*[HttpDelete("{id}")]

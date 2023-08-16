@@ -116,6 +116,7 @@ public partial class Swp391onGoingReportContext : DbContext
                 .HasMaxLength(500)
                 .HasColumnName("description");
             entity.Property(e => e.IsDeleted).HasColumnName("isDeleted");
+            entity.Property(e => e.IsSelected).HasColumnName("isSelected");
             entity.Property(e => e.ProjectName)
                 .HasMaxLength(100)
                 .HasColumnName("projectName");
