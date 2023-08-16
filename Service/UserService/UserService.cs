@@ -95,11 +95,14 @@ namespace Service.UserService
                 {
                     if (item.FullName.ToLower().Contains(txtSearch.ToLower()) || item.Email.ToLower().Contains(txtSearch.ToLower()))
                     {
+                        var role = await _context.Roles.FindAsync(item.RoleId);
                         var tmp = new UserListResponse
                         {
                             UserId = item.UserId,
                             FullName = item.FullName,
-                            Email = item.Email
+                            Email = item.Email,
+                            Role = role.RoleName,
+                            isBan = item.IsBan
                         };
                         result.Add(tmp);
                     }
@@ -109,11 +112,14 @@ namespace Service.UserService
             {
                 foreach (var item in users)
                 {
+                    var role = await _context.Roles.FindAsync(item.RoleId);
                     var tmp = new UserListResponse
                     {
                         UserId = item.UserId,
                         FullName = item.FullName,
-                        Email = item.Email
+                        Email = item.Email,
+                        Role = role.RoleName,
+                        isBan = item.IsBan
                     };
                     result.Add(tmp);
                 }
