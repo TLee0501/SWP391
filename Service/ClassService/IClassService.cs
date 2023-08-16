@@ -14,7 +14,7 @@ namespace Service.ClassService
         Task<int> CreateClass(CreateClassRequest request);
         Task<ClassResponse> GetClassByID(Guid classId);
         Task<int> DeleteClass(Guid classId);
-        Task<List<ClassResponse>> GetAllClasses(Guid courseId);
-        Task<List<ClassResponse>> SearchClass(Guid courseID, string searchText);
+        Task<List<ClassResponse>> GetAllClasses(Guid? courseId);
+        Task<List<ClassResponse>> SearchClass(Guid courseID, string? searchText);
     }
 }

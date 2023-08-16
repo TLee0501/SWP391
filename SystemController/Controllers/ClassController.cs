@@ -66,13 +66,12 @@ namespace SystemController.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<ClassResponse>>> GetAllClasses(Guid courseId)
+        public async Task<ActionResult<List<ClassResponse>>> GetAllClasses(Guid? courseId)
         {
-            if (courseId == null) return BadRequest("Không nhận được dữ liệu.");
             var result = await _classService.GetAllClasses(courseId);
             if (result == null || result.Count == 0)
             {
-                return NotFound("Không có có khoá học này.");
+                return NotFound("Không tìm thấy.");
             }
             return result;
         }
@@ -95,9 +94,8 @@ namespace SystemController.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ClassResponse>>> SearchClass(Guid courseId, string searchText)
+        public async Task<ActionResult<IEnumerable<ClassResponse>>> SearchClass(Guid courseId, string? searchText)
         {
-            if (searchText == null) return BadRequest("Không nhận được dữ liệu.");
             var result = await _classService.SearchClass(courseId, searchText);
 
             if (result == null || result.Count == 0)
