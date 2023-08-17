@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace BusinessObjects.Models;
 
@@ -226,6 +224,7 @@ public partial class Swp391onGoingReportContext : DbContext
             entity.Property(e => e.TaskName)
                 .HasMaxLength(100)
                 .HasColumnName("taskName");
+            entity.Property(e => e.UserId).HasColumnName("userID");
 
             entity.HasOne(d => d.Project).WithMany(p => p.Tasks)
                 .HasForeignKey(d => d.ProjectId)
