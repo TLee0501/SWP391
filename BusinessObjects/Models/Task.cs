@@ -7,6 +7,8 @@ public partial class Task
 {
     public Guid TaskId { get; set; }
 
+    public Guid UserId { get; set; }
+
     public Guid ProjectId { get; set; }
 
     public string TaskName { get; set; } = null!;

@@ -2,9 +2,7 @@
 {
     public class TeamRequestResponse
     {
-        public Guid UserId { get; set; }
-        public string UserName { get; set; } = string.Empty;
         public Guid TeamId { get; set; }
-        public string Status { get; set; } = null!;
+        public List<UserBasicResponse> Users { get; set; }
     }
 }

@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using BusinessObjects.Models;
 using Service.ProjectTeamService;
 using BusinessObjects.RequestModel;
+using Microsoft.AspNetCore.Authentication.OAuth.Claims;
+using BusinessObjects.ResponseModel;
 
 namespace SystemController.Controllers
 {
@@ -24,7 +26,6 @@ namespace SystemController.Controllers
             _projectTeamServise = projectTeamServise;
         }
 
-
         // GET: api/ProjectTeams
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ProjectTeam>>> GetProjectTeamsForTest()
@@ -34,6 +35,14 @@ namespace SystemController.Controllers
               return NotFound();
           }
             return await _context.ProjectTeams.ToListAsync();
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<TeamRequestResponse>>> GetTeamProjectRequests(Guid classId)
+        {
+            var result = await _projectTeamServise.GetTeamProjectRequests(classId);
+            if (result == null) return BadRequest("Không tìm thấy Request!");
+            return result;
         }
 
         // GET: api/ProjectTeams/5

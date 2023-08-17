@@ -7,6 +7,6 @@ namespace Service.ProjectTeamService
     {
         Task<ProjectTeamResponse> getProjectTeamById(Guid projectTeamId);
         Task<int> StudentCreateTeamRequest(StudentCreateTeamRequest request);
-        //Task<List<reques>>
+        Task<List<TeamRequestResponse>> GetTeamProjectRequests(Guid classId);
     }
 }
