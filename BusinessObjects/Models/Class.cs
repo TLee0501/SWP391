@@ -13,6 +13,8 @@ public partial class Class
 
     public string ClassName { get; set; } = null!;
 
+    public string EnrollCode { get; set; } = null!;
+
     public DateTime TimeStart { get; set; }
 
     public DateTime? TimeEnd { get; set; }

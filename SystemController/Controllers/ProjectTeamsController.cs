@@ -10,6 +10,7 @@ using Service.ProjectTeamService;
 using BusinessObjects.RequestModel;
 using Microsoft.AspNetCore.Authentication.OAuth.Claims;
 using BusinessObjects.ResponseModel;
+using Microsoft.IdentityModel.Tokens;
 
 namespace SystemController.Controllers
 {
@@ -56,46 +57,34 @@ namespace SystemController.Controllers
 
         // PUT: api/ProjectTeams/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        /*[HttpPut("{id}")]
-        public async Task<IActionResult> PutProjectTeam(Guid id, ProjectTeam projectTeam)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> DenyTeamProjectrequest(Guid teamId)
         {
-            if (id != projectTeam.ProjectTeamId)
+            if (teamId == Guid.Empty)
             {
-                return BadRequest();
+                return BadRequest("Không nhận được teamId!");
             }
 
-            _context.Entry(projectTeam).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ProjectTeamExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }*/
+            var result = await _projectTeamServise.DenyTeamProjectrequest(teamId);
+            if (result == 1) return BadRequest("Không tìm thấy yêu cầu!");
+            else if (result == 2) return BadRequest("Yêu cầu đã bị từ chối!");
+            else if (result == 3) return Ok("Thành công!");
+            else return BadRequest("Thất bại!");
+        }
 
         // POST: api/ProjectTeams
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult> StudentCreateTeamRequest(StudentCreateTeamRequest request)
         {
+            if (request.TeamName.IsNullOrEmpty()) return BadRequest("Chưa có tên nhóm!");
             try
             {
                 var result = await _projectTeamServise.StudentCreateTeamRequest(request);
                 if (result == 1) return BadRequest("Không tìm thấy lớp học!");
                 else if (result == 2) return Ok("Thành công!");
-                else return BadRequest("Thất bại!");
+                else if (result == 3) return BadRequest("Tên nhóm đã tồn tại!");
+                else return BadRequest("Thất bại!"); //0
             }
             catch (DbUpdateException)
             {
