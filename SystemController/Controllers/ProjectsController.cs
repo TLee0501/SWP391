@@ -68,16 +68,16 @@ namespace SystemController.Controllers
             else return Ok("Thành công!");
         }
 
-        [HttpGet("{classId}")]
+        /*[HttpGet("{classId}")]
         public async Task<ActionResult<Project>> GetProjectsByClassID(Guid classId)
         {
             if (classId == Guid.Empty || classId == null) return BadRequest("Không nhận được dữ liệu!");
             var result = await _projectService.GetProjectsByClassID(classId);
             if (result == null) return BadRequest("Không tìm thấy Project!");
             return Ok(result);
-        }
+        }*/
 
-        [HttpGet("{classId}"), Authorize]
+        /*[HttpGet("{classId}"), Authorize]
         public async Task<ActionResult<Project>> GetProjectsByClassIDandUserID(Guid classId)
         {
             var roleClaim = User?.FindAll(ClaimTypes.Name);
@@ -87,13 +87,25 @@ namespace SystemController.Controllers
             var result = await _projectService.GetProjectsByClassIDandUserID(classId, userID);
             if (result == null || result.Count == 0) return BadRequest("Không tìm thấy Project!");
             return Ok(result);
-        }
+        }*/
 
-        [HttpGet("{classId}")]
+        /*[HttpGet("{classId}")]
         public async Task<ActionResult<Project>> SearchProjectInClass(Guid classId, string? searchName)
         {
             if (classId == Guid.Empty || classId == null) return BadRequest("Không nhận được dữ liệu!");
             var result = await _projectService.SearchProjectInClass(classId, searchName);
+            if (result == null || result.Count == 0) return BadRequest("Không tìm thấy Project!");
+            return Ok(result);
+        }*/
+
+        [HttpGet("{classId}"), Authorize]
+        public async Task<ActionResult<Project>> GetProjectsByFilter(Guid classId, string? searchName, bool hasUserId)
+        {
+            var roleClaim = User?.FindAll(ClaimTypes.Name);
+            var userID = new Guid(roleClaim?.Select(c => c.Value).SingleOrDefault().ToString());
+
+            if (classId == Guid.Empty || classId == null) return BadRequest("Không nhận được dữ liệu!");
+            var result = await _projectService.GetProjectsByFilter(classId, userID, searchName, hasUserId);
             if (result == null || result.Count == 0) return BadRequest("Không tìm thấy Project!");
             return Ok(result);
         }
