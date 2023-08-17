@@ -24,7 +24,7 @@ namespace Service.ClassService
         {
             var classes = await _context.Classes.SingleOrDefaultAsync(x => x.ClassName.ToLower() == request.ClassName.ToLower() && x.IsDeleted == false);
             if (classes != null) return 1;
-
+            
             var id = Guid.NewGuid();
             var newclass = new Class
             {
