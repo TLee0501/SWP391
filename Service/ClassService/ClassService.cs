@@ -1,4 +1,5 @@
-﻿using BusinessObjects.Models;
+﻿using Azure.Core;
+using BusinessObjects.Models;
 using BusinessObjects.RequestModel;
 using BusinessObjects.ResponseModel;
 using Microsoft.EntityFrameworkCore;
@@ -31,6 +32,7 @@ namespace Service.ClassService
                 UserId = request.UserId,
                 CourseId = request.CourseId,
                 ClassName = request.ClassName,
+                EnrollCode = request.EnrollCode,
                 TimeStart = request.TimeStart,
                 TimeEnd = request.TimeEnd,
                 IsDeleted = false,
@@ -80,6 +82,7 @@ namespace Service.ClassService
                     ClassName = classes.ClassName,
                     UserId = classes.UserId,
                     CourseCode = course.CourseCode,
+                    EnrollCode = classes.EnrollCode,
                     StartTime = classes.TimeStart
                 };
             }
@@ -91,6 +94,7 @@ namespace Service.ClassService
                     ClassName = classes.ClassName,
                     UserId = classes.UserId,
                     CourseCode = course.CourseCode,
+                    EnrollCode = classes.EnrollCode,
                     StartTime = classes.TimeStart,
                     EndTime = classes.TimeEnd
                 };
@@ -114,6 +118,7 @@ namespace Service.ClassService
                         ClassName = item.ClassName,
                         UserId = item.UserId,
                         CourseCode = course.CourseCode,
+                        EnrollCode = item.EnrollCode,
                         StartTime = item.TimeStart,
                         EndTime = item.TimeEnd,
                     };
@@ -133,6 +138,7 @@ namespace Service.ClassService
                             ClassName = item.ClassName,
                             UserId = item.UserId,
                             CourseCode = course.CourseCode,
+                            EnrollCode = item.EnrollCode,
                             StartTime = item.TimeStart,
                             EndTime = item.TimeEnd,
                         };
@@ -160,6 +166,7 @@ namespace Service.ClassService
                                 ClassId = item.ClassId,
                                 ClassName = item.ClassName,
                                 CourseCode = course.CourseCode,
+                                EnrollCode = item.EnrollCode,
                                 UserId = item.UserId,
                                 StartTime = item.TimeStart
                             };
@@ -171,6 +178,7 @@ namespace Service.ClassService
                                 ClassId = item.ClassId,
                                 ClassName = item.ClassName,
                                 CourseCode = course.CourseCode,
+                                EnrollCode = item.EnrollCode,
                                 UserId = item.UserId,
                                 StartTime = item.TimeStart,
                                 EndTime = (DateTime)item.TimeEnd,
@@ -193,6 +201,7 @@ namespace Service.ClassService
                                     ClassId = item.ClassId,
                                     ClassName = item.ClassName,
                                     CourseCode = course.CourseCode,
+                                    EnrollCode = item.EnrollCode,
                                     UserId = item.UserId,
                                     StartTime = item.TimeStart
                                 };
@@ -204,6 +213,7 @@ namespace Service.ClassService
                                     ClassId = item.ClassId,
                                     ClassName = item.ClassName,
                                     CourseCode = course.CourseCode,
+                                    EnrollCode = item.EnrollCode,
                                     UserId = item.UserId,
                                     StartTime = item.TimeStart,
                                     EndTime = (DateTime)item.TimeEnd,
