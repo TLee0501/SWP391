@@ -65,17 +65,6 @@ namespace SystemController.Controllers
             return result;
         }
 
-        [HttpGet]
-        public async Task<ActionResult<List<ClassResponse>>> GetAllClasses(Guid? courseId)
-        {
-            var result = await _classService.GetAllClasses(courseId);
-            if (result == null || result.Count == 0)
-            {
-                return NotFound("Không tìm thấy.");
-            }
-            return result;
-        }
-
         [HttpDelete("{classId}")]
         public async Task<IActionResult> DeleteClass(Guid classId)
         {
@@ -94,15 +83,9 @@ namespace SystemController.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ClassResponse>>> SearchClass(Guid courseId, string? searchText)
+        public async Task<ActionResult<IEnumerable<ClassResponse>>> SearchClass(Guid? courseId = null, string? searchText = null)
         {
-            var result = await _classService.SearchClass(courseId, searchText);
-
-            if (result == null || result.Count == 0)
-            {
-                return NotFound("Không tìm thấy.");
-            }
-
+            var result = await _classService.GetClasses(courseId, searchText);
             return result;
         }
     }
