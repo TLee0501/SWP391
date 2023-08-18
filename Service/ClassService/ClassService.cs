@@ -106,7 +106,7 @@ namespace Service.ClassService
 
         public async Task<List<ClassResponse>> GetClasses(Guid? courseId = null, string? searchText = null)
         {
-            IQueryable<Class> query = _context.Classes.Include(item => item.Course);
+            IQueryable<Class> query = _context.Classes.Include(item => item.Course).Where(item => !item.IsDeleted);
 
             if (courseId != null)
             {
