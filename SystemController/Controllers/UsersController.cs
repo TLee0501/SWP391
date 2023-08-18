@@ -88,34 +88,25 @@ namespace SystemController.Controllers
 
         // PUT: api/Users/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        /*[HttpPut("{id}")]
-        public async Task<IActionResult> PutUser(Guid id, User user)
+        [HttpPut("{userId}")]
+        public async Task<IActionResult> UnbanUser(Guid userId)
         {
-            if (id != user.UserId)
-            {
-                return BadRequest();
-            }
+            var result = await _userService.UnbanUser(userId);
+            if (result == 1) return BadRequest("Tài khoản không tồn tại!");
+            else if (result == 2) return BadRequest("Tài khoản đã ở trạng thái hoạt động!");
+            else if (result == 3) return Ok("Thành công!");
+            else return BadRequest("Thất bại!");
+        }
 
-            _context.Entry(user).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!UserExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }*/
+        [HttpPut("{userId}")]
+        public async Task<IActionResult> BanUser(Guid userId)
+        {
+            var result = await _userService.BanUser(userId);
+            if (result == 1) return BadRequest("Tài khoản không tồn tại!");
+            else if (result == 2) return BadRequest("Tài khoản đã ở trạng thái bị khóa!");
+            else if (result == 3) return Ok("Thành công!");
+            else return BadRequest("Thất bại!");
+        }
 
         // POST: api/Users
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754

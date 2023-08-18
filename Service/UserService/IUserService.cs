@@ -10,5 +10,7 @@ namespace Service.UserService
         Task<int> CreateStudent(UserCreateRequest request);
         Task<UserResponse> GetUser(Guid userId);
         Task<List<UserListResponse>> SearchUser(string? txtSearch);
+        Task<int> BanUser(Guid userId);
+        Task<int> UnbanUser(Guid userId);
     }
 }
