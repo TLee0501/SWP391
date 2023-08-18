@@ -29,10 +29,10 @@ namespace SystemController.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Project>>> GetProjectsForTest()
         {
-          if (_context.Projects == null)
-          {
-              return NotFound();
-          }
+            if (_context.Projects == null)
+            {
+                return NotFound();
+            }
             return await _context.Projects.ToListAsync();
         }
 

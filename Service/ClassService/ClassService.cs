@@ -24,7 +24,7 @@ namespace Service.ClassService
         {
             var classes = await _context.Classes.SingleOrDefaultAsync(x => x.ClassName.ToLower() == request.ClassName.ToLower() && x.IsDeleted == false);
             if (classes != null) return 1;
-            
+
             var id = Guid.NewGuid();
             var newclass = new Class
             {
@@ -104,9 +104,9 @@ namespace Service.ClassService
             return classResponse;
         }
 
-        public async Task<List<ClassResponse>> GetClasses(Guid? courseId = null, string? searchText = null)
+        public async Task<List<ClassResponse>> GetClasses(Guid userID, Guid? courseId = null, string? searchText = null)
         {
-            IQueryable<Class> query = _context.Classes.Include(item => item.Course).Where(item => !item.IsDeleted);
+            IQueryable<Class> query = _context.Classes.Include(item => item.Course).Where(item => item.UserId == userID && !item.IsDeleted);
 
             if (courseId != null)
             {
