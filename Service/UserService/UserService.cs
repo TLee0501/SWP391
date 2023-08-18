@@ -16,6 +16,23 @@ namespace Service.UserService
             _context = context;
         }
 
+        public async Task<int> BanUser(Guid userId)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null) return 1;
+            if (user.IsBan == true) return 2;
+            try
+            {
+                user.IsBan = true;
+                await _context.SaveChangesAsync();
+                return 3;
+            }
+            catch (Exception ex)
+            {
+                return 0;
+            }
+        }
+
         public async Task<int> CreateStudent(UserCreateRequest request)
         {
             var check = await _context.Users.SingleOrDefaultAsync(a => a.Email == request.Email);
@@ -127,6 +144,22 @@ namespace Service.UserService
                 }
             }
             return result;
+        }
+
+        public async Task<int> UnbanUser(Guid userId)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null) return 1;
+            if (user.IsBan == false) return 2;
+            try
+            {
+                user.IsBan = false;
+                await _context.SaveChangesAsync();
+                return 3;
+            } catch (Exception ex)
+            {
+                return 0;
+            }
         }
     }
 }

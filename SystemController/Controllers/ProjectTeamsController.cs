@@ -42,7 +42,7 @@ namespace SystemController.Controllers
         public async Task<ActionResult<IEnumerable<TeamRequestResponse>>> GetTeamProjectRequests(Guid classId)
         {
             var result = await _projectTeamServise.GetTeamProjectRequests(classId);
-            if (result == null) return BadRequest("Không tìm thấy Request!");
+            if (result.IsNullOrEmpty()) return BadRequest("Không tìm thấy Request!");
             return result;
         }
 
@@ -57,7 +57,7 @@ namespace SystemController.Controllers
 
         // PUT: api/ProjectTeams/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
+        [HttpPut("{teamId}")]
         public async Task<IActionResult> DenyTeamProjectrequest(Guid teamId)
         {
             if (teamId == Guid.Empty)
@@ -72,12 +72,29 @@ namespace SystemController.Controllers
             else return BadRequest("Thất bại!");
         }
 
+        [HttpPut("{teamId}")]
+        public async Task<IActionResult> AcceptTeamProjectrequest(Guid teamId)
+        {
+            if (teamId == Guid.Empty)
+            {
+                return BadRequest("Không nhận được teamId!");
+            }
+
+            var result = await _projectTeamServise.AcceptTeamProjectrequest(teamId);
+            if (result == 1) return BadRequest("Không tìm thấy yêu cầu!");
+            else if (result == 2) return BadRequest("Yêu cầu đã bị chấp nhận!");
+            else if (result == 3) return Ok("Thành công!");
+            else if (result == 4) return BadRequest("Có thành viên đã tham gia vào nhóm khác!");
+            else return BadRequest("Thất bại!");
+        }
+
         // POST: api/ProjectTeams
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult> StudentCreateTeamRequest(StudentCreateTeamRequest request)
         {
             if (request.TeamName.IsNullOrEmpty()) return BadRequest("Chưa có tên nhóm!");
+            if (request.ProjectId == Guid.Empty) return BadRequest("Chưa có ID đề tài!");
             try
             {
                 var result = await _projectTeamServise.StudentCreateTeamRequest(request);
