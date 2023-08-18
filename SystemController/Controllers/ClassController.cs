@@ -1,11 +1,14 @@
 ﻿using BusinessObjects.Models;
 using BusinessObjects.RequestModel;
 using BusinessObjects.ResponseModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Service.ClassService;
 using Service.CourseService;
 using System.Data.Common;
+using System.Security.Claims;
+using System.Security.Principal;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -82,10 +85,14 @@ namespace SystemController.Controllers
             }
         }
 
-        [HttpGet]
+        [HttpGet, Authorize]
         public async Task<ActionResult<IEnumerable<ClassResponse>>> SearchClass(Guid? courseId = null, string? searchText = null)
         {
-            var result = await _classService.GetClasses(courseId, searchText);
+
+            var userId = Utils.GetUserIdFromHttpContext(HttpContext);
+            var userGuid = new Guid(userId!);
+
+            var result = await _classService.GetClasses(userGuid, courseId, searchText);
             return result;
         }
     }
