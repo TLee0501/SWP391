@@ -76,7 +76,7 @@ namespace Service.ProjectService
             return result;
         }
 
-        public async Task<List<ProjectResponse>> GetProjectsByClassIDandUserID(Guid classId, Guid userId)
+        private async Task<List<ProjectResponse>> GetProjectsByClassIDandUserID(Guid classId, Guid userId)
         {
             var result = new List<ProjectResponse>();
             var projects = await _context.Projects.Where(a => a.ClassId == classId && a.IsDeleted == false).ToListAsync();
@@ -116,7 +116,17 @@ namespace Service.ProjectService
             return result;
         }
 
-        public async Task<List<ProjectResponse>> SearchProjectInClass(Guid classId, string? searchName)
+        public async Task<List<ProjectResponse>> GetProjectsByFilter(Guid classId, Guid userId, string? searchName, bool hasUserId)
+        {
+            var result = new List<ProjectResponse>();
+            if (hasUserId == true)
+                result = await GetProjectsByClassIDandUserID(classId, userId);
+            else if (hasUserId == false)
+                result = await SearchProjectInClass(classId, searchName);
+            return result;
+        }
+
+        private async Task<List<ProjectResponse>> SearchProjectInClass(Guid classId, string? searchName)
         {
             var project = await _context.Projects.Where(a => a.ClassId == classId && a.IsDeleted == false).ToListAsync();
             if (project == null) return null;

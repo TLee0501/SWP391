@@ -62,6 +62,8 @@ namespace Service.UserService
                 tmp.UserId = user.UserId;
                 tmp.FullName = user.FullName;
                 tmp.Email = user.Email;
+                tmp.Role = _context.Roles.FindAsync(user.RoleId).Result.RoleName;
+                tmp.isBan = user.IsBan;
                 result.Add(tmp);
             }
             if (result.Count == 0) return null;

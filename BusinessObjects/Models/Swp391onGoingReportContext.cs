@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
 
 namespace BusinessObjects.Models;
 
@@ -54,6 +56,7 @@ public partial class Swp391onGoingReportContext : DbContext
                 .HasMaxLength(100)
                 .HasColumnName("className");
             entity.Property(e => e.CourseId).HasColumnName("courseID");
+            entity.Property(e => e.EnrollCode).HasMaxLength(50);
             entity.Property(e => e.IsCompleted).HasColumnName("isCompleted");
             entity.Property(e => e.IsDeleted).HasColumnName("isDeleted");
             entity.Property(e => e.TimeEnd)
@@ -263,12 +266,16 @@ public partial class Swp391onGoingReportContext : DbContext
                 .ValueGeneratedNever()
                 .HasColumnName("requestID");
             entity.Property(e => e.ClassId).HasColumnName("classID");
+            entity.Property(e => e.ProjectId).HasColumnName("projectID");
             entity.Property(e => e.Status)
                 .HasMaxLength(10)
                 .IsUnicode(false)
                 .IsFixedLength()
                 .HasColumnName("status");
             entity.Property(e => e.Team).HasColumnName("team");
+            entity.Property(e => e.TeamName)
+                .HasMaxLength(50)
+                .HasColumnName("teamName");
             entity.Property(e => e.UserId).HasColumnName("userID");
 
             entity.HasOne(d => d.Class).WithMany(p => p.TeamRequests)

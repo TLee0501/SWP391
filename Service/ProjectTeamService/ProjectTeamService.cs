@@ -19,6 +19,80 @@ namespace Service.ProjectTeamService
             _context = context;
         }
 
+        public async Task<int> AcceptTeamProjectrequest(Guid teamId)
+        {
+            var pts = await _context.TeamRequests.Where(a => a.Team == teamId).ToListAsync();
+            if (pts == null) return 1;
+
+            var projectTeamId = Guid.NewGuid();
+            if (pts[0].ProjectId == null || pts[0].ProjectId == Guid.Empty)
+            {
+                var projectTeam = new ProjectTeam
+                {
+                    ProjectTeamId = projectTeamId,
+                    TeamName = pts[0].TeamName,
+                    TimeStart = DateTime.Now,
+                    Status = 1
+                };
+                await _context.ProjectTeams.AddAsync(projectTeam);
+            }
+            else
+            {
+                var projectTeam = new ProjectTeam
+                {
+                    ProjectTeamId = projectTeamId,
+                    ProjectId = (Guid)pts[0].ProjectId,
+                    TeamName = pts[0].TeamName,
+                    TimeStart = DateTime.Now,
+                    Status = 1
+                };
+                await _context.ProjectTeams.AddAsync(projectTeam);
+            }
+
+            foreach (var item in pts)
+            {
+                if (item.Status.Equals("1")) return 2;
+                item.Status = "1";
+
+                var teamMember = new TeamMember
+                {
+                    TeamMemberId = Guid.NewGuid(),
+                    ProjectTeamId = projectTeamId,
+                    UserId = item.UserId
+                };
+                await _context.TeamMembers.AddAsync(teamMember);
+            }
+
+            try
+            {
+                await _context.SaveChangesAsync();
+                return 3;
+            }
+            catch (Exception ex)
+            {
+                return 0;
+            }
+        }
+
+        public async Task<int> DenyTeamProjectrequest(Guid teamId)
+        {
+            var pts = await _context.TeamRequests.Where(a => a.Team == teamId).ToListAsync();
+            if (pts == null) return 1;
+            foreach (var item in pts)
+            {
+                if (item.Status.Equals("2")) return 2;
+                item.Status = "2";
+            }
+            try
+            {
+                await _context.SaveChangesAsync();
+                return 3;
+            } catch (Exception ex)
+            {
+                return 0;
+            }
+        }
+
         public async Task<ProjectTeamResponse> getProjectTeamById(Guid projectTeamId)
         {
             var pt = await _context.ProjectTeams.FindAsync(projectTeamId);
@@ -40,23 +114,19 @@ namespace Service.ProjectTeamService
         public async Task<List<TeamRequestResponse>> GetTeamProjectRequests(Guid classId)
         {
             var result = new List<TeamRequestResponse>();
-            var listRequest = await _context.TeamRequests.Where(a => a.ClassId == classId && a.Status == "0").ToListAsync();
             var listTeamId = new List<Guid>();
 
             //Lay list team
-            foreach (var item in listRequest)
-            {
-                listTeamId.Add(item.Team);
-            }
-            var uniqueListTeamId = listTeamId.Distinct().ToList();
+            var listRequest = await _context.TeamRequests.Where(a => a.ClassId == classId && a.Status == "0").ToListAsync();
+            var uniqueListTeam = listRequest.DistinctBy(a => a.Team).ToList();
 
             //Xu ly tung Team
-            foreach (var item in listTeamId)
+            foreach (var item in uniqueListTeam)
             {
                 var listBasicMember = new List<UserBasicResponse>();
-                var listTR = await _context.TeamRequests.Where(a => a.Team == item).ToListAsync();
-                listTR = listTR.Distinct().ToList();
-                foreach (var item1 in listTR)
+                var listTR = await _context.TeamRequests.Where(a => a.Team == item.Team).ToListAsync();
+                var uniqueListTR = listTR.DistinctBy(a =>a.Team).ToList();
+                foreach (var item1 in uniqueListTR)
                 {
                     var members = await _context.TeamRequests.Where(a => a.Team == item1.Team).ToListAsync();
                     foreach (var item2 in members)
@@ -69,12 +139,27 @@ namespace Service.ProjectTeamService
                         };
                         listBasicMember.Add(tmp);
                     }
-                    var tmpResult = new TeamRequestResponse()
+                    if (item1.ProjectId != Guid.Empty || item1.ProjectId != null)
                     {
-                        TeamId = item1.Team,
-                        Users = listBasicMember
-                    };
-                    result.Add(tmpResult);
+                        var projectTmp = await _context.Projects.FindAsync(item1.ProjectId);
+                        var tmpResult = new TeamRequestResponse()
+                        {
+                            TeamId = item1.Team,
+                            ProjectId = item1.ProjectId,
+                            ProjectName = projectTmp.ProjectName,
+                            Users = listBasicMember
+                        };
+                        result.Add(tmpResult);
+                    }
+                    else
+                    {
+                        var tmpResult = new TeamRequestResponse()
+                        {
+                            TeamId = item1.Team,
+                            Users = listBasicMember
+                        };
+                        result.Add(tmpResult);
+                    }
                 }
             }
             return result;
@@ -82,21 +167,40 @@ namespace Service.ProjectTeamService
 
         public async Task<int> StudentCreateTeamRequest(StudentCreateTeamRequest request)
         {
-            var checkclass = await _context.Classes.FindAsync(request.ClassID);
+            var checkName = await _context.TeamRequests.Where(a => a.ClassId == request.ClassId && a.TeamName == request.TeamName).ToListAsync();
+            if (checkName.Count > 0) return 3;
+
+            var checkclass = await _context.Classes.FindAsync(request.ClassId);
             if (checkclass == null) return 1;
 
             var team = Guid.NewGuid();
             foreach (var item in request.ListStudent)
             {
-                var tmp = new TeamRequest
+                if (request.ProjectId == null)
                 {
-                    RequestId = Guid.NewGuid(),
-                    UserId = item,
-                    ClassId = request.ClassID,
-                    Team = team,
-                    Status = "0"
-                };
-                await _context.TeamRequests.AddAsync(tmp);
+                    var tmp = new TeamRequest
+                    {
+                        RequestId = Guid.NewGuid(),
+                        UserId = item,
+                        ClassId = request.ClassId,
+                        Team = team,
+                        Status = "0"
+                    };
+                    await _context.TeamRequests.AddAsync(tmp);
+                }
+                else
+                {
+                    var tmp = new TeamRequest
+                    {
+                        RequestId = Guid.NewGuid(),
+                        UserId = item,
+                        ClassId = request.ClassId,
+                        Team = team,
+                        ProjectId = request.ProjectId,
+                        Status = "0"
+                    };
+                    await _context.TeamRequests.AddAsync(tmp);
+                }
             }
             try
             {
