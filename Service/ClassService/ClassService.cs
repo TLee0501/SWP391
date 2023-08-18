@@ -66,6 +66,11 @@ namespace Service.ClassService
             }
         }
 
+        public Task<List<ClassResponse>> GetAllClasses(Guid? courseId)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<ClassResponse> GetClassByID(Guid classId)
         {
             var classes = await _context.Classes.FindAsync(classId);
