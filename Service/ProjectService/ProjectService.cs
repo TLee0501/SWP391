@@ -46,6 +46,7 @@ namespace Service.ProjectService
             {
                 ProjectId = projectId,
                 ProjectName = project.ProjectName,
+                Description = project.Description,
                 ClassID = project.ClassId,
                 ClassName = classTmp.ClassName,
                 IsSelected = project.IsSelected
@@ -111,7 +112,7 @@ namespace Service.ProjectService
                             }
                         }
                     }
-                }                
+                }
             }
             return result;
         }
@@ -185,6 +186,22 @@ namespace Service.ProjectService
                 return 2;
             }
             catch { return 0; }
+        }
+
+        public async Task<int> DeleteProject(Guid projectId)
+        {
+            var check = await _context.Projects.FindAsync(projectId);
+            if (check == null) return 1;
+            try
+            {
+                check.IsDeleted = true;
+                await _context.SaveChangesAsync();
+                return 2;
+            }
+            catch (Exception ex)
+            {
+                return 0;
+            }
         }
     }
 }
