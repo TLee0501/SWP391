@@ -127,7 +127,8 @@ namespace Service.ClassService
                 CourseName = item.Course.CourseName,
                 EnrollCode = item.EnrollCode,
                 UserId = item.UserId,
-                StartTime = item.TimeStart
+                StartTime = item.TimeStart,
+                EndTime = item.TimeEnd,
             });
 
             return classResponses.ToList();
