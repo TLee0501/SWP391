@@ -4,6 +4,7 @@ using BusinessObjects.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BusinessObjects.Migrations
 {
     [DbContext(typeof(Swp391onGoingReportContext))]
-    partial class Swp391onGoingReportContextModelSnapshot : ModelSnapshot
+    [Migration("20230817013844_Migration20230817")]
+    partial class Migration20230817
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -37,11 +40,6 @@ namespace BusinessObjects.Migrations
                     b.Property<Guid>("CourseId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("courseID");
-
-                    b.Property<string>("EnrollCode")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
 
                     b.Property<bool>("IsCompleted")
                         .HasColumnType("bit")
@@ -327,10 +325,6 @@ namespace BusinessObjects.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("classID");
 
-                    b.Property<Guid?>("ProjectId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("projectID");
-
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasMaxLength(10)
@@ -342,12 +336,6 @@ namespace BusinessObjects.Migrations
                     b.Property<Guid>("Team")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("team");
-
-                    b.Property<string>("TeamName")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasColumnName("teamName");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier")
