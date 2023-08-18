@@ -129,5 +129,21 @@ namespace SystemController.Controllers
 
             return NoContent();
         }*/
+
+        [HttpDelete("{projectId}")]
+        public async Task<IActionResult> DeleteProject(Guid projectId)
+        {
+            try
+            {
+                var result = await _projectService.DeleteProject(projectId);
+                if (result == 0) return BadRequest("Không thành công!");
+                else if (result == 1) return BadRequest("Không tìm thấy dự án.");
+                else return Ok("Thành công!");
+            }
+            catch (DbUpdateException)
+            {
+                return BadRequest("Không thành công.");
+            }
+        }
     }
 }
