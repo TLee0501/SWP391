@@ -82,6 +82,7 @@ namespace Service.ClassService
                     ClassName = classes.ClassName,
                     UserId = classes.UserId,
                     CourseCode = course.CourseCode,
+                    CourseName = course.CourseName,
                     EnrollCode = classes.EnrollCode,
                     StartTime = classes.TimeStart
                 };
@@ -94,6 +95,7 @@ namespace Service.ClassService
                     ClassName = classes.ClassName,
                     UserId = classes.UserId,
                     CourseCode = course.CourseCode,
+                    CourseName = course.CourseName,
                     EnrollCode = classes.EnrollCode,
                     StartTime = classes.TimeStart,
                     EndTime = classes.TimeEnd
@@ -102,128 +104,33 @@ namespace Service.ClassService
             return classResponse;
         }
 
-        public async Task<List<ClassResponse>> GetAllClasses(Guid? courseId)
+        public async Task<List<ClassResponse>> GetClasses(Guid? courseId = null, string? searchText = null)
         {
-            var check = await _context.Classes.Where(x => x.IsDeleted == false).ToListAsync();
-            if (check == null || check.Count == 0) return null;
-            var list = new List<ClassResponse>();
-            if (courseId == null || courseId == Guid.Empty)
+            IQueryable<Class> query = _context.Classes.Include(item => item.Course);
+
+            if (courseId != null)
             {
-                foreach (var item in check)
-                {
-                    var course = await _context.Courses.FindAsync(item.CourseId);
-                    var classes = new ClassResponse()
-                    {
-                        ClassId = item.ClassId,
-                        ClassName = item.ClassName,
-                        UserId = item.UserId,
-                        CourseCode = course.CourseCode,
-                        EnrollCode = item.EnrollCode,
-                        StartTime = item.TimeStart,
-                        EndTime = item.TimeEnd,
-                    };
-                    list.Add(classes);
-                }
+                query = query.Where(item => item.CourseId == courseId);
             }
-            else
+
+            if (!string.IsNullOrEmpty(searchText))
             {
-                foreach (var item in check)
-                {
-                    if (item.CourseId == courseId)
-                    {
-                        var course = await _context.Courses.FindAsync(courseId);
-                        var classes = new ClassResponse()
-                        {
-                            ClassId = item.ClassId,
-                            ClassName = item.ClassName,
-                            UserId = item.UserId,
-                            CourseCode = course.CourseCode,
-                            EnrollCode = item.EnrollCode,
-                            StartTime = item.TimeStart,
-                            EndTime = item.TimeEnd,
-                        };
-                        list.Add(classes);
-                    }
-                }
+                query = query.Where(item => item.ClassName.Contains(searchText));
             }
-            return list;
-        }
-            public async Task<List<ClassResponse>> SearchClass(Guid courseId, string? searchText)
+
+            var classes = await query.ToListAsync();
+            var classResponses = classes.Select(item => new ClassResponse
             {
-                var result = new List<ClassResponse>();
-                var classes = await _context.Classes.Where(x => x.IsDeleted == false && x.CourseId == courseId).ToListAsync();
-                if (classes == null || classes.Count == 0) return null;
-                var course = await _context.Courses.FindAsync(courseId);
-                if (searchText == null || searchText == "")
-                {
-                    foreach (var item in classes)
-                    {
-                        var tmp = new ClassResponse();
-                        if (item.TimeEnd == null)
-                        {
-                            tmp = new ClassResponse
-                            {
-                                ClassId = item.ClassId,
-                                ClassName = item.ClassName,
-                                CourseCode = course.CourseCode,
-                                EnrollCode = item.EnrollCode,
-                                UserId = item.UserId,
-                                StartTime = item.TimeStart
-                            };
-                        }
-                        else
-                        {
-                            tmp = new ClassResponse
-                            {
-                                ClassId = item.ClassId,
-                                ClassName = item.ClassName,
-                                CourseCode = course.CourseCode,
-                                EnrollCode = item.EnrollCode,
-                                UserId = item.UserId,
-                                StartTime = item.TimeStart,
-                                EndTime = (DateTime)item.TimeEnd,
-                            };
-                        }
-                        result.Add(tmp);
-                    }
-                }
-                else
-                {
-                    foreach (var item in classes)
-                    {
-                        if (item.ClassName.ToLower().Contains(searchText.ToLower()))
-                        {
-                            var tmp = new ClassResponse();
-                            if (item.TimeEnd == null)
-                            {
-                                tmp = new ClassResponse
-                                {
-                                    ClassId = item.ClassId,
-                                    ClassName = item.ClassName,
-                                    CourseCode = course.CourseCode,
-                                    EnrollCode = item.EnrollCode,
-                                    UserId = item.UserId,
-                                    StartTime = item.TimeStart
-                                };
-                            }
-                            else
-                            {
-                                tmp = new ClassResponse
-                                {
-                                    ClassId = item.ClassId,
-                                    ClassName = item.ClassName,
-                                    CourseCode = course.CourseCode,
-                                    EnrollCode = item.EnrollCode,
-                                    UserId = item.UserId,
-                                    StartTime = item.TimeStart,
-                                    EndTime = (DateTime)item.TimeEnd,
-                                };
-                            }
-                            result.Add(tmp);
-                        }
-                    }
-                }
-                return result;
-            }
+                ClassId = item.ClassId,
+                ClassName = item.ClassName,
+                CourseCode = item.Course.CourseCode,
+                CourseName = item.Course.CourseName,
+                EnrollCode = item.EnrollCode,
+                UserId = item.UserId,
+                StartTime = item.TimeStart
+            });
+
+            return classResponses.ToList();
         }
     }
+}
