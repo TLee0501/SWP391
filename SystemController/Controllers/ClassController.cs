@@ -88,11 +88,11 @@ namespace SystemController.Controllers
         [HttpGet, Authorize]
         public async Task<ActionResult<IEnumerable<ClassResponse>>> SearchClass(Guid? courseId = null, string? searchText = null)
         {
-
+            var role = Utils.GetUserRoleFromHttpContext(HttpContext);
             var userId = Utils.GetUserIdFromHttpContext(HttpContext);
             var userGuid = new Guid(userId!);
 
-            var result = await _classService.GetClasses(userGuid, courseId, searchText);
+            var result = await _classService.GetClasses(userGuid, role, courseId, searchText);
             return result;
         }
     }
