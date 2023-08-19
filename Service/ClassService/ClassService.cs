@@ -1,14 +1,9 @@
-﻿using Azure.Core;
+﻿using BusinessObjects;
 using BusinessObjects.Models;
 using BusinessObjects.RequestModel;
 using BusinessObjects.ResponseModel;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace Service.ClassService
 {
@@ -66,47 +61,70 @@ namespace Service.ClassService
             }
         }
 
-        public async Task<ClassResponse> GetClassByID(Guid classId)
+        public async Task<bool> EnrollClass(Guid userId, Guid classId, string enrollCode)
         {
-            var classes = await _context.Classes.FindAsync(classId);
-            if (classes == null) return null;
-
-            var user = await _context.Users.FindAsync(classes.UserId);
-            var course = await _context.Courses.FindAsync(classes.CourseId);
-            var classResponse = new ClassResponse();
-            if (classes.TimeEnd == null)
+            var matchClass = await _context.Classes.Where(_ => _.EnrollCode == enrollCode).SingleOrDefaultAsync();
+            if (matchClass == null)
             {
-                classResponse = new ClassResponse
-                {
-                    ClassId = classId,
-                    ClassName = classes.ClassName,
-                    UserId = classes.UserId,
-                    CourseCode = course.CourseCode,
-                    CourseName = course.CourseName,
-                    EnrollCode = classes.EnrollCode,
-                    StartTime = classes.TimeStart
-                };
+                return false;
+            }
+
+            var studentClass = new StudentClass
+            {
+                StudentClassId = Guid.NewGuid(),
+                ClassId = classId,
+                UserId = userId,
+            };
+
+            _context.StudentClasses.Add(studentClass);
+            var result = await _context.SaveChangesAsync();
+            return result == 1;
+        }
+
+        public async Task<ClassResponse?> GetClassByID(Guid classId, Guid? userId, string? role)
+        {
+            var isStudent = role!.Equals(Roles.STUDENT);
+            var query = _context.Classes.Include(item => item.User).Include(item => item.Course).Where(item => item.ClassId == classId);
+            var result = await query.SingleOrDefaultAsync();
+            if (result == null) return null;
+
+            List<StudentClass>? enrolledClasses = null;
+            if (isStudent)
+            {
+                enrolledClasses = await _context.StudentClasses.Where(_ => _.UserId == userId).ToListAsync();
+            }
+
+
+            return new ClassResponse
+            {
+                ClassId = classId,
+                ClassName = result.ClassName,
+                UserId = result.UserId,
+                EnrollCode = result.EnrollCode,
+                StartTime = result.TimeStart,
+                EndTime = result.TimeEnd,
+                CourseCode = result.Course.CourseCode,
+                CourseName = result.Course.CourseName,
+                TeacherName = result.User.FullName,
+                Enrolled = isStudent ? enrolledClasses!.Find(_ => _.ClassId == classId) != null : null,
+            }; ;
+        }
+
+        public async Task<List<ClassResponse>> GetClasses(Guid userID, string? role, Guid? courseId = null, string? searchText = null)
+        {
+            var isStudent = role!.Equals(Roles.STUDENT);
+            IQueryable<Class> query = _context.Classes.Include(item => item.Course).Include(item => item.User);
+            List<StudentClass>? enrolledClasses = null;
+
+            // Allow students to get all classes
+            if (!isStudent)
+            {
+                query = query.Where(item => item.UserId == userID);
             }
             else
             {
-                classResponse = new ClassResponse
-                {
-                    ClassId = classId,
-                    ClassName = classes.ClassName,
-                    UserId = classes.UserId,
-                    CourseCode = course.CourseCode,
-                    CourseName = course.CourseName,
-                    EnrollCode = classes.EnrollCode,
-                    StartTime = classes.TimeStart,
-                    EndTime = classes.TimeEnd
-                };
+                enrolledClasses = await _context.StudentClasses.Where(_ => _.UserId == userID).ToListAsync();
             }
-            return classResponse;
-        }
-
-        public async Task<List<ClassResponse>> GetClasses(Guid userID, Guid? courseId = null, string? searchText = null)
-        {
-            IQueryable<Class> query = _context.Classes.Include(item => item.Course).Where(item => item.UserId == userID && !item.IsDeleted);
 
             if (courseId != null)
             {
@@ -129,6 +147,8 @@ namespace Service.ClassService
                 UserId = item.UserId,
                 StartTime = item.TimeStart,
                 EndTime = item.TimeEnd,
+                TeacherName = item.User.FullName,
+                Enrolled = isStudent ? enrolledClasses!.Find(_ => _.ClassId == item.ClassId) != null : null,
             });
 
             return classResponses.ToList();

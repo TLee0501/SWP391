@@ -16,6 +16,19 @@ namespace SystemController
 
             return null;
         }
+
+        public static string? GetUserRoleFromHttpContext(HttpContext context)
+        {
+            var claim = context.User.FindFirst(ClaimTypes.Role);
+
+            if (claim != null)
+            {
+                string role = claim.Value;
+                return role;
+            }
+
+            return null;
+        }
     }
 }
 

@@ -145,5 +145,12 @@ namespace SystemController.Controllers
                 return BadRequest("Không thành công.");
             }
         }
+
+        [HttpGet("{classId}"), Authorize]
+        public async Task<ActionResult<Project>> GetAllProjects(Guid classId, string? searchName)
+        {
+            var result = await _projectService.GetAllProjectsInClass(classId, searchName);
+            return Ok(result);
+        }
     }
 }

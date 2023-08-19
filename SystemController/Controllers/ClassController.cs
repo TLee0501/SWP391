@@ -1,14 +1,11 @@
-﻿using BusinessObjects.Models;
+﻿using BusinessObjects;
+using BusinessObjects.Models;
 using BusinessObjects.RequestModel;
 using BusinessObjects.ResponseModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Service.ClassService;
-using Service.CourseService;
-using System.Data.Common;
-using System.Security.Claims;
-using System.Security.Principal;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -57,15 +54,10 @@ namespace SystemController.Controllers
         [HttpGet("{classId}")]
         public async Task<ActionResult<ClassResponse>> GetClassByID(Guid classId)
         {
-            if (classId == null) return BadRequest("Không nhận được dữ liệu.");
-            var result = await _classService.GetClassByID(classId);
-
-            if (result == null)
-            {
-                return NotFound("Không tìm thấy.");
-            }
-
-            return result;
+            var role = Utils.GetUserRoleFromHttpContext(HttpContext);
+            var userId = new Guid(Utils.GetUserIdFromHttpContext(HttpContext)!);
+            var result = await _classService.GetClassByID(classId, userId, role);
+            return Ok(result);
         }
 
         [HttpDelete("{classId}")]
@@ -88,12 +80,34 @@ namespace SystemController.Controllers
         [HttpGet, Authorize]
         public async Task<ActionResult<IEnumerable<ClassResponse>>> SearchClass(Guid? courseId = null, string? searchText = null)
         {
+            var role = Utils.GetUserRoleFromHttpContext(HttpContext);
+            var userId = Utils.GetUserIdFromHttpContext(HttpContext);
+            var userGuid = new Guid(userId!);
+
+            var result = await _classService.GetClasses(userGuid, role, courseId, searchText);
+            return result;
+        }
+
+        [HttpPost, Authorize]
+        public async Task<ActionResult<IEnumerable<ClassResponse>>> EnrollClass(EnrollClassRequest request)
+        {
+            var role = Utils.GetUserRoleFromHttpContext(HttpContext);
+
+            if (!role!.Equals(Roles.STUDENT))
+            {
+                return Forbid();
+            }
 
             var userId = Utils.GetUserIdFromHttpContext(HttpContext);
             var userGuid = new Guid(userId!);
 
-            var result = await _classService.GetClasses(userGuid, courseId, searchText);
-            return result;
+            var success = await _classService.EnrollClass(userGuid, request.ClassId, request.EnrollCode);
+            if (success)
+            {
+                return Ok("Tham gia lớp học thành công.");
+            }
+
+            return BadRequest();
         }
     }
 }

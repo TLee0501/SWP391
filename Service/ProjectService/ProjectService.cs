@@ -203,5 +203,26 @@ namespace Service.ProjectService
                 return 0;
             }
         }
+
+        public async Task<List<ProjectResponse>> GetAllProjectsInClass(Guid classId, string? searchName)
+        {
+            var query = _context.Projects.Include(_ => _.Class).Where(_ => _.ClassId == classId);
+            if (!string.IsNullOrEmpty(searchName))
+            {
+                query = query.Where(_ => _.ProjectName.Contains(searchName));
+            }
+            var list = await query.ToListAsync();
+            var result = list.Select(item => new ProjectResponse
+            {
+                ProjectId = item.ProjectId,
+                ProjectName = item.ProjectName,
+                ClassID = item.ClassId,
+                ClassName = item.Class.ClassName,
+                Description = item.Description,
+                IsSelected = item.IsSelected
+            }).ToList();
+
+            return result;
+        }
     }
 }
