@@ -5,6 +5,7 @@ using BusinessObjects.ResponseModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Service.ClassService;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -108,6 +109,14 @@ namespace SystemController.Controllers
             }
 
             return BadRequest();
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<UserListResponse>>> GetUsersInClass(Guid classId)
+        {
+            var result = await _classService.GetUsersInClass(classId);
+            if (result.IsNullOrEmpty()) return NotFound("Không tìm thấy!");
+            return Ok(result);
         }
     }
 }
