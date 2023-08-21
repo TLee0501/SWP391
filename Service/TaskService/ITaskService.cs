@@ -11,6 +11,7 @@ namespace Service.TaskService
     public interface ITaskService
     {
         Task<int> CreateTask(CreateTaskRequest request);
+        Task<int> UpdateTask(UpdateTaskRequest request);
         Task<int> DeleteTask(Guid taskId);
         Task<List<TaskResponse>> GetAllTask(Guid projectId);
     }
