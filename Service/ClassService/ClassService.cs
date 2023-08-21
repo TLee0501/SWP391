@@ -153,5 +153,26 @@ namespace Service.ClassService
 
             return classResponses.ToList();
         }
+
+        public async Task<List<UserListResponse>> GetUsersInClass(Guid classId)
+        {
+            var result = new List<UserListResponse>();
+            var studenClasses = await _context.StudentClasses.Where(a => a.ClassId == classId).ToListAsync();
+            foreach (var item in studenClasses)
+            {
+                var stu = await _context.Users.FindAsync(item.UserId);
+                var roleName = await _context.Roles.FindAsync(stu.RoleId);
+                var tmp = new UserListResponse
+                {
+                    UserId = item.UserId,
+                    FullName = stu.FullName,
+                    Email = stu.Email,
+                    Role = roleName.RoleName,
+                    isBan = stu.IsBan
+                };
+                result.Add(tmp);
+            }
+            return result;
+        }
     }
 }
