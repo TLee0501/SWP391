@@ -43,6 +43,15 @@ namespace SystemController.Controllers
             }
         }
 
+        [HttpPut]
+        public async Task<ActionResult> UpdateTask(UpdateTaskRequest request)
+        {
+            var result = await _taskService.UpdateTask(request);
+            if (result == 1) return BadRequest("Task không tồn tại.");
+            else if (result == 0) return BadRequest("Thất bại.");
+            else { return Ok("Cập nhật task thành công."); }
+        }
+
         [HttpDelete]
         public async Task<ActionResult> DeleteTask(Guid taskId)
         {

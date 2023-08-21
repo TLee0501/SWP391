@@ -52,6 +52,26 @@ namespace Service.TaskService
             }
         }
 
+        public async Task<int> UpdateTask(UpdateTaskRequest request)
+        {
+            var check = await _context.Tasks.FindAsync(request.TaskId);
+            if (check == null)
+            {
+                return 1;
+            }
+            check.TaskName = request.TaskName;
+            check.Description = request.Description;
+            check.Status = request.Status;
+            try
+            {
+                await _context.SaveChangesAsync();
+                return 2;
+            }catch(DbException e)
+            {
+                return 0;
+            }
+        }
+
 
         public async Task<int> DeleteTask(Guid taskId)
         {
