@@ -118,23 +118,13 @@ namespace SystemController.Controllers
         }
 
         // DELETE: api/ProjectTeams/5
-        /*[HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteProjectTeam(Guid id)
+        [HttpDelete("{projectTeamId}")]
+        public async Task<IActionResult> DeleteProjectTeam(Guid projectTeamId)
         {
-            if (_context.ProjectTeams == null)
-            {
-                return NotFound();
-            }
-            var projectTeam = await _context.ProjectTeams.FindAsync(id);
-            if (projectTeam == null)
-            {
-                return NotFound();
-            }
-
-            _context.ProjectTeams.Remove(projectTeam);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }*/
+            var result = await _projectTeamServise.DeleteProjectTeam(projectTeamId);
+            if (result == 0) return BadRequest("Không tìm thấy nhóm!");
+            else if (result == 2) return Ok("Thành công!");
+            else return BadRequest("Thất bại!");
+        }
     }
 }
