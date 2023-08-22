@@ -93,6 +93,28 @@ namespace Service.TaskService
             }
         }
 
+        public async Task<int> AssignTask(AssignTaskRequest request)
+        {
+            var check = await _context.StudentTasks.SingleOrDefaultAsync(x => x.UserId == request.userID && x.TaskId == request.taskId);
+            if (check != null) return 1;
+            var id = Guid.NewGuid();
+            var studentTask = new StudentTask
+            {
+                StudentTaskId = id,
+                UserId = request.userID,
+                TaskId = request.taskId,                       
+            };
+            try
+            {
+                await _context.StudentTasks.AddAsync(studentTask);
+                await _context.SaveChangesAsync();
+                return 2;
+            }catch (Exception e)
+            {
+                return 0;
+            }
+        }
+
         public async Task<List<TaskResponse>> GetAllTask(Guid projectId)
         {
             var check = await _context.Tasks.Where(x => x.ProjectId == projectId && x.IsDeleted == false).ToListAsync();
