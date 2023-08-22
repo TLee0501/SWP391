@@ -63,7 +63,7 @@ namespace Service.ClassService
 
         public async Task<bool> EnrollClass(Guid userId, Guid classId, string enrollCode)
         {
-            var matchClass = await _context.Classes.Where(_ => _.EnrollCode == enrollCode).SingleOrDefaultAsync();
+            var matchClass = await _context.Classes.Where(_ => _.EnrollCode == enrollCode && _.ClassId == classId).SingleOrDefaultAsync();
             if (matchClass == null)
             {
                 return false;
@@ -76,7 +76,7 @@ namespace Service.ClassService
                 UserId = userId,
             };
 
-            _context.StudentClasses.AddAsync(studentClass);
+            await _context.StudentClasses.AddAsync(studentClass);
             var result = await _context.SaveChangesAsync();
             return result == 1;
         }
