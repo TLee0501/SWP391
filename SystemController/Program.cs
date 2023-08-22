@@ -4,6 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Service.ClassService;
 using Service.CourseService;
+using Service.OnGoingReportService;
 using Service.ProjectService;
 using Service.ProjectTeamService;
 using Service.TaskService;
@@ -31,6 +32,7 @@ builder.Services.AddScoped<IProjectService, ProjectService>();
 builder.Services.AddScoped<IClassService, ClassService>();
 builder.Services.AddScoped<ITaskService, TaskService>();
 builder.Services.AddScoped<IProjectTeamServise, ProjectTeamService>();
+builder.Services.AddScoped<IOnGoingReportService, OnGoingReportService>();
 
 //swagger
 builder.Services.AddEndpointsApiExplorer();
