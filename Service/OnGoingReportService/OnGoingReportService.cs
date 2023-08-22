@@ -38,5 +38,27 @@ namespace Service.OnGoingReportService
             }
             return result;
         }
+
+        public async Task<ReportTaskResponse> GetOnGoingReportInProject(Guid projectId)
+        {
+            var project = await _context.Projects.FindAsync(projectId);
+            if (project == null) return null;
+            var report = new ReportTaskResponse();
+            var total = await _context.Tasks.Where(a => a.ProjectId == projectId && a.IsDeleted == false).ToListAsync();
+            report.NumberOfTask = total.Count();
+
+            var done = await _context.Tasks.Where(a => a.ProjectId == projectId && a.IsDeleted == false && a.Status.Equals(1)).ToListAsync();
+            report.NumberOfFinishTask = done.Count();
+
+            var doing = await _context.Tasks.Where(a => a.ProjectId == projectId && a.IsDeleted == false && a.Status.Equals(0)).ToListAsync();
+            report.NumberOfDoingTask = doing.Count();
+
+            var undone = await _context.Tasks.Where(a => a.ProjectId == projectId && a.IsDeleted == false && a.Status.Equals(2)).ToListAsync();
+            report.NumberOfUnFinishTask = undone.Count();
+
+            report.ProjectId = projectId;
+            report.ProjectName = project.ProjectName;
+            return report;
+        }
     }
 }

@@ -23,5 +23,13 @@ namespace SystemController.Controllers
             if (result.IsNullOrEmpty()) return NotFound("Không tìm thấy!");
             return Ok(result);
         }
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<ReportTaskResponse>>> GetOnGoingReportInProject(Guid projectId)
+        {
+            var result = await _onGoingReportService.GetOnGoingReportInProject(projectId);
+            if (result == null) return NotFound("Không tìm thấy!");
+            return Ok(result);
+        }
     }
 }
