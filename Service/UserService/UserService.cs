@@ -52,6 +52,25 @@ namespace Service.UserService
             return 2;
         }
 
+        public async Task<int> CreateTeacher(UserCreateRequest request)
+        {
+            var check = await _context.Users.SingleOrDefaultAsync(a => a.Email == request.Email);
+            if (check != null) return 1;
+            var role = await _context.Roles.SingleOrDefaultAsync(a => a.RoleName == "Teacher");
+            var user = new User
+            {
+                UserId = Guid.NewGuid(),
+                FullName = request.FullName,
+                Email = request.Email,
+                Password = request.Password,
+                RoleId = role.RoleId,
+                IsBan = false
+            };
+            await _context.Users.AddAsync(user);
+            await _context.SaveChangesAsync();
+            return 2;
+        }
+
         public async Task<UserResponse> GetUser(Guid userId)
         {
             var user = await _context.Users.FindAsync(userId);

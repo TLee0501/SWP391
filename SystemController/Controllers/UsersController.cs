@@ -123,6 +123,19 @@ namespace SystemController.Controllers
             catch (Exception ex) { return BadRequest("Thất bại!"); }
         }
 
+        [HttpPost]
+        public async Task<ActionResult> CreateTeacher(UserCreateRequest request)
+        {
+            try
+            {
+                var result = await _userService.CreateTeacher(request);
+                if (result == 0) return BadRequest("Thất bại!");
+                else if (result == 1) return BadRequest("Email đã được sử dụng!");
+                return Ok("Thành công!");
+            }
+            catch (Exception ex) { return BadRequest("Thất bại!"); }
+        }
+
         [HttpGet]
         public async Task<ActionResult<IEnumerable<UserListResponse>>> SearchUser(string? txtSearch)
         {

@@ -12,5 +12,6 @@ namespace Service.UserService
         Task<List<UserListResponse>> SearchUser(string? txtSearch);
         Task<int> BanUser(Guid userId);
         Task<int> UnbanUser(Guid userId);
+        Task<int> CreateTeacher(UserCreateRequest request);
     }
 }
