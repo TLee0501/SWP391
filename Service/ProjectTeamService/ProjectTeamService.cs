@@ -91,7 +91,7 @@ namespace Service.ProjectTeamService
             if (pt.Status.Equals("2")) status = "Đã hoàn thành";
             else if (pt.Status.Equals("3")) status = "Đã dừng";
 
-            var members = await _context.TeamMembers.Where(a => a.ProjectTeamId == pt.ProjectId).ToListAsync();
+            var members = await _context.TeamMembers.Where(a => a.ProjectTeamId == pt.ProjectTeamId).ToListAsync();
 
             var team = new List<UserBasicResponse>();
             foreach (var m in members)
