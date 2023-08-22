@@ -224,5 +224,24 @@ namespace Service.ProjectService
 
             return result;
         }
+
+        public async Task<List<ProjectResponse>> GetWorkingProjectsInClass(Guid userId, Guid classId)
+        {
+            var query = _context.TeamMembers.Where(_ => _.UserId == userId).Include(_ => _.ProjectTeam).Include(_ => _.ProjectTeam.Project)
+                .Where(_ => _.ProjectTeam.Project.ClassId == classId);
+
+            var list = await query.ToListAsync();
+            var result = list.Select(item => new ProjectResponse
+            {
+                ProjectId = item.ProjectTeam.Project.ProjectId,
+                ProjectName = item.ProjectTeam.Project.ProjectName,
+                ClassID = item.ProjectTeam.Project.ClassId,
+                ClassName = item.ProjectTeam.Project.Class.ClassName,
+                Description = item.ProjectTeam.Project.Description,
+                IsSelected = item.ProjectTeam.Project.IsSelected
+            }).ToList();
+
+            return result;
+        }
     }
 }

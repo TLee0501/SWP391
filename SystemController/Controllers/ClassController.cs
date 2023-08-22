@@ -115,7 +115,6 @@ namespace SystemController.Controllers
         public async Task<ActionResult<IEnumerable<UserListResponse>>> GetUsersInClass(Guid classId)
         {
             var result = await _classService.GetUsersInClass(classId);
-            if (result.IsNullOrEmpty()) return NotFound("Không tìm thấy!");
             return Ok(result);
         }
     }
