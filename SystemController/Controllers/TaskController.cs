@@ -71,9 +71,9 @@ namespace SystemController.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TaskResponse>>> GetAllTask(Guid projectId)
         {
-            var check = await _taskService.GetAllTask(projectId);
-            if (check.IsNullOrEmpty()) return BadRequest("Không tìm thấy task.");
-            return check;
+            var tasks = await _taskService.GetAllTask(projectId);
+            // Just returning empty task list in the case of no data
+            return tasks;
         }
     }
 }
