@@ -1,6 +1,7 @@
 ﻿using BusinessObjects.Models;
 using BusinessObjects.RequestModel;
 using BusinessObjects.ResponseModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -22,17 +23,17 @@ namespace SystemController.Controllers
             _taskService = taskService;
         }
 
-        [HttpPost]
+        [HttpPost, Authorize]
         public async Task<ActionResult> CreateTask(CreateTaskRequest request)
         {
             if (request == null)
             {
                 return BadRequest("Không nhận được dữ liệu.");
-
             }
             try
             {
-                var result = await _taskService.CreateTask(request);
+                var userId = Utils.GetUserIdFromHttpContext(HttpContext);
+                var result = await _taskService.CreateTask(new Guid(userId!), request);
                 if (result == 0) return BadRequest("Không thành công.");
                 else if (result == 1) return BadRequest("Task đã tồn tại.");
                 else return Ok("Task đã được tạo thành công.");
