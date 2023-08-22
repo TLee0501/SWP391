@@ -53,6 +53,23 @@ namespace SystemController.Controllers
             else { return Ok("Cập nhật task thành công."); }
         }
 
+        [HttpPost]
+        public async Task<ActionResult> AssignTask(AssignTaskRequest request)
+        {
+            if (request == null) return BadRequest("Không nhận được dữ liệu.");
+            try
+            {
+                var result = await _taskService.AssignTask(request);
+                if (result == 0) return BadRequest("Không thành công!");
+                else if (result == 1) return BadRequest("Sinh viên đã được thêm vào task.");
+                else return Ok("Thêm thành công.");
+            }
+            catch (DbUpdateException)
+            {
+                return BadRequest("Không thành công.");
+            }
+        }
+
         [HttpDelete]
         public async Task<ActionResult> DeleteTask(Guid taskId)
         {
