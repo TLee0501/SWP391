@@ -63,6 +63,29 @@ namespace Service.ProjectTeamService
             }
         }
 
+        public async Task<int> DeleteProjectTeam(Guid projectTeamId)
+        {
+            var pt = await _context.ProjectTeams.FindAsync(projectTeamId);
+            if (pt == null) return 0;
+
+            pt.TimeEnd = DateTime.Now;
+            pt.Status = 3;
+
+            var tasks = await _context.Tasks.Where(a => a.ProjectId == pt.ProjectId).ToListAsync();
+            foreach (var item in tasks)
+            {
+                item.IsDeleted = true;
+            }
+
+            var project = await _context.Projects.FindAsync(pt.ProjectId);
+            project.IsSelected = false;
+            try
+            {
+                await _context.SaveChangesAsync();
+                return 2;
+            } catch (Exception ex) { return 1; }
+        }
+
         public async Task<int> DenyTeamProjectrequest(Guid teamId)
         {
             var pts = await _context.TeamRequests.Where(a => a.Team == teamId).ToListAsync();
