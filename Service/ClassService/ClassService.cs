@@ -156,22 +156,14 @@ namespace Service.ClassService
 
         public async Task<List<UserListResponse>> GetUsersInClass(Guid classId)
         {
-            var result = new List<UserListResponse>();
-            var studenClasses = await _context.StudentClasses.Where(a => a.ClassId == classId).ToListAsync();
-            foreach (var item in studenClasses)
+            var studenClasses = await _context.StudentClasses.Where(_ => _.ClassId == classId).Include(_ => _.User).ToListAsync();
+            var result = studenClasses.Select(item => new UserListResponse
             {
-                var stu = await _context.Users.FindAsync(item.UserId);
-                var roleName = await _context.Roles.FindAsync(stu.RoleId);
-                var tmp = new UserListResponse
-                {
-                    UserId = item.UserId,
-                    FullName = stu.FullName,
-                    Email = stu.Email,
-                    Role = roleName.RoleName,
-                    isBan = stu.IsBan
-                };
-                result.Add(tmp);
-            }
+                UserId = item.UserId,
+                FullName = item.User.FullName,
+                Email = item.User.Email,
+            }).ToList();
+
             return result;
         }
     }

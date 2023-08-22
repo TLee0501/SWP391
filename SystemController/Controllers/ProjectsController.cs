@@ -152,5 +152,13 @@ namespace SystemController.Controllers
             var result = await _projectService.GetAllProjectsInClass(classId, searchName);
             return Ok(result);
         }
+
+        [HttpGet("{classId}"), Authorize]
+        public async Task<ActionResult<Project>> GetWorkingProjects(Guid classId)
+        {
+            var userId = Utils.GetUserIdFromHttpContext(HttpContext);
+            var result = await _projectService.GetWorkingProjectsInClass(new Guid(userId!), classId);
+            return Ok(result);
+        }
     }
 }
