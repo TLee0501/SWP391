@@ -9,6 +9,7 @@ using Service.ProjectService;
 using Service.ProjectTeamService;
 using Service.TaskService;
 using Service.UserService;
+using Service.RoleService;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text;
 
@@ -26,6 +27,7 @@ builder.Services.AddDbContext<Swp391onGoingReportContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Swp391onGoingReportContext"));
 });
 
+builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICourseService, CourseService>();
 builder.Services.AddScoped<IProjectService, ProjectService>();

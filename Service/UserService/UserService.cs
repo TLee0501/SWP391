@@ -1,4 +1,5 @@
-﻿using BusinessObjects.Models;
+﻿using BusinessObjects;
+using BusinessObjects.Models;
 using BusinessObjects.RequestModel;
 using BusinessObjects.ResponseModel;
 using Microsoft.EntityFrameworkCore;
@@ -31,6 +32,24 @@ namespace Service.UserService
             {
                 return 0;
             }
+        }
+
+        public async Task<int> CreateAccount(CreateAccountRequest request)
+        {
+            var user = await _context.Users.SingleOrDefaultAsync(a => a.Email == request.Email);
+            if (user != null) return -1;
+            var newUser = new User
+            {
+                UserId = Guid.NewGuid(),
+                FullName = request.FullName,
+                Email = request.Email,
+                Password = request.Password,
+                RoleId = request.RoleId,
+                IsBan = false
+            };
+            await _context.Users.AddAsync(newUser);
+            await _context.SaveChangesAsync();
+            return 0;
         }
 
         public async Task<int> CreateStudent(UserCreateRequest request)
@@ -123,46 +142,26 @@ namespace Service.UserService
             return result;
         }
 
-        public async Task<List<UserListResponse>> SearchUser(string? txtSearch)
+        public async Task<List<UserListResponse>> SearchUser(string? search)
         {
-            var result = new List<UserListResponse>();
-            var users = await _context.Users.ToListAsync();
-            if (!txtSearch.IsNullOrEmpty())
+            var searchValue = search?.ToLower();
+            var query = _context.Users.Include(_ => _.Role).AsQueryable();
+            if (!string.IsNullOrEmpty(searchValue))
             {
-                foreach (var item in users)
-                {
-                    if (item.FullName.ToLower().Contains(txtSearch.ToLower()) || item.Email.ToLower().Contains(txtSearch.ToLower()))
-                    {
-                        var role = await _context.Roles.FindAsync(item.RoleId);
-                        var tmp = new UserListResponse
-                        {
-                            UserId = item.UserId,
-                            FullName = item.FullName,
-                            Email = item.Email,
-                            Role = role.RoleName,
-                            isBan = item.IsBan
-                        };
-                        result.Add(tmp);
-                    }
-                }
+                query = query.Where(_ => _.FullName.Contains(searchValue) || _.Email.Contains(searchValue));
             }
-            else
+            var result = await query.ToListAsync();
+            var users = result.Select(item => new UserListResponse
             {
-                foreach (var item in users)
-                {
-                    var role = await _context.Roles.FindAsync(item.RoleId);
-                    var tmp = new UserListResponse
-                    {
-                        UserId = item.UserId,
-                        FullName = item.FullName,
-                        Email = item.Email,
-                        Role = role.RoleName,
-                        isBan = item.IsBan
-                    };
-                    result.Add(tmp);
-                }
-            }
-            return result;
+                UserId = item.UserId,
+                FullName = item.FullName,
+                Email = item.Email,
+                Role = item.Role.RoleName,
+                RoleId = item.Role.RoleId,
+                isBan = item.IsBan
+            }).ToList();
+
+            return users;
         }
 
         public async Task<int> UnbanUser(Guid userId)
@@ -175,9 +174,27 @@ namespace Service.UserService
                 user.IsBan = false;
                 await _context.SaveChangesAsync();
                 return 3;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 return 0;
+            }
+        }
+
+        public async Task<bool> UpdateUserRole(Guid userId, Guid roleId)
+        {
+            try
+            {
+                var user = await _context.Users.SingleAsync(_ => _.UserId == userId);
+                if (user == null) return false;
+
+                user.RoleId = roleId;
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception e)
+            {
+                return false;
             }
         }
     }
