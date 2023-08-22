@@ -87,6 +87,24 @@ namespace Service.ProjectTeamService
             var pt = await _context.ProjectTeams.FindAsync(projectTeamId);
             if (pt == null) return null;
             var project = await _context.Projects.FindAsync(pt.ProjectId);
+            var status = "Đang làm";
+            if (pt.Status.Equals("2")) status = "Đã hoàn thành";
+            else if (pt.Status.Equals("3")) status = "Đã dừng";
+
+            var members = await _context.TeamMembers.Where(a => a.ProjectTeamId == pt.ProjectTeamId).ToListAsync();
+
+            var team = new List<UserBasicResponse>();
+            foreach (var m in members)
+            {
+                var userTmp = await _context.Users.FindAsync(m.UserId);
+                var tmp = new UserBasicResponse
+                {
+                    UserId = userTmp.UserId,
+                    FullName = userTmp.FullName
+                };
+                team.Add(tmp);
+            }
+
             var result = new ProjectTeamResponse
             {
                 ProjectTeamId = projectTeamId,
@@ -95,8 +113,54 @@ namespace Service.ProjectTeamService
                 TeamName = pt.TeamName,
                 TimeStart = pt.TimeStart,  
                 TimeEnd = pt.TimeEnd,
-                Status = pt.Status
+                Users = team,
+                Status = status
             };
+            return result;
+        }
+
+        public async Task<List<ProjectTeamResponse>> getProjectTeamInClass(Guid classId)
+        {
+            var result = new List<ProjectTeamResponse>();
+            var projects = await _context.Projects.Where(a => a.ClassId == classId && a.IsDeleted == false).ToListAsync();
+            foreach (var p in projects)
+            {
+                var projectTeams = await _context.ProjectTeams.Where(a => a.ProjectId == p.ProjectId).ToListAsync();
+
+                foreach (var pt in projectTeams)
+                {
+                    var members = await _context.TeamMembers.Where(a => a.ProjectTeamId == pt.ProjectTeamId).ToListAsync();
+
+                    var team = new List<UserBasicResponse>();
+                    foreach (var m in members)
+                    {
+                        var userTmp = await _context.Users.FindAsync(m.UserId);
+                        var tmp = new UserBasicResponse
+                        {
+                            UserId = userTmp.UserId,
+                            FullName = userTmp.FullName
+                        };
+                        team.Add(tmp);
+                    }
+                    var project = await _context.Projects.FindAsync(pt.ProjectId);
+                    var status = "Đang làm";
+                    if (pt.Status.Equals("2")) status = "Đã hoàn thành";
+                    else if (pt.Status.Equals("3")) status = "Đã dừng";
+
+                    var ptTmp = new ProjectTeamResponse
+                    {
+                        ProjectTeamId = pt.ProjectTeamId,
+                        ProjectId = pt.ProjectId,
+                        ProjectName = project.ProjectName,
+                        TeamName = pt.TeamName,
+                        TimeStart = pt.TimeStart,
+                        TimeEnd = pt.TimeEnd,
+                        Users = team,
+                        Status = status
+                    };
+                    result.Add(ptTmp);
+                }
+            }
             return result;
         }
 

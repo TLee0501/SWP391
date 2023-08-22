@@ -10,5 +10,6 @@ namespace Service.ProjectTeamService
         Task<List<TeamRequestResponse>> GetTeamProjectRequests(Guid classId);
         Task<int> AcceptTeamProjectrequest(Guid teamId);
         Task<int> DenyTeamProjectrequest(Guid teamId);
+        Task<List<ProjectTeamResponse>> getProjectTeamInClass(Guid classId);
     }
 }

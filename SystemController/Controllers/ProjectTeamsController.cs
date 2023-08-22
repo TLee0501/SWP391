@@ -109,6 +109,14 @@ namespace SystemController.Controllers
             }
         }
 
+        [HttpGet("{classId}")]
+        public async Task<ActionResult<ProjectTeam>> getProjectTeamInClass(Guid classId)
+        {
+            var result = await _projectTeamServise.getProjectTeamInClass(classId);
+            if (result.IsNullOrEmpty()) return NotFound("Không tìm thấy ProjectTeam!");
+            return Ok(result);
+        }
+
         // DELETE: api/ProjectTeams/5
         /*[HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProjectTeam(Guid id)
