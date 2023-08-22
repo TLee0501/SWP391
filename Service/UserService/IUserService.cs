@@ -13,5 +13,7 @@ namespace Service.UserService
         Task<int> BanUser(Guid userId);
         Task<int> UnbanUser(Guid userId);
         Task<int> CreateTeacher(UserCreateRequest request);
+        Task<bool> UpdateUserRole(Guid userId, Guid roleId);
+        Task<int> CreateAccount(CreateAccountRequest request);
     }
 }

@@ -10,4 +10,10 @@
     <ProjectReference Include="..\BusinessObjects\BusinessObjects.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="RoleService\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="RoleService\" />
+  </ItemGroup>
 </Project>

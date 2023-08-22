@@ -32,10 +32,10 @@ namespace SystemController.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetUsersForTest()
         {
-          if (_context.Users == null)
-          {
-              return NotFound();
-          }
+            if (_context.Users == null)
+            {
+                return NotFound();
+            }
             return await _context.Users.ToListAsync();
         }
 
@@ -137,10 +137,9 @@ namespace SystemController.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<UserListResponse>>> SearchUser(string? txtSearch)
+        public async Task<ActionResult<IEnumerable<UserListResponse>>> SearchUser(string? search)
         {
-            var result = await _userService.SearchUser(txtSearch);
-            if (result == null || result.Count == 0) return BadRequest("Không có tài khoản t=cần tìm!");
+            var result = await _userService.SearchUser(search);
             return Ok(result);
         }
 
@@ -187,13 +186,32 @@ namespace SystemController.Controllers
             return jwt;
         }
 
-        /*[HttpGet, Authorize]
-        public ActionResult<string> getUserID()
+        [HttpPut, Authorize]
+        public async Task<IActionResult> UpdateUserRole(UpdateRoleRequest request)
         {
-            var roleClaim = User?.FindAll(ClaimTypes.Name);
-            
-            var id = roleClaim?.Select(c => c.Value).SingleOrDefault().ToString();
-            return Ok(id);
-        }*/
+            var success = await _userService.UpdateUserRole(request.UserId, request.RoleId);
+            if (success)
+            {
+                return Ok("Cập nhật role thành công.");
+            }
+            return BadRequest("Cập nhật role thất bại.");
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> Register(CreateAccountRequest request)
+        {
+            try
+            {
+                var result = await _userService.CreateAccount(request);
+
+                if (result == -1) return BadRequest("Email đã được sử dụng!");
+
+                return Ok("Thành công!");
+            }
+            catch (Exception e)
+            {
+                return BadRequest("Thất bại!");
+            }
+        }
     }
 }
