@@ -6,6 +6,7 @@ using Service.ClassService;
 using Service.CourseService;
 using Service.ProjectService;
 using Service.ProjectTeamService;
+using Service.TaskService;
 using Service.UserService;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text;
@@ -28,6 +29,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICourseService, CourseService>();
 builder.Services.AddScoped<IProjectService, ProjectService>();
 builder.Services.AddScoped<IClassService, ClassService>();
+builder.Services.AddScoped<ITaskService, TaskService>();
 builder.Services.AddScoped<IProjectTeamServise, ProjectTeamService>();
 
 //swagger

@@ -13,7 +13,7 @@ public partial class TeamRequest
 
     public Guid Team { get; set; }
 
-    public Guid? ProjectId { get; set; }
+    public Guid ProjectId { get; set; }
 
     public string TeamName { get; set; } = null!;
 

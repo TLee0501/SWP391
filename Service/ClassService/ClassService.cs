@@ -76,7 +76,7 @@ namespace Service.ClassService
                 UserId = userId,
             };
 
-            _context.StudentClasses.Add(studentClass);
+            _context.StudentClasses.AddAsync(studentClass);
             var result = await _context.SaveChangesAsync();
             return result == 1;
         }

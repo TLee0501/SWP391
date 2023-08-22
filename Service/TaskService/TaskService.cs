@@ -21,7 +21,7 @@ namespace Service.TaskService
         }
         public async Task<int> CreateTask(CreateTaskRequest request)
         {
-            var task = await _context.Tasks.SingleOrDefaultAsync(x => x.TaskName.ToLower() == request.TaskName.ToLower());
+            var task = await _context.Tasks.SingleOrDefaultAsync(x => x.TaskName.ToLower() == request.TaskName.ToLower() && x.IsDeleted == false);
             if (task != null)
             {
                 return 1;
@@ -34,7 +34,7 @@ namespace Service.TaskService
                 ProjectId = request.ProjectId,
                 TaskName = request.TaskName,
                 Description = request.TaskDescription,
-                Status = "0",
+                Status = 0,
                 IsDeleted = false,
             };
             // status = 0: đang tiến hành
@@ -47,6 +47,26 @@ namespace Service.TaskService
                 return 2;
             }
             catch (DbException e)
+            {
+                return 0;
+            }
+        }
+
+        public async Task<int> UpdateTask(UpdateTaskRequest request)
+        {
+            var check = await _context.Tasks.FindAsync(request.TaskId);
+            if (check == null)
+            {
+                return 1;
+            }
+            check.TaskName = request.TaskName;
+            check.Description = request.Description;
+            check.Status = request.Status;
+            try
+            {
+                await _context.SaveChangesAsync();
+                return 2;
+            }catch(DbException e)
             {
                 return 0;
             }
@@ -74,7 +94,7 @@ namespace Service.TaskService
 
         public async Task<List<TaskResponse>> GetAllTask(Guid projectId)
         {
-            var check = await _context.Tasks.Where(x => x.ProjectId == projectId).ToListAsync();
+            var check = await _context.Tasks.Where(x => x.ProjectId == projectId && x.IsDeleted == false).ToListAsync();
             if (check == null || check.Count == 0)
             {
                 return null;
