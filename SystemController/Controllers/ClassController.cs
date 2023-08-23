@@ -117,5 +117,16 @@ namespace SystemController.Controllers
             var result = await _classService.GetUsersInClass(classId);
             return Ok(result);
         }
+
+        [HttpGet, Authorize]
+        public async Task<ActionResult<IEnumerable<ClassResponse>>> GetAllClasses(Guid? courseId = null, string? searchText = null)
+        {
+            var role = Utils.GetUserRoleFromHttpContext(HttpContext);
+            var userId = Utils.GetUserIdFromHttpContext(HttpContext);
+            var userGuid = new Guid(userId!);
+
+            var result = await _classService.GetClasses(userGuid, role, courseId, searchText);
+            return result;
+        }
     }
 }

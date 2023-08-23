@@ -33,7 +33,7 @@ namespace Service.TaskService
                 UserId = userId,
                 ProjectId = request.ProjectId,
                 TaskName = request.TaskName,
-                Description = request.TaskDescription,
+                Description = request?.TaskDescription ?? "",
                 Status = 0,
                 IsDeleted = false,
             };

@@ -227,7 +227,8 @@ namespace Service.ProjectService
 
         public async Task<List<ProjectResponse>> GetWorkingProjectsInClass(Guid userId, Guid classId)
         {
-            var query = _context.TeamMembers.Where(_ => _.UserId == userId).Include(_ => _.ProjectTeam).Include(_ => _.ProjectTeam.Project)
+            var query = _context.TeamMembers.Where(_ => _.UserId == userId).Include(_ => _.ProjectTeam).ThenInclude(x => x.Project)
+                .ThenInclude(x => x.Class)
                 .Where(_ => _.ProjectTeam.Project.ClassId == classId);
 
             var list = await query.ToListAsync();
