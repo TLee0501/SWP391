@@ -15,5 +15,6 @@ namespace Service.ProjectService
         Task<int> DeleteProject(Guid projectId);
         Task<List<ProjectResponse>> GetAllProjectsInClass(Guid classId, string? searchName);
         Task<List<ProjectResponse>> GetWorkingProjectsInClass(Guid userId, Guid classId);
+        Task<List<ProjectAndStatusResponse>> GetProjectsAndStatusByClassIDandUserID(Guid classId, Guid userId);
     }
 }

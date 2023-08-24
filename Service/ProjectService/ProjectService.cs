@@ -244,5 +244,52 @@ namespace Service.ProjectService
 
             return result;
         }
+
+        public async Task<List<ProjectAndStatusResponse>> GetProjectsAndStatusByClassIDandUserID(Guid classId, Guid userId)
+        {
+            var result = new List<ProjectAndStatusResponse>();
+            var projects = await _context.Projects.Where(a => a.ClassId == classId).ToListAsync();
+            if (projects.IsNullOrEmpty()) return null;
+
+            foreach (var item in projects)
+            {
+                var ps = await _context.TeamRequests.SingleOrDefaultAsync(a => a.ProjectId == item.ProjectId && a.UserId == userId);
+
+                var classTmp = await _context.Classes.FindAsync(item.ClassId);
+
+                if (ps == null)
+                {
+                    var tmp = new ProjectAndStatusResponse
+                    {
+                        ProjectId = item.ProjectId,
+                        ProjectName = item.ProjectName,
+                        ClassID = item.ClassId,
+                        ClassName = classTmp.ClassName,
+                        Description = item.Description,
+                        RequestStatus = "Chưa đăng ký",
+                        IsSelected = item.IsSelected
+                    };
+                    result.Add(tmp);
+                }
+                else
+                {
+                    var requestStatus = "Yêu cầu đã bị từ chối";
+                    if (ps.Status == "0") requestStatus = "Đã gửi yêu cầu";
+                    else if (ps.Status == "1") requestStatus = "Yêu cầu đã được chấp nhận";
+                    var tmp = new ProjectAndStatusResponse
+                    {
+                        ProjectId = item.ProjectId,
+                        ProjectName = item.ProjectName,
+                        ClassID = item.ClassId,
+                        ClassName = classTmp.ClassName,
+                        Description = item.Description,
+                        RequestStatus = requestStatus,
+                        IsSelected = item.IsSelected
+                    };
+                    result.Add(tmp);
+                }
+            }
+            return result;
+        }
     }
 }
