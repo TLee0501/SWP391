@@ -34,6 +34,8 @@ namespace Service.TaskService
                 ProjectId = request.ProjectId,
                 TaskName = request.TaskName,
                 Description = request?.TaskDescription ?? "",
+                StartTime = request.StartTime,
+                EndTime = request?.EndTime,
                 Status = 0,
                 IsDeleted = false,
             };
@@ -61,6 +63,8 @@ namespace Service.TaskService
             }
             check.TaskName = request.TaskName;
             check.Description = request.Description;
+            check.StartTime = request.StartTime;
+            check.EndTime = request.EndTime;
             check.Status = request.Status;
             try
             {
@@ -133,6 +137,8 @@ namespace Service.TaskService
                     TaskId = item.TaskId,
                     TaskName = item.TaskName,
                     TaskDescription = item.Description,
+                    StartTime = item.StartTime,
+                    EndTime = item.EndTime,
                     Status = item.Status,
                     UserFullName = fullName.FullName,
                 };

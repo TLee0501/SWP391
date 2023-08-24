@@ -217,8 +217,14 @@ public partial class Swp391onGoingReportContext : DbContext
             entity.Property(e => e.Description)
                 .HasMaxLength(500)
                 .HasColumnName("description");
+            entity.Property(e => e.EndTime)
+                .HasColumnType("datetime")
+                .HasColumnName("endTime");
             entity.Property(e => e.IsDeleted).HasColumnName("isDeleted");
             entity.Property(e => e.ProjectId).HasColumnName("projectID");
+            entity.Property(e => e.StartTime)
+                .HasColumnType("datetime")
+                .HasColumnName("startTime");
             entity.Property(e => e.Status).HasColumnName("status");
             entity.Property(e => e.TaskName)
                 .HasMaxLength(100)
