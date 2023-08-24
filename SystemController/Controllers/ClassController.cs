@@ -126,6 +126,13 @@ namespace SystemController.Controllers
             return Ok(result);
         }
 
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<UserListResponse>>> GetStudentsNotInProjectInClass(Guid classId)
+        {
+            var result = await _classService.GetStudentsNotInProjectInClass(classId);
+            return Ok(result);
+        }
+
         [HttpGet, Authorize]
         public async Task<ActionResult<IEnumerable<ClassResponse>>> GetAllClasses(Guid? courseId = null, string? searchText = null)
         {
