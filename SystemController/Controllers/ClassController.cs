@@ -51,6 +51,14 @@ namespace SystemController.Controllers
                 return BadRequest("Không thành công.");
             }
         }
+        [HttpPut]
+        public async Task<ActionResult> UpdateClass(UpdateClassRequest request)
+        {
+            var result = await _classService.UpdateClass(request);
+            if (result == 1) return BadRequest("Lớp học không tồn tại.");
+            else if (result == 0) return BadRequest("Thất bại.");
+            else { return Ok("Cập nhật lớp học thành công."); }
+        }
 
         [HttpGet("{classId}")]
         public async Task<ActionResult<ClassResponse>> GetClassByID(Guid classId)
