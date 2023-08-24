@@ -206,7 +206,7 @@ namespace Service.ProjectService
 
         public async Task<List<ProjectResponse>> GetAllProjectsInClass(Guid classId, string? searchName)
         {
-            var query = _context.Projects.Include(_ => _.Class).Where(_ => _.ClassId == classId);
+            var query = _context.Projects.Include(_ => _.Class).Where(_ => _.ClassId == classId && !_.IsDeleted);
             if (!string.IsNullOrEmpty(searchName))
             {
                 query = query.Where(_ => _.ProjectName.Contains(searchName));
