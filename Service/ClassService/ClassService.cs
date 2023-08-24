@@ -58,7 +58,8 @@ namespace Service.ClassService
             {
                 await _context.SaveChangesAsync();
                 return 2;
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 return 0;
             }
@@ -132,7 +133,7 @@ namespace Service.ClassService
         public async Task<List<ClassResponse>> GetClasses(Guid userID, string? role, Guid? courseId = null, string? searchText = null)
         {
             var isStudent = role!.Equals(Roles.STUDENT);
-            IQueryable<Class> query = _context.Classes.Include(item => item.Course).Include(item => item.User);
+            IQueryable<Class> query = _context.Classes.Include(item => item.Course).Include(item => item.User).Where(_ => !_.IsDeleted);
             List<StudentClass>? enrolledClasses = null;
 
             // Allow students to get all classes
