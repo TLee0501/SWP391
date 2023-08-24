@@ -15,6 +15,10 @@ public partial class Task
 
     public string Description { get; set; } = null!;
 
+    public DateTime StartTime { get; set; }
+
+    public DateTime? EndTime { get; set; }
+
     public int Status { get; set; }
 
     public bool IsDeleted { get; set; }
