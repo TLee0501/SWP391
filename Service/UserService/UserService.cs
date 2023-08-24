@@ -1,9 +1,7 @@
-﻿using BusinessObjects;
-using BusinessObjects.Models;
+﻿using BusinessObjects.Models;
 using BusinessObjects.RequestModel;
 using BusinessObjects.ResponseModel;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using System.Data;
 
 namespace Service.UserService
@@ -38,40 +36,65 @@ namespace Service.UserService
         {
             var user = await _context.Users.SingleOrDefaultAsync(a => a.Email == request.Email);
             if (user != null) return -1;
-            var newUser = new User
+
+            var roleName = await _context.Roles.FindAsync(request.RoleId);
+            if (roleName.RoleName == "Student")
             {
-                UserId = Guid.NewGuid(),
-                FullName = request.FullName,
-                Email = request.Email,
-                Password = request.Password,
-                RoleId = request.RoleId,
-                IsBan = false
-            };
-            await _context.Users.AddAsync(newUser);
+                var mssvMax = await _context.Users.MaxAsync(a => a.Mssv);
+                string digits = new string(mssvMax.Where(char.IsDigit).ToArray());
+                string letters = new string(mssvMax.Where(char.IsLetter).ToArray());
+
+                int number;
+                if (!int.TryParse(digits, out number)) //int.Parse would do the job since only digits are selected
+                {
+                    Console.WriteLine("Something weired happened");
+                }
+
+                string newMSSV = letters + (++number).ToString("D4");
+
+                var newUser = new User
+                {
+                    UserId = Guid.NewGuid(),
+                    FullName = request.FullName,
+                    Email = request.Email,
+                    Password = request.Password,
+                    RoleId = request.RoleId,
+                    Mssv = newMSSV,
+                    IsBan = false
+                };
+                await _context.Users.AddAsync(newUser);
+            }
+            else
+            {
+                var newUser = new User
+                {
+                    UserId = Guid.NewGuid(),
+                    FullName = request.FullName,
+                    Email = request.Email,
+                    Password = request.Password,
+                    RoleId = request.RoleId,
+                    IsBan = false
+                };
+                await _context.Users.AddAsync(newUser);
+            }
+
             await _context.SaveChangesAsync();
             return 0;
         }
 
-        public async Task<int> CreateStudent(UserCreateRequest request)
+        /*public async Task<int> CreateStudent(UserCreateRequest request)
         {
             var check = await _context.Users.SingleOrDefaultAsync(a => a.Email == request.Email);
             if (check != null) return 1;
+
             var role = await _context.Roles.SingleOrDefaultAsync(a => a.RoleName == "Student");
-            var user = new User
-            {
-                UserId = Guid.NewGuid(),
-                FullName = request.FullName,
-                Email = request.Email,
-                Password = request.Password,
-                RoleId = role.RoleId,
-                IsBan = false
-            };
-            await _context.Users.AddAsync(user);
+
+            
             await _context.SaveChangesAsync();
             return 2;
-        }
+        }*/
 
-        public async Task<int> CreateTeacher(UserCreateRequest request)
+        /*public async Task<int> CreateTeacher(UserCreateRequest request)
         {
             var check = await _context.Users.SingleOrDefaultAsync(a => a.Email == request.Email);
             if (check != null) return 1;
@@ -88,7 +111,7 @@ namespace Service.UserService
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
             return 2;
-        }
+        }*/
 
         public async Task<UserResponse> GetUser(Guid userId)
         {
@@ -101,6 +124,7 @@ namespace Service.UserService
                 FullName = user.FullName,
                 Email = user.Email,
                 Role = role.RoleName,
+                Mssv = user.Mssv,
                 IsBan = user.IsBan
             };
             return result;
@@ -136,6 +160,7 @@ namespace Service.UserService
                 UserId = user.UserId,
                 FullName = user.FullName,
                 Email = user.Email,
+                Mssv = user.Mssv,
                 Role = role.RoleName,
                 IsBan = user.IsBan
             };
@@ -157,7 +182,7 @@ namespace Service.UserService
                 FullName = item.FullName,
                 Email = item.Email,
                 Role = item.Role.RoleName,
-                RoleId = item.Role.RoleId,
+                Mssv = item.Mssv,
                 isBan = item.IsBan
             }).ToList();
 
