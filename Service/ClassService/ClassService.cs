@@ -45,6 +45,25 @@ namespace Service.ClassService
             }
         }
 
+        public async Task<int> UpdateClass(UpdateClassRequest request)
+        {
+            var check = await _context.Classes.FindAsync(request.ClassId);
+            if (check == null) return 1;
+            check.ClassName = request.ClassName;
+            check.EnrollCode = request.EnrollCode;
+            check.TimeStart = request.TimeStart;
+            check.TimeEnd = request.TimeEnd;
+            check.IsCompleted = request.IsCompleted;
+            try
+            {
+                await _context.SaveChangesAsync();
+                return 2;
+            }catch(Exception ex)
+            {
+                return 0;
+            }
+        }
+
         public async Task<int> DeleteClass(Guid classId)
         {
             var check = await _context.Classes.FindAsync(classId);
