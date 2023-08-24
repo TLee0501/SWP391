@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BusinessObjects.Models;
 using Service.ProjectService;
 using BusinessObjects.RequestModel;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.IdentityModel.Tokens;
+using BusinessObjects.ResponseModel;
 
 namespace SystemController.Controllers
 {
@@ -77,17 +74,17 @@ namespace SystemController.Controllers
             return Ok(result);
         }*/
 
-        /*[HttpGet("{classId}"), Authorize]
-        public async Task<ActionResult<Project>> GetProjectsByClassIDandUserID(Guid classId)
+        [HttpGet("{classId}"), Authorize]
+        public async Task<ActionResult<ProjectAndStatusResponse>> GetProjectsAndStatusByClassIDandUserID(Guid classId)
         {
             var roleClaim = User?.FindAll(ClaimTypes.Name);
             var userID = new Guid(roleClaim?.Select(c => c.Value).SingleOrDefault().ToString());
 
-            if (classId == Guid.Empty || classId == null) return BadRequest("Không nhận được dữ liệu!");
-            var result = await _projectService.GetProjectsByClassIDandUserID(classId, userID);
-            if (result == null || result.Count == 0) return BadRequest("Không tìm thấy Project!");
+            if (classId == Guid.Empty) return BadRequest("Không nhận được dữ liệu!");
+            var result = await _projectService.GetProjectsAndStatusByClassIDandUserID(classId, userID);
+            if (result.IsNullOrEmpty()) return BadRequest("Không tìm thấy Project!");
             return Ok(result);
-        }*/
+        }
 
         /*[HttpGet("{classId}")]
         public async Task<ActionResult<Project>> SearchProjectInClass(Guid classId, string? searchName)
