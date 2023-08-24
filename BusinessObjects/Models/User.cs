@@ -17,6 +17,8 @@ public partial class User
 
     public bool IsBan { get; set; }
 
+    public string? Mssv { get; set; }
+
     public virtual ICollection<Class> Classes { get; set; } = new List<Class>();
 
     public virtual ICollection<Course> Courses { get; set; } = new List<Course>();

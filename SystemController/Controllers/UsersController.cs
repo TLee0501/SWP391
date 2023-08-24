@@ -110,7 +110,7 @@ namespace SystemController.Controllers
 
         // POST: api/Users
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
+        /*[HttpPost]
         public async Task<ActionResult> CreateStudent(UserCreateRequest request)
         {
             try
@@ -121,9 +121,9 @@ namespace SystemController.Controllers
                 return Ok("Thành công!");
             }
             catch (Exception ex) { return BadRequest("Thất bại!"); }
-        }
+        }*/
 
-        [HttpPost]
+        /*[HttpPost]
         public async Task<ActionResult> CreateTeacher(UserCreateRequest request)
         {
             try
@@ -134,7 +134,7 @@ namespace SystemController.Controllers
                 return Ok("Thành công!");
             }
             catch (Exception ex) { return BadRequest("Thất bại!"); }
-        }
+        }*/
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<UserListResponse>>> SearchUser(string? search)

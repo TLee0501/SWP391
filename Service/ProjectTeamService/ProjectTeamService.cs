@@ -123,7 +123,8 @@ namespace Service.ProjectTeamService
                 var tmp = new UserBasicResponse
                 {
                     UserId = userTmp.UserId,
-                    FullName = userTmp.FullName
+                    FullName = userTmp.FullName,
+                    Mssv = userTmp.Mssv
                 };
                 team.Add(tmp);
             }
@@ -161,7 +162,8 @@ namespace Service.ProjectTeamService
                         var tmp = new UserBasicResponse
                         {
                             UserId = userTmp.UserId,
-                            FullName = userTmp.FullName
+                            FullName = userTmp.FullName,
+                            Mssv = userTmp.Mssv
                         };
                         team.Add(tmp);
                     }
@@ -211,7 +213,8 @@ namespace Service.ProjectTeamService
                         var tmp = new UserBasicResponse
                         {
                             UserId = item2.UserId,
-                            FullName = name.FullName
+                            FullName = name.FullName,
+                            Mssv = name.Mssv
                         };
                         listBasicMember.Add(tmp);
                     }

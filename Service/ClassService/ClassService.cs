@@ -182,6 +182,7 @@ namespace Service.ClassService
                 UserId = item.UserId,
                 FullName = item.User.FullName,
                 Email = item.User.Email,
+                Mssv = item.User.Mssv,
             }).ToList();
 
             return result;
