@@ -59,6 +59,7 @@ namespace Service.ProjectService
                 {
                     MemberId = _.User.UserId,
                     MemberFullName = _.User.FullName,
+                    MemberCode = _.User.Mssv!,
                 }).ToList(),
             };
             return result;
