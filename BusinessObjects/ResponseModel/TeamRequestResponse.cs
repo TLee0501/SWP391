@@ -1,4 +1,5 @@
-﻿
+﻿using BusinessObjects.Enums;
+
 namespace BusinessObjects.ResponseModel
 {
     public class TeamRequestResponse
@@ -8,5 +9,6 @@ namespace BusinessObjects.ResponseModel
         public string? ProjectName { get; set; }
         public List<UserBasicResponse> Users { get; set; } = null!;
         public Guid CreatedBy { get; set; }
+        public TeamRequestStatus Status { get; set; }
     }
 }

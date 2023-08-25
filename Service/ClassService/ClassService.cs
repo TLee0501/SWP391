@@ -190,26 +190,26 @@ namespace Service.ClassService
 
         public async Task<List<UserListResponse>> GetStudentsNotInProjectInClass(Guid classId)
         {
-            var checkRequest = await _context.TeamRequests.Where(x => x.Status != "2" && x.ClassId == classId).ToListAsync();
-            var studentsRequest = new List<Guid>();    
+            var checkRequest = await _context.TeamRequests.Where(x => x.ClassId == classId).ToListAsync();
+            var studentsRequest = new List<Guid>();
             foreach (var item in checkRequest)
             {
                 studentsRequest.Add(item.UserId);
             }
 
             var checkClass = await _context.StudentClasses.Where(x => x.ClassId == classId).ToListAsync();
-            var studentsClass = new List<Guid>(); 
+            var studentsClass = new List<Guid>();
             var list = new List<UserListResponse>();
             foreach (var item in checkClass)
             {
                 studentsClass.Add(item.UserId);
             }
 
-            foreach(var item in studentsClass)
+            foreach (var item in studentsClass)
             {
-                foreach(var item2 in studentsRequest)
+                foreach (var item2 in studentsRequest)
                 {
-                    if(item == item2)
+                    if (item == item2)
                     {
                         studentsClass.Remove(item);
                     }

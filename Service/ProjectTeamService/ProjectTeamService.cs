@@ -1,6 +1,7 @@
 ﻿using BusinessObjects.Models;
 using BusinessObjects.RequestModel;
 using BusinessObjects.ResponseModel;
+using BusinessObjects.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
@@ -39,8 +40,8 @@ namespace Service.ProjectTeamService
 
             foreach (var item in pts)
             {
-                if (item.Status.Equals("1")) return 2;
-                item.Status = "1";
+                if (item.Status.Equals(TeamRequestStatus.Approved)) return 2;
+                item.Status = TeamRequestStatus.Approved;
 
                 var teamMember = new TeamMember
                 {
@@ -58,7 +59,6 @@ namespace Service.ProjectTeamService
             }
             catch (Exception ex)
             {
-                //throw new NotImplementedException(ex.Message);
                 return 0;
             }
         }
@@ -93,8 +93,8 @@ namespace Service.ProjectTeamService
             if (pts == null) return 1;
             foreach (var item in pts)
             {
-                if (item.Status.Equals("2")) return 2;
-                item.Status = "2";
+                if (item.Status.Equals(TeamRequestStatus.Denied)) return 2;
+                item.Status = TeamRequestStatus.Denied;
             }
             try
             {
@@ -197,7 +197,7 @@ namespace Service.ProjectTeamService
             var listTeamId = new List<Guid>();
 
             //Lay list team
-            var listRequest = await _context.TeamRequests.Where(a => a.ClassId == classId && a.Status == "0").ToListAsync();
+            var listRequest = await _context.TeamRequests.Where(a => a.ClassId == classId).ToListAsync();
             var uniqueListTeam = listRequest.DistinctBy(a => a.Team).ToList();
 
             //Xu ly tung Team
@@ -229,7 +229,8 @@ namespace Service.ProjectTeamService
                             ProjectId = item1.ProjectId,
                             ProjectName = projectTmp.ProjectName,
                             Users = listBasicMember,
-                            CreatedBy = item1.UserId
+                            CreatedBy = item1.UserId,
+                            Status = item1.Status
                         };
                         result.Add(tmpResult);
                     }
@@ -239,7 +240,8 @@ namespace Service.ProjectTeamService
                         {
                             TeamId = item1.Team,
                             Users = listBasicMember,
-                            CreatedBy = item1.UserId
+                            CreatedBy = item1.UserId,
+                            Status = item1.Status
                         };
                         result.Add(tmpResult);
                     }
@@ -264,7 +266,7 @@ namespace Service.ProjectTeamService
                     Team = team,
                     TeamName = "",
                     ProjectId = request.ProjectId,
-                    Status = "0"
+                    Status = TeamRequestStatus.Pending
                 };
                 await _context.TeamRequests.AddAsync(tmp);
             }
@@ -308,7 +310,7 @@ namespace Service.ProjectTeamService
 
             //UserId from request
             var userIdsFromRequest = new List<Guid>();
-            var teamRequests = await _context.TeamRequests.Where(a => a.Team == teamId && a.Status == "0").ToListAsync();
+            var teamRequests = await _context.TeamRequests.Where(a => a.Team == teamId && a.Status == TeamRequestStatus.Pending).ToListAsync();
             foreach (var item in teamRequests)
             {
                 userIdsFromRequest.Add(item.UserId);
