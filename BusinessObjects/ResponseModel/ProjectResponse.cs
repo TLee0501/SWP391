@@ -6,6 +6,7 @@ namespace BusinessObjects.ResponseModel
     {
         public Guid MemberId { get; set; }
         public string MemberFullName { get; set; } = null!;
+        public string MemberCode { get; set; } = null!;
     }
 
     public class ProjectResponse
