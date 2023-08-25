@@ -273,9 +273,9 @@ namespace Service.ProjectService
                 }
                 else
                 {
-                    var requestStatus = "Yêu cầu đã bị từ chối";
-                    if (ps.Status == "0") requestStatus = "Đã gửi yêu cầu";
-                    else if (ps.Status == "1") requestStatus = "Yêu cầu đã được chấp nhận";
+                    var requestStatus = "Chưa đăng ký";
+                    if (ps.Status == "0") requestStatus = "Đã đăng ký";
+                    else if (ps.Status == "1") requestStatus = "Đã đăng ký";
                     var tmp = new ProjectAndStatusResponse
                     {
                         ProjectId = item.ProjectId,
