@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BusinessObjects.Models;
 using BusinessObjects.RequestModel;
 using Service.CourseService;
 using BusinessObjects.ResponseModel;
-using Azure.Core;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 
@@ -192,6 +186,14 @@ namespace SystemController.Controllers
             }
 
             return result;
+        }
+
+        [HttpPut]
+        public async Task<ActionResult> UpdateCourse (CoursceUpdateRequest request)
+        {
+            var result = await _courseService.UpdateCourse(request);
+            if (result.Equals(1)) return Ok("Thành công");
+            else { return BadRequest("Thất bại!"); }
         }
     }
 }
