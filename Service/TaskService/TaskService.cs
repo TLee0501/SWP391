@@ -2,13 +2,9 @@
 using BusinessObjects.RequestModel;
 using BusinessObjects.ResponseModel;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
 using System.Data.Common;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Task = BusinessObjects.Models.Task;
+using BusinessObjects.Enums;
 
 namespace Service.TaskService
 {
@@ -21,11 +17,6 @@ namespace Service.TaskService
         }
         public async Task<int> CreateTask(Guid userId, CreateTaskRequest request)
         {
-            var task = await _context.Tasks.SingleOrDefaultAsync(x => x.TaskName.ToLower() == request.TaskName.ToLower() && x.IsDeleted == false);
-            if (task != null)
-            {
-                return 1;
-            }
             var id = Guid.NewGuid();
             var newTask = new Task
             {
@@ -34,14 +25,11 @@ namespace Service.TaskService
                 ProjectId = request.ProjectId,
                 TaskName = request.TaskName,
                 Description = request?.TaskDescription ?? "",
-                StartTime = request.StartTime,
+                StartTime = request?.StartTime,
                 EndTime = request?.EndTime,
-                Status = 0,
+                Status = ProjectTaskStatus.New,
                 IsDeleted = false,
             };
-            // status = 0: chưa làm
-            //status = 1: đang làm
-            //status = 2: đã hoàn thành
             try
             {
                 await _context.AddAsync(newTask);
@@ -106,14 +94,15 @@ namespace Service.TaskService
             {
                 StudentTaskId = id,
                 UserId = request.userID,
-                TaskId = request.taskId,                       
+                TaskId = request.taskId,
             };
             try
             {
                 await _context.StudentTasks.AddAsync(studentTask);
                 await _context.SaveChangesAsync();
                 return 2;
-            }catch (Exception e)
+            }
+            catch (Exception e)
             {
                 return 0;
             }
@@ -122,14 +111,10 @@ namespace Service.TaskService
         public async Task<List<TaskResponse>> GetAllTask(Guid projectId)
         {
             var check = await _context.Tasks.Where(x => x.ProjectId == projectId && x.IsDeleted == false).ToListAsync();
-            if (check == null || check.Count == 0)
-            {
-                return null;
-            }
             var list = new List<TaskResponse>();
             foreach (var item in check)
             {
-                var fullName = await _context.Users.FindAsync(item.UserId);
+                var user = await _context.Users.FindAsync(item.UserId);
                 var tmp = new TaskResponse
                 {
                     ProjectId = item.ProjectId,
@@ -140,7 +125,7 @@ namespace Service.TaskService
                     StartTime = item.StartTime,
                     EndTime = item.EndTime,
                     Status = item.Status,
-                    UserFullName = fullName.FullName,
+                    UserFullName = user!.FullName,
                 };
                 list.Add(tmp);
             }
