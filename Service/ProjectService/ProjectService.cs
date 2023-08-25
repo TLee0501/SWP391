@@ -1,4 +1,5 @@
 ﻿using BusinessObjects.Models;
+using BusinessObjects.Enums;
 using BusinessObjects.RequestModel;
 using BusinessObjects.ResponseModel;
 using Microsoft.EntityFrameworkCore;
@@ -274,8 +275,7 @@ namespace Service.ProjectService
                 else
                 {
                     var requestStatus = "Chưa đăng ký";
-                    if (ps.Status == "0") requestStatus = "Đã đăng ký";
-                    else if (ps.Status == "1") requestStatus = "Đã đăng ký";
+                    if (ps.Status == TeamRequestStatus.Approved) requestStatus = "Đã đăng ký";
                     var tmp = new ProjectAndStatusResponse
                     {
                         ProjectId = item.ProjectId,

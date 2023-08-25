@@ -31,10 +31,10 @@ namespace SystemController.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ProjectTeam>>> GetProjectTeamsForTest()
         {
-          if (_context.ProjectTeams == null)
-          {
-              return NotFound();
-          }
+            if (_context.ProjectTeams == null)
+            {
+                return NotFound();
+            }
             return await _context.ProjectTeams.ToListAsync();
         }
 
@@ -73,6 +73,21 @@ namespace SystemController.Controllers
         }
 
         [HttpPut("{teamId}")]
+        public async Task<IActionResult> CancelTeamProjectrequest(Guid teamId)
+        {
+            if (teamId == Guid.Empty)
+            {
+                return BadRequest("Không nhận được teamId!");
+            }
+
+            var result = await _projectTeamServise.CancelProjectrequest(teamId);
+            if (result == 1) return BadRequest("Không tìm thấy yêu cầu!");
+            else if (result == 2) return BadRequest("Yêu cầu đã bị từ chối!");
+            else if (result == 3) return Ok("Thành công!");
+            else return BadRequest("Thất bại!");
+        }
+
+        [HttpPut("{teamId}")]
         public async Task<IActionResult> AcceptTeamProjectrequest(Guid teamId)
         {
             if (teamId == Guid.Empty)
@@ -93,7 +108,6 @@ namespace SystemController.Controllers
         [HttpPost]
         public async Task<ActionResult> StudentCreateTeamRequest(StudentCreateTeamRequest request)
         {
-            if (request.TeamName.IsNullOrEmpty()) return BadRequest("Chưa có tên nhóm!");
             if (request.ProjectId == Guid.Empty) return BadRequest("Chưa có ID đề tài!");
             try
             {
