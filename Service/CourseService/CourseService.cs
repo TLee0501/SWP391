@@ -1,14 +1,8 @@
-﻿using Azure.Core;
-using BusinessObjects.Models;
+﻿using BusinessObjects.Models;
 using BusinessObjects.RequestModel;
 using BusinessObjects.ResponseModel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Service.CourseService
 {
@@ -231,6 +225,19 @@ namespace Service.CourseService
                 return result;
             }
 
+        }
+
+        public async Task<int> UpdateCourse(CoursceUpdateRequest request)
+        {
+            var course = await _context.Courses.FindAsync(request.CourseId);
+            course.CourseCode = request.CourseCode;
+            course.CourseName = request.CourseName;
+            try
+            {
+                await _context.SaveChangesAsync();
+                return 1;
+            }
+            catch {  return 0; }
         }
     }
 }

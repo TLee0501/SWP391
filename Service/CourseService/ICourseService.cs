@@ -1,10 +1,5 @@
 ﻿using BusinessObjects.RequestModel;
 using BusinessObjects.ResponseModel;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Service.CourseService
 {
@@ -19,5 +14,6 @@ namespace Service.CourseService
         Task<int> DeactiveCourse(Guid courseId);
         Task<int> DeleteCourse(Guid courseId);
         Task<List<CourseResponse>> SearchCourse(string? searchText);
+        Task<int> UpdateCourse(CoursceUpdateRequest request);
     }
 }
