@@ -220,13 +220,20 @@ namespace Service.ProjectTeamService
             return result;
         }
 
-        public async Task<List<TeamRequestResponse>> GetTeamProjectRequests(Guid classId)
+
+
+        public async Task<List<TeamRequestResponse>> GetTeamProjectRequests(Guid? userId, Guid classId)
         {
             var result = new List<TeamRequestResponse>();
             var listTeamId = new List<Guid>();
 
             //Lay list team
-            var listRequest = await _context.TeamRequests.Where(a => a.ClassId == classId && a.Status != TeamRequestStatus.Cancelled).ToListAsync();
+            var query = _context.TeamRequests.Where(a => a.ClassId == classId && a.Status != TeamRequestStatus.Cancelled);
+            if (userId != null)
+            {
+                query = query.Where(_ => _.UserId == userId);
+            }
+            var listRequest = await query.ToListAsync();
             var uniqueListTeam = listRequest.DistinctBy(a => a.Team).ToList();
 
             //Xu ly tung Team

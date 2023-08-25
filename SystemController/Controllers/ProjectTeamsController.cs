@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BusinessObjects.Models;
 using Service.ProjectTeamService;
 using BusinessObjects.RequestModel;
-using Microsoft.AspNetCore.Authentication.OAuth.Claims;
 using BusinessObjects.ResponseModel;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SystemController.Controllers
 {
@@ -38,11 +33,21 @@ namespace SystemController.Controllers
             return await _context.ProjectTeams.ToListAsync();
         }
 
-        [HttpGet]
+        [HttpGet, Authorize]
         public async Task<ActionResult<IEnumerable<TeamRequestResponse>>> GetTeamProjectRequests(Guid classId)
         {
-            var result = await _projectTeamServise.GetTeamProjectRequests(classId);
-            if (result.IsNullOrEmpty()) return BadRequest("Không tìm thấy Request!");
+            var userId = Utils.GetUserIdFromHttpContext(HttpContext);
+            var role = Utils.GetUserRoleFromHttpContext(HttpContext);
+            List<TeamRequestResponse>? result;
+            if (role == "Student")
+            {
+                result = await _projectTeamServise.GetTeamProjectRequests(new Guid(userId!), classId);
+            }
+            else
+            {
+                result = await _projectTeamServise.GetTeamProjectRequests(null, classId);
+            }
+
             return result;
         }
 
