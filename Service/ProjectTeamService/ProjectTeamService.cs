@@ -34,6 +34,9 @@ namespace Service.ProjectTeamService
                 return 1;
             }
 
+            //check if project already choosen
+            var checkChoosen = await _context.ProjectTeams.Where(a => a.ProjectId == teamRequestList.First().ProjectId && a.Status != 3).ToListAsync();
+            if (!checkChoosen.IsNullOrEmpty()) return 5;
 
             var projects = await _context.Projects.Where(a => a.ClassId == teamRequestList.First().ClassId && a.IsDeleted == false).ToListAsync();
             var pt = new List<ProjectTeam>();
