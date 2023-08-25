@@ -275,9 +275,6 @@ public partial class Swp391onGoingReportContext : DbContext
                 .IsFixedLength()
                 .HasColumnName("status");
             entity.Property(e => e.Team).HasColumnName("team");
-            entity.Property(e => e.TeamName)
-                .HasMaxLength(50)
-                .HasColumnName("teamName");
             entity.Property(e => e.UserId).HasColumnName("userID");
 
             entity.HasOne(d => d.Class).WithMany(p => p.TeamRequests)

@@ -1,4 +1,5 @@
-﻿using BusinessObjects.Enums;
+﻿using System;
+using System.Collections.Generic;
 
 namespace BusinessObjects.Models;
 
@@ -14,9 +15,7 @@ public partial class TeamRequest
 
     public Guid ProjectId { get; set; }
 
-    public string TeamName { get; set; } = null!;
-
-    public TeamRequestStatus Status { get; set; }
+    public string Status { get; set; } = null!;
 
     public virtual Class Class { get; set; } = null!;
 

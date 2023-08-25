@@ -275,7 +275,7 @@ namespace Service.ProjectService
                 else
                 {
                     var requestStatus = "Chưa đăng ký";
-                    if (ps.Status == TeamRequestStatus.Approved) requestStatus = "Đã đăng ký";
+                    if (ps.Status == TeamRequestStatus.Approved.ToString()) requestStatus = "Đã đăng ký";
                     var tmp = new ProjectAndStatusResponse
                     {
                         ProjectId = item.ProjectId,
