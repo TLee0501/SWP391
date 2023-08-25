@@ -31,10 +31,10 @@ namespace SystemController.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ProjectTeam>>> GetProjectTeamsForTest()
         {
-          if (_context.ProjectTeams == null)
-          {
-              return NotFound();
-          }
+            if (_context.ProjectTeams == null)
+            {
+                return NotFound();
+            }
             return await _context.ProjectTeams.ToListAsync();
         }
 
@@ -93,7 +93,6 @@ namespace SystemController.Controllers
         [HttpPost]
         public async Task<ActionResult> StudentCreateTeamRequest(StudentCreateTeamRequest request)
         {
-            if (request.TeamName.IsNullOrEmpty()) return BadRequest("Chưa có tên nhóm!");
             if (request.ProjectId == Guid.Empty) return BadRequest("Chưa có ID đề tài!");
             try
             {

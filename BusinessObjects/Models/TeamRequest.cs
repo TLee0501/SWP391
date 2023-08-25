@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using BusinessObjects.Enums;
 
 namespace BusinessObjects.Models;
 
@@ -17,7 +16,7 @@ public partial class TeamRequest
 
     public string TeamName { get; set; } = null!;
 
-    public string Status { get; set; } = null!;
+    public TeamRequestStatus Status { get; set; }
 
     public virtual Class Class { get; set; } = null!;
 

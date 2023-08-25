@@ -83,7 +83,8 @@ namespace Service.ProjectTeamService
             {
                 await _context.SaveChangesAsync();
                 return 2;
-            } catch (Exception ex) { return 1; }
+            }
+            catch (Exception ex) { return 1; }
         }
 
         public async Task<int> DenyTeamProjectrequest(Guid teamId)
@@ -99,7 +100,8 @@ namespace Service.ProjectTeamService
             {
                 await _context.SaveChangesAsync();
                 return 3;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 return 0;
             }
@@ -135,7 +137,7 @@ namespace Service.ProjectTeamService
                 ProjectId = (Guid)pt.ProjectId,
                 ProjectName = project.ProjectName,
                 TeamName = pt.TeamName,
-                TimeStart = pt.TimeStart,  
+                TimeStart = pt.TimeStart,
                 TimeEnd = pt.TimeEnd,
                 Users = team,
                 Status = status
@@ -203,7 +205,7 @@ namespace Service.ProjectTeamService
             {
                 var listBasicMember = new List<UserBasicResponse>();
                 var listTR = await _context.TeamRequests.Where(a => a.Team == item.Team).ToListAsync();
-                var uniqueListTR = listTR.DistinctBy(a =>a.Team).ToList();
+                var uniqueListTR = listTR.DistinctBy(a => a.Team).ToList();
                 foreach (var item1 in uniqueListTR)
                 {
                     var members = await _context.TeamRequests.Where(a => a.Team == item1.Team).ToListAsync();
@@ -226,7 +228,8 @@ namespace Service.ProjectTeamService
                             TeamId = item1.Team,
                             ProjectId = item1.ProjectId,
                             ProjectName = projectTmp.ProjectName,
-                            Users = listBasicMember
+                            Users = listBasicMember,
+                            CreatedBy = item1.UserId
                         };
                         result.Add(tmpResult);
                     }
@@ -235,7 +238,8 @@ namespace Service.ProjectTeamService
                         var tmpResult = new TeamRequestResponse()
                         {
                             TeamId = item1.Team,
-                            Users = listBasicMember
+                            Users = listBasicMember,
+                            CreatedBy = item1.UserId
                         };
                         result.Add(tmpResult);
                     }
@@ -246,9 +250,6 @@ namespace Service.ProjectTeamService
 
         public async Task<int> StudentCreateTeamRequest(StudentCreateTeamRequest request)
         {
-            var checkName = await _context.TeamRequests.Where(a => a.ClassId == request.ClassId && a.TeamName == request.TeamName).ToListAsync();
-            if (checkName.Count > 0) return 3;
-
             var checkclass = await _context.Classes.FindAsync(request.ClassId);
             if (checkclass == null) return 1;
 
@@ -261,7 +262,7 @@ namespace Service.ProjectTeamService
                     UserId = item,
                     ClassId = request.ClassId,
                     Team = team,
-                    TeamName = request.TeamName,
+                    TeamName = "",
                     ProjectId = request.ProjectId,
                     Status = "0"
                 };
@@ -271,7 +272,8 @@ namespace Service.ProjectTeamService
             {
                 await _context.SaveChangesAsync();
                 return 2;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 return 0;
             }
