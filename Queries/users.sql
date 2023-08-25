@@ -2,6 +2,18 @@ use SWP391OnGoingReport
 go
 
 -- delete from [User]
+-- select * from [User]
+
+-- Admin
+insert into [User] (userID, email, fullName, password, isBan, roleID)
+values (
+    newid(),
+    'admin@gmail.com',
+    N'Nguyễn Phúc Bảo',
+    '123',
+    0,
+    (select roleID from [Role] where roleName = 'Admin')
+)
 
 -- Students
 insert into [User] (userID, MSSV, email, fullName, password, isBan, roleID)
