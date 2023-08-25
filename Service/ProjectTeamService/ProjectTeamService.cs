@@ -302,8 +302,8 @@ namespace Service.ProjectTeamService
                             ProjectId = item1.ProjectId,
                             ProjectName = projectTmp.ProjectName,
                             Users = listBasicMember,
-                            CreatedBy = item1.UserId
-                            //Status = item1.Status
+                            CreatedBy = item1.UserId,
+                            Status = item1.Status
                         };
                         result.Add(tmpResult);
                     }
@@ -313,8 +313,8 @@ namespace Service.ProjectTeamService
                         {
                             TeamId = item1.Team,
                             Users = listBasicMember,
-                            CreatedBy = item1.UserId
-                            //Status = item1.Status
+                            CreatedBy = item1.UserId,
+                            Status = item1.Status
                         };
                         result.Add(tmpResult);
                     }
