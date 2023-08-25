@@ -18,31 +18,67 @@ namespace Service.ProjectTeamService
 
         public async Task<int> AcceptTeamProjectrequest(Guid teamId)
         {
+            //check student 
+            var checkStudent = await CheckStudentValid(teamId);
+            if (checkStudent == false) return 4;
+
+            var teamRequestList = await _context.TeamRequests.Where(_ => _.Team == teamId).ToListAsync();
+            if (teamRequestList.IsNullOrEmpty())
+            {
+                return 1;
+            }
+
+            var fistRequest = teamRequestList[0];
+            if (fistRequest.Status == TeamRequestStatus.Approved)
+            {
+                return 1;
+            }
+
+
+            var projects = await _context.Projects.Where(a => a.ClassId == teamRequestList.First().ClassId && a.IsDeleted == false).ToListAsync();
+            var pt = new List<ProjectTeam>();
+            foreach (var item in projects)
+            {
+                var ptTmp = await _context.ProjectTeams.Where(a => a.ProjectId == item.ProjectId).ToListAsync();
+                if (!ptTmp.IsNullOrEmpty())
+                {
+                    foreach (var item1 in ptTmp)
+                    {
+                        pt.Add(item1);
+                    }
+                }
+            }
+
+            //Tên nhóm
+            string newName;
+            if (pt.IsNullOrEmpty())
+            {
+                newName = "G01";
+            }
+            else
+            {
+                var nameMax = pt.MaxBy(a => a.TeamName).TeamName;
+                string digits = new string(nameMax.Where(char.IsDigit).ToArray());
+                string letters = new string(nameMax.Where(char.IsLetter).ToArray());
+
+                int number;
+                if (!int.TryParse(digits, out number)) //int.Parse would do the job since only digits are selected
+                {
+                    Console.WriteLine("Something weired happened");
+                }
+
+                newName = letters + (++number).ToString("D2");
+            }
+
             try
             {
-                //check student 
-                var checkStudent = await CheckStudentValid(teamId);
-                if (checkStudent == false) return 4;
-
-                var teamRequestList = await _context.TeamRequests.Where(_ => _.Team == teamId).ToListAsync();
-                if (teamRequestList.IsNullOrEmpty())
-                {
-                    return 1;
-                }
-
-                var fistRequest = teamRequestList[0];
-                if (fistRequest.Status == TeamRequestStatus.Approved)
-                {
-                    return 1;
-                }
-
                 var projectTeamId = Guid.NewGuid();
 
                 var projectTeam = new ProjectTeam
                 {
                     ProjectTeamId = projectTeamId,
                     ProjectId = fistRequest.ProjectId,
-                    TeamName = fistRequest.TeamName,
+                    TeamName = newName,
                     TimeStart = DateTime.Now,
                     Status = 1
                 };
@@ -234,6 +270,7 @@ namespace Service.ProjectTeamService
                 query = query.Where(_ => _.UserId == userId);
             }
             var listRequest = await query.ToListAsync();
+
             var uniqueListTeam = listRequest.DistinctBy(a => a.Team).ToList();
 
             //Xu ly tung Team
@@ -265,8 +302,8 @@ namespace Service.ProjectTeamService
                             ProjectId = item1.ProjectId,
                             ProjectName = projectTmp.ProjectName,
                             Users = listBasicMember,
-                            CreatedBy = item1.UserId,
-                            Status = item1.Status
+                            CreatedBy = item1.UserId
+                            //Status = item1.Status
                         };
                         result.Add(tmpResult);
                     }
@@ -276,8 +313,8 @@ namespace Service.ProjectTeamService
                         {
                             TeamId = item1.Team,
                             Users = listBasicMember,
-                            CreatedBy = item1.UserId,
-                            Status = item1.Status
+                            CreatedBy = item1.UserId
+                            //Status = item1.Status
                         };
                         result.Add(tmpResult);
                     }
@@ -300,7 +337,7 @@ namespace Service.ProjectTeamService
                     UserId = item,
                     ClassId = request.ClassId,
                     Team = team,
-                    TeamName = "",
+                    //TeamName = "",
                     ProjectId = request.ProjectId,
                     Status = TeamRequestStatus.Pending
                 };
