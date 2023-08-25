@@ -105,6 +105,7 @@ namespace SystemController.Controllers
             else if (result == 2) return BadRequest("Yêu cầu đã bị chấp nhận!");
             else if (result == 3) return Ok("Thành công!");
             else if (result == 4) return BadRequest("Có thành viên đã tham gia vào nhóm khác!");
+            else if (result == 5) return BadRequest("Dự án đã được chọn!");
             else return BadRequest("Thất bại!");
         }
 
