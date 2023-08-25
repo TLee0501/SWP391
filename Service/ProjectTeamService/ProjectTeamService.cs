@@ -18,40 +18,69 @@ namespace Service.ProjectTeamService
 
         public async Task<int> AcceptTeamProjectrequest(Guid teamId)
         {
-            //check student 
-            var checkStudent = await CheckStudentValid(teamId);
-            if (checkStudent == false) return 4;
-
-            var pts = await _context.TeamRequests.Where(a => a.Team == teamId).ToListAsync();
-            if (pts == null) return 1;
-
-            var projectTeamId = Guid.NewGuid();
-            var projectTeam = new ProjectTeam
+            try
             {
-                ProjectTeamId = projectTeamId,
-                ProjectId = (Guid)pts[0].ProjectId,
-                TeamName = pts[0].TeamName,
-                TimeStart = DateTime.Now,
-                Status = 1
-            };
-            await _context.ProjectTeams.AddAsync(projectTeam);
-            var project = await _context.Projects.FindAsync(pts[0].ProjectId);
-            project.IsSelected = true;
+                //check student 
+                var checkStudent = await CheckStudentValid(teamId);
+                if (checkStudent == false) return 4;
 
-            foreach (var item in pts)
-            {
-                if (item.Status.Equals(TeamRequestStatus.Approved)) return 2;
-                item.Status = TeamRequestStatus.Approved;
-
-                var teamMember = new TeamMember
+                var teamRequestList = await _context.TeamRequests.Where(_ => _.Team == teamId).ToListAsync();
+                if (teamRequestList.IsNullOrEmpty())
                 {
-                    TeamMemberId = Guid.NewGuid(),
+                    return 1;
+                }
+
+                var fistRequest = teamRequestList[0];
+                if (fistRequest.Status == TeamRequestStatus.Approved)
+                {
+                    return 1;
+                }
+
+                var projectTeamId = Guid.NewGuid();
+
+                var projectTeam = new ProjectTeam
+                {
                     ProjectTeamId = projectTeamId,
-                    UserId = item.UserId
+                    ProjectId = fistRequest.ProjectId,
+                    TeamName = fistRequest.TeamName,
+                    TimeStart = DateTime.Now,
+                    Status = 1
                 };
-                await _context.TeamMembers.AddAsync(teamMember);
+
+                await _context.ProjectTeams.AddAsync(projectTeam);
+
+                foreach (var request in teamRequestList)
+                {
+                    request.Status = TeamRequestStatus.Approved;
+                    var teamMember = new TeamMember
+                    {
+                        TeamMemberId = Guid.NewGuid(),
+                        ProjectTeamId = projectTeamId,
+                        UserId = request.UserId
+                    };
+                    await _context.TeamMembers.AddAsync(teamMember);
+                }
+
+                await _context.SaveChangesAsync();
+                return 3;
+            }
+            catch (Exception ex)
+            {
+                return 0;
             }
 
+
+        }
+
+        public async Task<int> CancelProjectrequest(Guid teamId)
+        {
+            var pts = await _context.TeamRequests.Where(a => a.Team == teamId).ToListAsync();
+            if (pts == null) return 1;
+            foreach (var item in pts)
+            {
+                if (item.Status.Equals(TeamRequestStatus.Cancelled)) return 2;
+                item.Status = TeamRequestStatus.Cancelled;
+            }
             try
             {
                 await _context.SaveChangesAsync();
@@ -197,7 +226,7 @@ namespace Service.ProjectTeamService
             var listTeamId = new List<Guid>();
 
             //Lay list team
-            var listRequest = await _context.TeamRequests.Where(a => a.ClassId == classId).ToListAsync();
+            var listRequest = await _context.TeamRequests.Where(a => a.ClassId == classId && a.Status != TeamRequestStatus.Cancelled).ToListAsync();
             var uniqueListTeam = listRequest.DistinctBy(a => a.Team).ToList();
 
             //Xu ly tung Team
