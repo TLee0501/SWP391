@@ -40,17 +40,26 @@ namespace Service.ProjectService
 
         public async Task<ProjectResponse> GetProjectByID(Guid projectId)
         {
-            var project = await _context.Projects.FindAsync(projectId);
-            var classTmp = await _context.Classes.FindAsync(project.ClassId);
-            if (project == null) return null;
+            var projectTeam = await _context.ProjectTeams
+                .Include(_ => _.TeamMembers)
+                    .ThenInclude(_ => _.User)
+                .Include(_ => _.Project)
+                    .ThenInclude(_ => _.Class)
+                .Where(_ => _.ProjectId == projectId).SingleOrDefaultAsync();
+
             var result = new ProjectResponse
             {
                 ProjectId = projectId,
-                ProjectName = project.ProjectName,
-                Description = project.Description,
-                ClassID = project.ClassId,
-                ClassName = classTmp.ClassName,
-                IsSelected = project.IsSelected
+                ProjectName = projectTeam!.Project.ProjectName,
+                Description = projectTeam.Project.Description,
+                ClassID = projectTeam.Project.Class.ClassId,
+                ClassName = projectTeam.Project.Class.ClassName,
+                IsSelected = projectTeam.Project.IsSelected,
+                Members = projectTeam.TeamMembers.Select(_ => new ProjectMemberResponse
+                {
+                    MemberId = _.User.UserId,
+                    MemberFullName = _.User.FullName,
+                }).ToList(),
             };
             return result;
         }

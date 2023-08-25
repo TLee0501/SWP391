@@ -87,14 +87,14 @@ namespace Service.TaskService
 
         public async Task<int> AssignTask(AssignTaskRequest request)
         {
-            var check = await _context.StudentTasks.SingleOrDefaultAsync(x => x.UserId == request.userID && x.TaskId == request.taskId);
+            var check = await _context.StudentTasks.SingleOrDefaultAsync(x => x.UserId == request.MemberId && x.TaskId == request.TaskId);
             if (check != null) return 1;
-            var id = Guid.NewGuid();
+
             var studentTask = new StudentTask
             {
-                StudentTaskId = id,
-                UserId = request.userID,
-                TaskId = request.taskId,
+                StudentTaskId = Guid.NewGuid(),
+                UserId = request.MemberId,
+                TaskId = request.TaskId,
             };
             try
             {
@@ -108,9 +108,26 @@ namespace Service.TaskService
             }
         }
 
+        public async Task<int> UnAssignTask(AssignTaskRequest request)
+        {
+            var check = await _context.StudentTasks.SingleOrDefaultAsync(x => x.UserId == request.MemberId && x.TaskId == request.TaskId);
+            if (check == null) return 1;
+
+            try
+            {
+                _context.StudentTasks.Remove(check);
+                await _context.SaveChangesAsync();
+                return 2;
+            }
+            catch (Exception e)
+            {
+                return 0;
+            }
+        }
+
         public async Task<List<TaskResponse>> GetAllTask(Guid projectId)
         {
-            var check = await _context.Tasks.Where(x => x.ProjectId == projectId && x.IsDeleted == false).ToListAsync();
+            var check = await _context.Tasks.Include(_ => _.StudentTasks).ThenInclude(_ => _.User).Where(x => x.ProjectId == projectId && x.IsDeleted == false).ToListAsync();
             var list = new List<TaskResponse>();
             foreach (var item in check)
             {
@@ -126,10 +143,17 @@ namespace Service.TaskService
                     EndTime = item.EndTime,
                     Status = item.Status,
                     UserFullName = user!.FullName,
+                    Members = item.StudentTasks.Select(_ => new TaskMemberResponse
+                    {
+                        MemberId = _.User.UserId,
+                        MemberFullName = _.User.FullName,
+                    }).ToList(),
                 };
                 list.Add(tmp);
             }
             return list;
         }
+
+
     }
 }

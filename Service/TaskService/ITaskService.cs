@@ -14,6 +14,7 @@ namespace Service.TaskService
         Task<int> UpdateTask(UpdateTaskRequest request);
         Task<int> DeleteTask(Guid taskId);
         Task<int> AssignTask(AssignTaskRequest request);
+        Task<int> UnAssignTask(AssignTaskRequest request);
         Task<List<TaskResponse>> GetAllTask(Guid projectId);
     }
 }

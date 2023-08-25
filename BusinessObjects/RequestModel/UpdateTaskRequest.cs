@@ -7,7 +7,7 @@ namespace BusinessObjects.RequestModel
         public Guid TaskId { get; set; }
         public string TaskName { get; set; } = null!;
         public string Description { get; set; } = null!;
-        public DateTime StartTime { get; set; }
+        public DateTime? StartTime { get; set; }
         public DateTime? EndTime { get; set; }
         public ProjectTaskStatus Status { get; set; }
     }

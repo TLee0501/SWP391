@@ -53,7 +53,7 @@ namespace SystemController.Controllers
             else { return Ok("Cập nhật task thành công."); }
         }
 
-        [HttpPost]
+        [HttpPut]
         public async Task<ActionResult> AssignTask(AssignTaskRequest request)
         {
             if (request == null) return BadRequest("Không nhận được dữ liệu.");
@@ -63,6 +63,23 @@ namespace SystemController.Controllers
                 if (result == 0) return BadRequest("Không thành công!");
                 else if (result == 1) return BadRequest("Sinh viên đã được thêm vào task.");
                 else return Ok("Thêm thành công.");
+            }
+            catch (DbUpdateException)
+            {
+                return BadRequest("Không thành công.");
+            }
+        }
+
+        [HttpPut]
+        public async Task<ActionResult> UnAssignTask(AssignTaskRequest request)
+        {
+            if (request == null) return BadRequest("Không nhận được dữ liệu.");
+            try
+            {
+                var result = await _taskService.UnAssignTask(request);
+                if (result == 0) return BadRequest("Không thành công!");
+                else if (result == 1) return BadRequest("Sinh viên chưa được thêm vào task.");
+                else return Ok("Xóa thành công.");
             }
             catch (DbUpdateException)
             {
