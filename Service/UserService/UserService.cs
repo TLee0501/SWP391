@@ -182,6 +182,7 @@ namespace Service.UserService
                 FullName = item.FullName,
                 Email = item.Email,
                 Role = item.Role.RoleName,
+                RoleId = item.Role.RoleId,
                 Mssv = item.Mssv,
                 isBan = item.IsBan
             }).ToList();
