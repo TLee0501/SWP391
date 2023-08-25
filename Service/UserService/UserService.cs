@@ -116,7 +116,7 @@ namespace Service.UserService
         public async Task<UserResponse> GetUser(Guid userId)
         {
             var user = await _context.Users.FindAsync(userId);
-            if (user == null) return null;
+            if (user == null || user.IsBan) return null;
             var role = await _context.Roles.FindAsync(user.RoleId);
             UserResponse result = new UserResponse
             {
@@ -182,6 +182,7 @@ namespace Service.UserService
                 FullName = item.FullName,
                 Email = item.Email,
                 Role = item.Role.RoleName,
+                RoleId = item.Role.RoleId,
                 Mssv = item.Mssv,
                 isBan = item.IsBan
             }).ToList();
