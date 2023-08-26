@@ -1,5 +1,4 @@
-﻿using BusinessObjects.RequestModel;
-using BusinessObjects.ResponseModel;
+﻿using BusinessObjects.ResponseModel;
 
 namespace Service.ProjectTeamService
 {
