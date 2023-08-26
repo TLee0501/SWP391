@@ -11,7 +11,11 @@ public partial class Project
 
     public string ProjectName { get; set; } = null!;
 
-    public string Description { get; set; } = null!;
+    public string? Description { get; set; }
+
+    public string? FunctionalReq { get; set; }
+
+    public string? NonfunctionalReq { get; set; }
 
     public bool IsSelected { get; set; }
 
