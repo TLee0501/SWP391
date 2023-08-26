@@ -264,11 +264,11 @@ namespace Service.ProjectService
 
             foreach (var item in projects)
             {
-                var ps = await _context.TeamRequests.SingleOrDefaultAsync(a => a.ProjectId == item.ProjectId && a.UserId == userId);
+                //var ps = await _context.TeamRequests.SingleOrDefaultAsync(a => a.ProjectId == item.ProjectId && a.UserId == userId);
 
                 var classTmp = await _context.Classes.FindAsync(item.ClassId);
 
-                if (ps == null)
+                /*if (ps == null)
                 {
                     var tmp = new ProjectAndStatusResponse
                     {
@@ -297,7 +297,7 @@ namespace Service.ProjectService
                         IsSelected = item.IsSelected
                     };
                     result.Add(tmp);
-                }
+                }*/
             }
             return result;
         }

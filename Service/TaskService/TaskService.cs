@@ -27,7 +27,7 @@ namespace Service.TaskService
                 Description = request?.TaskDescription ?? "",
                 StartTime = request?.StartTime,
                 EndTime = request?.EndTime,
-                Status = ProjectTaskStatus.New,
+                Status = (int)ProjectTaskStatus.New,
                 IsDeleted = false,
             };
             try
@@ -53,7 +53,7 @@ namespace Service.TaskService
             check.Description = request.Description;
             check.StartTime = request.StartTime;
             check.EndTime = request.EndTime;
-            check.Status = request.Status;
+            check.Status = (int)request.Status;
             try
             {
                 await _context.SaveChangesAsync();
@@ -141,7 +141,7 @@ namespace Service.TaskService
                     TaskDescription = item.Description,
                     StartTime = item.StartTime,
                     EndTime = item.EndTime,
-                    Status = item.Status,
+                    Status = (ProjectTaskStatus)item.Status,
                     UserFullName = user!.FullName,
                     Members = item.StudentTasks.Select(_ => new TaskMemberResponse
                     {
