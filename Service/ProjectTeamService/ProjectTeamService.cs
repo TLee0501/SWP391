@@ -16,7 +16,7 @@ namespace Service.ProjectTeamService
             _context = context;
         }
 
-        public async Task<int> AcceptTeamProjectrequest(Guid teamId)
+        /*public async Task<int> AcceptTeamProjectrequest(Guid teamId)
         {
             //check student 
             var checkStudent = await CheckStudentValid(teamId);
@@ -107,36 +107,13 @@ namespace Service.ProjectTeamService
             {
                 return 0;
             }
-
-
-        }
-
-        public async Task<int> CancelProjectrequest(Guid teamId)
-        {
-            var pts = await _context.TeamRequests.Where(a => a.Team == teamId).ToListAsync();
-            if (pts == null) return 1;
-            foreach (var item in pts)
-            {
-                if (item.Status.Equals(TeamRequestStatus.Cancelled)) return 2;
-                item.Status = TeamRequestStatus.Cancelled;
-            }
-            try
-            {
-                await _context.SaveChangesAsync();
-                return 3;
-            }
-            catch (Exception ex)
-            {
-                return 0;
-            }
-        }
+        }*/
 
         public async Task<int> DeleteProjectTeam(Guid projectTeamId)
         {
             var pt = await _context.ProjectTeams.FindAsync(projectTeamId);
             if (pt == null) return 0;
 
-            pt.TimeEnd = DateTime.Now;
             pt.Status = 3;
 
             var tasks = await _context.Tasks.Where(a => a.ProjectId == pt.ProjectId).ToListAsync();
@@ -155,7 +132,7 @@ namespace Service.ProjectTeamService
             catch (Exception ex) { return 1; }
         }
 
-        public async Task<int> DenyTeamProjectrequest(Guid teamId)
+        /*public async Task<int> DenyTeamProjectrequest(Guid teamId)
         {
             var pts = await _context.TeamRequests.Where(a => a.Team == teamId).ToListAsync();
             if (pts == null) return 1;
@@ -173,7 +150,7 @@ namespace Service.ProjectTeamService
             {
                 return 0;
             }
-        }
+        }*/
 
         public async Task<ProjectTeamResponse> getProjectTeamById(Guid projectTeamId)
         {
@@ -205,8 +182,6 @@ namespace Service.ProjectTeamService
                 ProjectId = (Guid)pt.ProjectId,
                 ProjectName = project.ProjectName,
                 TeamName = pt.TeamName,
-                TimeStart = pt.TimeStart,
-                TimeEnd = pt.TimeEnd,
                 Users = team,
                 Status = status
             };
@@ -248,8 +223,6 @@ namespace Service.ProjectTeamService
                         ProjectId = pt.ProjectId,
                         ProjectName = project.ProjectName,
                         TeamName = pt.TeamName,
-                        TimeStart = pt.TimeStart,
-                        TimeEnd = pt.TimeEnd,
                         Users = team,
                         Status = status
                     };
@@ -259,9 +232,7 @@ namespace Service.ProjectTeamService
             return result;
         }
 
-
-
-        public async Task<List<TeamRequestResponse>> GetTeamProjectRequests(Guid? userId, Guid classId)
+        /*public async Task<List<TeamRequestResponse>> GetTeamProjectRequests(Guid? userId, Guid classId)
         {
             var result = new List<TeamRequestResponse>();
             var listTeamId = new List<Guid>();
@@ -324,9 +295,9 @@ namespace Service.ProjectTeamService
                 }
             }
             return result;
-        }
+        }*/
 
-        public async Task<int> StudentCreateTeamRequest(StudentCreateTeamRequest request)
+        /*public async Task<int> StudentCreateTeamRequest(StudentCreateTeamRequest request)
         {
             var checkclass = await _context.Classes.FindAsync(request.ClassId);
             if (checkclass == null) return 1;
@@ -355,9 +326,9 @@ namespace Service.ProjectTeamService
             {
                 return 0;
             }
-        }
+        }*/
 
-        private async Task<bool> CheckStudentValid(Guid teamId)
+        /*private async Task<bool> CheckStudentValid(Guid teamId)
         {
             var classId = _context.TeamRequests.FirstOrDefaultAsync(a => a.Team == teamId).Result.ClassId;
             var projects = await _context.Projects.Where(a => a.ClassId == classId && a.IsDeleted == false).ToListAsync();
@@ -396,6 +367,6 @@ namespace Service.ProjectTeamService
             var duplicateList = userIds.Intersect(userIdsFromRequest).ToList();
             if (duplicateList.IsNullOrEmpty()) return true;
             return false;
-        }
+        }*/
     }
 }

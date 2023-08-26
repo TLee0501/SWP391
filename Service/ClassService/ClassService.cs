@@ -28,10 +28,7 @@ namespace Service.ClassService
                 CourseId = request.CourseId,
                 ClassName = request.ClassName,
                 EnrollCode = request.EnrollCode,
-                TimeStart = request.TimeStart,
-                TimeEnd = request.TimeEnd,
                 IsDeleted = false,
-                IsCompleted = false,
             };
             try
             {
@@ -51,9 +48,6 @@ namespace Service.ClassService
             if (check == null) return 1;
             check.ClassName = request.ClassName;
             check.EnrollCode = request.EnrollCode;
-            check.TimeStart = request.TimeStart;
-            check.TimeEnd = request.TimeEnd;
-            check.IsCompleted = request.IsCompleted;
             try
             {
                 await _context.SaveChangesAsync();
@@ -121,8 +115,6 @@ namespace Service.ClassService
                 ClassName = result.ClassName,
                 UserId = result.UserId,
                 EnrollCode = result.EnrollCode,
-                StartTime = result.TimeStart,
-                EndTime = result.TimeEnd,
                 CourseCode = result.Course.CourseCode,
                 CourseName = result.Course.CourseName,
                 TeacherName = result.User.FullName,
@@ -165,8 +157,6 @@ namespace Service.ClassService
                 CourseName = item.Course.CourseName,
                 EnrollCode = item.EnrollCode,
                 UserId = item.UserId,
-                StartTime = item.TimeStart,
-                EndTime = item.TimeEnd,
                 TeacherName = item.User.FullName,
                 Enrolled = isStudent ? enrolledClasses!.Find(_ => _.ClassId == item.ClassId) != null : null,
             });
@@ -190,12 +180,12 @@ namespace Service.ClassService
 
         public async Task<List<UserListResponse>> GetStudentsNotInProjectInClass(Guid classId)
         {
-            var checkRequest = await _context.TeamRequests.Where(x => x.ClassId == classId).ToListAsync();
+            //var checkRequest = await _context.TeamRequests.Where(x => x.ClassId == classId).ToListAsync();
             var studentsRequest = new List<Guid>();
-            foreach (var item in checkRequest)
+            /*foreach (var item in checkRequest)
             {
                 studentsRequest.Add(item.UserId);
-            }
+            }*/
 
             var checkClass = await _context.StudentClasses.Where(x => x.ClassId == classId).ToListAsync();
             var studentsClass = new List<Guid>();

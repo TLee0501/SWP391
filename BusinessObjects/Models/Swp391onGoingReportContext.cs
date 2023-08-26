@@ -25,6 +25,8 @@ public partial class Swp391onGoingReportContext : DbContext
 
     public virtual DbSet<Role> Roles { get; set; }
 
+    public virtual DbSet<Semester> Semesters { get; set; }
+
     public virtual DbSet<StudentClass> StudentClasses { get; set; }
 
     public virtual DbSet<StudentTask> StudentTasks { get; set; }
@@ -32,8 +34,6 @@ public partial class Swp391onGoingReportContext : DbContext
     public virtual DbSet<Task> Tasks { get; set; }
 
     public virtual DbSet<TeamMember> TeamMembers { get; set; }
-
-    public virtual DbSet<TeamRequest> TeamRequests { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
 
@@ -57,14 +57,9 @@ public partial class Swp391onGoingReportContext : DbContext
                 .HasColumnName("className");
             entity.Property(e => e.CourseId).HasColumnName("courseID");
             entity.Property(e => e.EnrollCode).HasMaxLength(50);
-            entity.Property(e => e.IsCompleted).HasColumnName("isCompleted");
             entity.Property(e => e.IsDeleted).HasColumnName("isDeleted");
-            entity.Property(e => e.TimeEnd)
-                .HasColumnType("datetime")
-                .HasColumnName("timeEnd");
-            entity.Property(e => e.TimeStart)
-                .HasColumnType("datetime")
-                .HasColumnName("timeStart");
+            entity.Property(e => e.SemesterId).HasColumnName("semesterId");
+            entity.Property(e => e.Status).HasColumnName("status");
             entity.Property(e => e.UserId).HasColumnName("userID");
 
             entity.HasOne(d => d.Course).WithMany(p => p.Classes)
@@ -135,17 +130,12 @@ public partial class Swp391onGoingReportContext : DbContext
             entity.Property(e => e.ProjectTeamId)
                 .ValueGeneratedNever()
                 .HasColumnName("projectTeamID");
+            entity.Property(e => e.LeaderId).HasColumnName("leaderId");
             entity.Property(e => e.ProjectId).HasColumnName("projectID");
             entity.Property(e => e.Status).HasColumnName("status");
             entity.Property(e => e.TeamName)
                 .HasMaxLength(50)
                 .HasColumnName("teamName");
-            entity.Property(e => e.TimeEnd)
-                .HasColumnType("datetime")
-                .HasColumnName("timeEnd");
-            entity.Property(e => e.TimeStart)
-                .HasColumnType("datetime")
-                .HasColumnName("timeStart");
 
             entity.HasOne(d => d.Project).WithMany(p => p.ProjectTeams)
                 .HasForeignKey(d => d.ProjectId)
@@ -163,6 +153,24 @@ public partial class Swp391onGoingReportContext : DbContext
             entity.Property(e => e.RoleName)
                 .HasMaxLength(50)
                 .HasColumnName("roleName");
+        });
+
+        modelBuilder.Entity<Semester>(entity =>
+        {
+            entity.ToTable("Semester");
+
+            entity.Property(e => e.SemesterId)
+                .ValueGeneratedNever()
+                .HasColumnName("semesterId");
+            entity.Property(e => e.EndTime)
+                .HasColumnType("datetime")
+                .HasColumnName("endTime");
+            entity.Property(e => e.SemeterName)
+                .HasMaxLength(50)
+                .HasColumnName("semeterName");
+            entity.Property(e => e.StartTime)
+                .HasColumnType("datetime")
+                .HasColumnName("startTime");
         });
 
         modelBuilder.Entity<StudentClass>(entity =>
@@ -256,36 +264,6 @@ public partial class Swp391onGoingReportContext : DbContext
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_TeamMember_User");
-        });
-
-        modelBuilder.Entity<TeamRequest>(entity =>
-        {
-            entity.HasKey(e => e.RequestId);
-
-            entity.ToTable("TeamRequest");
-
-            entity.Property(e => e.RequestId)
-                .ValueGeneratedNever()
-                .HasColumnName("requestID");
-            entity.Property(e => e.ClassId).HasColumnName("classID");
-            entity.Property(e => e.ProjectId).HasColumnName("projectID");
-            entity.Property(e => e.Status)
-                .HasMaxLength(10)
-                .IsUnicode(false)
-                .IsFixedLength()
-                .HasColumnName("status");
-            entity.Property(e => e.Team).HasColumnName("team");
-            entity.Property(e => e.UserId).HasColumnName("userID");
-
-            entity.HasOne(d => d.Class).WithMany(p => p.TeamRequests)
-                .HasForeignKey(d => d.ClassId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_TeamRequest_Class");
-
-            entity.HasOne(d => d.User).WithMany(p => p.TeamRequests)
-                .HasForeignKey(d => d.UserId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_TeamRequest_User");
         });
 
         modelBuilder.Entity<User>(entity =>

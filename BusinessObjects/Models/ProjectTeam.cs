@@ -11,11 +11,9 @@ public partial class ProjectTeam
 
     public string TeamName { get; set; } = null!;
 
-    public DateTime TimeStart { get; set; }
-
-    public DateTime? TimeEnd { get; set; }
-
     public int Status { get; set; }
+
+    public Guid LeaderId { get; set; }
 
     public virtual Project Project { get; set; } = null!;
 
