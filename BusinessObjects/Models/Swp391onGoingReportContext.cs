@@ -108,14 +108,12 @@ public partial class Swp391onGoingReportContext : DbContext
                 .ValueGeneratedNever()
                 .HasColumnName("projectID");
             entity.Property(e => e.ClassId).HasColumnName("classID");
-            entity.Property(e => e.Description)
-                .HasMaxLength(500)
-                .HasColumnName("description");
+            entity.Property(e => e.Description).HasColumnName("description");
+            entity.Property(e => e.FunctionalReq).HasColumnName("functionalReq");
             entity.Property(e => e.IsDeleted).HasColumnName("isDeleted");
             entity.Property(e => e.IsSelected).HasColumnName("isSelected");
-            entity.Property(e => e.ProjectName)
-                .HasMaxLength(100)
-                .HasColumnName("projectName");
+            entity.Property(e => e.NonfunctionalReq).HasColumnName("nonfunctionalReq");
+            entity.Property(e => e.ProjectName).HasColumnName("projectName");
 
             entity.HasOne(d => d.Class).WithMany(p => p.Projects)
                 .HasForeignKey(d => d.ClassId)
