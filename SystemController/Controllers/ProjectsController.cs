@@ -46,12 +46,15 @@ namespace SystemController.Controllers
         [HttpPost]
         public async Task<ActionResult> CreateProject(ProjectCreateRequest request)
         {
-            if (request.ClassId == Guid.Empty) return BadRequest("Không nhận được dữ liệu!");
-            if (request.ProjectName == null || request.ProjectName == "") return BadRequest("Không nhận được dữ liệu!");
-            if (request.Description == null || request.Description == "") return BadRequest("Không nhận được dữ liệu!");
+            if (request.ClassId == Guid.Empty) return BadRequest(new ResponseCodeAndMessageModel(400, "Không nhận được ClassId!"));
+            if (request.ProjectName.IsNullOrEmpty()) return BadRequest(new ResponseCodeAndMessageModel(400, "Không nhận được ProjectName!"));
+            if (request.Description.IsNullOrEmpty()) return BadRequest(new ResponseCodeAndMessageModel(400, "Không nhận được Description!"));
+            
             var result = await _projectService.CreateProject(request);
-            if (result == 0) return BadRequest("Thất bại!");
-            return Ok("Thành công!");
+            
+            if (result == 0) return BadRequest(new ResponseCodeAndMessageModel(424, "Không nhận được dữ liệu!"));
+            else if (result == 2) return BadRequest(new ResponseCodeAndMessageModel(409, "Tên dự án đã tồn tại!"));
+            return Ok(new ResponseCodeAndMessageModel(200, "Thành công!"));
         }
 
         // PUT: api/Projects/5
@@ -127,7 +130,7 @@ namespace SystemController.Controllers
             return NoContent();
         }*/
 
-        [HttpDelete("{projectId}")]
+        /*[HttpDelete("{projectId}")]
         public async Task<IActionResult> DeleteProject(Guid projectId)
         {
             try
@@ -141,7 +144,7 @@ namespace SystemController.Controllers
             {
                 return BadRequest("Không thành công.");
             }
-        }
+        }*/
 
         [HttpGet("{classId}"), Authorize]
         public async Task<ActionResult<Project>> GetAllProjects(Guid classId, string? searchName)

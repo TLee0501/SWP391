@@ -12,7 +12,7 @@ namespace Service.ProjectService
         //Task<List<ProjectResponse>> SearchProjectInClass(Guid classId, string? searchName);
         //Task<List<ProjectResponse>> GetProjectsByClassIDandUserID(Guid classId, Guid userId);
         Task<List<ProjectResponse>> GetProjectsByFilter(Guid classId, Guid userId, string? searchName, bool hasUserId);
-        Task<int> DeleteProject(Guid projectId);
+        //Task<int> DeleteProject(Guid projectId);
         Task<List<ProjectResponse>> GetAllProjectsInClass(Guid classId, string? searchName);
         Task<List<ProjectResponse>> GetWorkingProjectsInClass(Guid userId, Guid classId);
         Task<List<ProjectAndStatusResponse>> GetProjectsAndStatusByClassIDandUserID(Guid classId, Guid userId);

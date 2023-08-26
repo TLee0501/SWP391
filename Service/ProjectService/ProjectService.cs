@@ -1,5 +1,4 @@
 ﻿using BusinessObjects.Models;
-using BusinessObjects.Enums;
 using BusinessObjects.RequestModel;
 using BusinessObjects.ResponseModel;
 using Microsoft.EntityFrameworkCore;
@@ -18,12 +17,17 @@ namespace Service.ProjectService
 
         public async Task<int> CreateProject(ProjectCreateRequest request)
         {
+            var check = await _context.Projects.SingleOrDefaultAsync(a => a.ProjectName == request.ProjectName && a.ClassId == request.ClassId && a.IsDeleted == false);
+            if (check != null) return 2;
+
             var project = new Project
             {
                 ClassId = request.ClassId,
                 ProjectId = Guid.NewGuid(),
                 ProjectName = request.ProjectName,
                 Description = request.Description,
+                FunctionalReq = request.FunctionalReq,
+                NonfunctionalReq = request.NonfunctionalReq,
                 IsDeleted = false
             };
             try
@@ -55,6 +59,8 @@ namespace Service.ProjectService
                 ClassID = projectTeam.Project.Class.ClassId,
                 ClassName = projectTeam.Project.Class.ClassName,
                 IsSelected = projectTeam.Project.IsSelected,
+                FunctionalReq = projectTeam.Project.FunctionalReq,
+                NonfunctionalReq = projectTeam.Project.NonfunctionalReq,
                 Members = projectTeam.TeamMembers.Select(_ => new ProjectMemberResponse
                 {
                     MemberId = _.User.UserId,
@@ -81,6 +87,8 @@ namespace Service.ProjectService
                     ClassID = item.ClassId,
                     ClassName = classTmp.ClassName,
                     Description = item.Description,
+                    FunctionalReq = item.FunctionalReq,
+                    NonfunctionalReq = item.NonfunctionalReq,
                     IsSelected = item.IsSelected
                 };
                 result.Add(tmp);
@@ -116,6 +124,8 @@ namespace Service.ProjectService
                                         ClassID = item.ClassId,
                                         ClassName = classTmp.ClassName,
                                         Description = item.Description,
+                                        FunctionalReq = item.FunctionalReq,
+                                        NonfunctionalReq = item.NonfunctionalReq,
                                         IsSelected = item.IsSelected
                                     };
                                     result.Add(tmp);
@@ -156,6 +166,8 @@ namespace Service.ProjectService
                         ClassID = item.ClassId,
                         ClassName = classTmp.ClassName,
                         Description = item.Description,
+                        FunctionalReq = item.FunctionalReq,
+                        NonfunctionalReq = item.NonfunctionalReq,
                         IsSelected = item.IsSelected
                     };
                     result.Add(projectTmp);
@@ -174,6 +186,8 @@ namespace Service.ProjectService
                             ClassID = item.ClassId,
                             ClassName = classTmp.ClassName,
                             Description = item.Description,
+                            FunctionalReq = item.FunctionalReq,
+                            NonfunctionalReq = item.NonfunctionalReq,
                             IsSelected = item.IsSelected
                         };
                         result.Add(projectTmp);
@@ -190,6 +204,8 @@ namespace Service.ProjectService
 
             project.ProjectName = request.ProjectName;
             project.Description = request.Description;
+            project.FunctionalReq = request.FunctionalReq;
+            project.NonfunctionalReq = request.NonfunctionalReq;
 
             try
             {
@@ -199,7 +215,7 @@ namespace Service.ProjectService
             catch { return 0; }
         }
 
-        public async Task<int> DeleteProject(Guid projectId)
+        /*public async Task<int> DeleteProject(Guid projectId)
         {
             var check = await _context.Projects.FindAsync(projectId);
             if (check == null) return 1;
@@ -213,7 +229,7 @@ namespace Service.ProjectService
             {
                 return 0;
             }
-        }
+        }*/
 
         public async Task<List<ProjectResponse>> GetAllProjectsInClass(Guid classId, string? searchName)
         {
@@ -230,6 +246,8 @@ namespace Service.ProjectService
                 ClassID = item.ClassId,
                 ClassName = item.Class.ClassName,
                 Description = item.Description,
+                FunctionalReq = item.FunctionalReq,
+                NonfunctionalReq = item.NonfunctionalReq,
                 IsSelected = item.IsSelected
             }).ToList();
 
@@ -238,8 +256,10 @@ namespace Service.ProjectService
 
         public async Task<List<ProjectResponse>> GetWorkingProjectsInClass(Guid userId, Guid classId)
         {
-            var query = _context.TeamMembers.Where(_ => _.UserId == userId).Include(_ => _.ProjectTeam).ThenInclude(x => x.Project)
-                .ThenInclude(x => x.Class)
+            var query = _context.TeamMembers.Where(_ => _.UserId == userId)
+                .Include(_ => _.ProjectTeam)
+                    .ThenInclude(x => x.Project)
+                    .ThenInclude(x => x.Class)
                 .Where(_ => _.ProjectTeam.Project.ClassId == classId);
 
             var list = await query.ToListAsync();
@@ -250,6 +270,8 @@ namespace Service.ProjectService
                 ClassID = item.ProjectTeam.Project.ClassId,
                 ClassName = item.ProjectTeam.Project.Class.ClassName,
                 Description = item.ProjectTeam.Project.Description,
+                FunctionalReq = item.ProjectTeam.Project.FunctionalReq,
+                NonfunctionalReq = item.ProjectTeam.Project.NonfunctionalReq,
                 IsSelected = item.ProjectTeam.Project.IsSelected
             }).ToList();
 
@@ -264,40 +286,18 @@ namespace Service.ProjectService
 
             foreach (var item in projects)
             {
-                //var ps = await _context.TeamRequests.SingleOrDefaultAsync(a => a.ProjectId == item.ProjectId && a.UserId == userId);
-
                 var classTmp = await _context.Classes.FindAsync(item.ClassId);
 
-                /*if (ps == null)
+                var tmp = new ProjectAndStatusResponse
                 {
-                    var tmp = new ProjectAndStatusResponse
-                    {
-                        ProjectId = item.ProjectId,
-                        ProjectName = item.ProjectName,
-                        ClassID = item.ClassId,
-                        ClassName = classTmp.ClassName,
-                        Description = item.Description,
-                        RequestStatus = "Chưa đăng ký",
-                        IsSelected = item.IsSelected
-                    };
-                    result.Add(tmp);
-                }
-                else
-                {
-                    var requestStatus = "Chưa đăng ký";
-                    if (ps.Status == TeamRequestStatus.Approved) requestStatus = "Đã đăng ký";
-                    var tmp = new ProjectAndStatusResponse
-                    {
-                        ProjectId = item.ProjectId,
-                        ProjectName = item.ProjectName,
-                        ClassID = item.ClassId,
-                        ClassName = classTmp.ClassName,
-                        Description = item.Description,
-                        RequestStatus = requestStatus,
-                        IsSelected = item.IsSelected
-                    };
-                    result.Add(tmp);
-                }*/
+                    ProjectId = item.ProjectId,
+                    ProjectName = item.ProjectName,
+                    ClassID = item.ClassId,
+                    ClassName = classTmp.ClassName,
+                    Description = item.Description,
+                    IsSelected = item.IsSelected
+                };
+                result.Add(tmp);
             }
             return result;
         }
