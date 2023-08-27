@@ -12,4 +12,6 @@ public partial class Semester
     public DateTime StartTime { get; set; }
 
     public DateTime EndTime { get; set; }
+
+    public Guid SemesterTypeId { get; set; }
 }
