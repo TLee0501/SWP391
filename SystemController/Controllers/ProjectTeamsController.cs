@@ -82,5 +82,13 @@ namespace SystemController.Controllers
             var teams = await _projectTeamServise.GetJoinedProjectTeams(new Guid(userId!), classId);
             return Ok(teams);
         }
+
+        [HttpGet("{teamId}"), Authorize]
+        public async Task<ActionResult<ProjectTeam>> GetJoinedProjectTeamsById(Guid teamId)
+        {
+            var userId = Utils.GetUserIdFromHttpContext(HttpContext);
+            var result = await _projectTeamServise.GetJoinedProjectTeamById(new Guid(userId!), teamId);
+            return Ok(result);
+        }
     }
 }

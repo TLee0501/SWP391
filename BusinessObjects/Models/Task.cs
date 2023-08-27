@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using BusinessObjects.Enums;
 
 namespace BusinessObjects.Models;
 
@@ -19,7 +18,7 @@ public partial class Task
 
     public DateTime? EndTime { get; set; }
 
-    public int Status { get; set; }
+    public ProjectTaskStatus Status { get; set; }
 
     public bool IsDeleted { get; set; }
 

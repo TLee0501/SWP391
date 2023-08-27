@@ -27,7 +27,7 @@ namespace Service.TaskService
                 Description = request?.TaskDescription ?? "",
                 StartTime = request?.StartTime,
                 EndTime = request?.EndTime,
-                Status = (int)ProjectTaskStatus.New,
+                Status = ProjectTaskStatus.New,
                 IsDeleted = false,
             };
             try
@@ -53,7 +53,7 @@ namespace Service.TaskService
             check.Description = request.Description;
             check.StartTime = request.StartTime;
             check.EndTime = request.EndTime;
-            check.Status = (int)request.Status;
+            check.Status = request.Status;
             try
             {
                 await _context.SaveChangesAsync();

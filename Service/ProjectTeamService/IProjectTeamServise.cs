@@ -1,4 +1,5 @@
-﻿using BusinessObjects.RequestModel;
+﻿using System.Threading.Tasks;
+using BusinessObjects.RequestModel;
 using BusinessObjects.ResponseModel;
 
 namespace Service.ProjectTeamService
@@ -15,5 +16,6 @@ namespace Service.ProjectTeamService
         //Task<int> DeleteProjectTeam(Guid projectTeamId);
         Task<int> CreateTeam(Guid leaderId, ProjectTeamCreateRequest request);
         Task<List<ProjectTeamListResponse>> GetJoinedProjectTeams(Guid userId, Guid classId);
+        Task<ProjectTeamDetailResponse?> GetJoinedProjectTeamById(Guid userId, Guid teamId);
     }
 }
