@@ -74,5 +74,13 @@ namespace SystemController.Controllers
             else if (result == 4) return Ok(new ResponseCodeAndMessageModel(100, "Thành công!"));
             else return BadRequest(new ResponseCodeAndMessageModel(99, "Thất bại!"));
         }
+
+        [HttpGet, Authorize]
+        public async Task<ActionResult<ProjectTeam>> GetJoinedProjectTeams(Guid classId)
+        {
+            var userId = Utils.GetUserIdFromHttpContext(HttpContext);
+            var teams = await _projectTeamServise.GetJoinedProjectTeams(new Guid(userId!), classId);
+            return Ok(teams);
+        }
     }
 }

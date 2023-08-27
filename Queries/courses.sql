@@ -12,7 +12,7 @@ values (
     getdate(),
     1,
     0,
-    (select userID from [User] where email = 'teacher01@gmail.com')
+    (select userID from [User] where email = 'admin@gmail.com')
 )
 
 insert into [Course] (courseID, courseCode, courseName, timeCreated, isActive, isDelete, userID)
@@ -23,5 +23,5 @@ values (
     getdate(),
     1,
     0,
-    (select userID from [User] where email = 'teacher01@gmail.com')
+    (select userID from [User] where email = 'admin@gmail.com')
 )

@@ -113,7 +113,54 @@ namespace Service.ProjectTeamService
 
                 await _context.SaveChangesAsync();
                 return 4;
-            } catch (Exception ex) { return 0; }
+            }
+            catch (Exception ex) { return 0; }
+        }
+
+        public async Task<List<ProjectTeamListResponse>> GetJoinedProjectTeams(Guid userId, Guid classId)
+        {
+            var query = _context.ProjectTeams
+                .Include(x => x.Project)
+                .Include(x => x.TeamMembers)
+                    .ThenInclude(x => x.User)
+                .Where(x => x.Project.ClassId == classId)
+                .Where(x => x.TeamMembers.SingleOrDefault(_ => _.UserId == userId) != null);
+            var teams = await query.ToListAsync();
+            List<ProjectTeamListResponse> result = new List<ProjectTeamListResponse>();
+
+            foreach (var team in teams)
+            {
+                var leader = await _context.Users.FindAsync(team!.LeaderId);
+                var data = new ProjectTeamListResponse
+                {
+                    Id = team!.ProjectTeamId,
+                    Members = team.TeamMembers.Select(x => new ProjectTeamMember
+                    {
+                        Id = x.UserId,
+                        FullName = x.User.FullName,
+                        Code = x.User.Mssv!,
+                        Email = x.User.Email
+                    }).ToList(),
+                    Project = new ProjectInfo
+                    {
+                        Id = team.Project.ProjectId,
+                        Name = team.Project.ProjectName,
+                        Description = team.Project.Description,
+                        FunctionalReq = team.Project.FunctionalReq,
+                        NonfunctionalReq = team.Project.NonfunctionalReq
+                    },
+                    Leader = new ProjectTeamMember
+                    {
+                        Id = leader!.UserId,
+                        FullName = leader!.FullName,
+                        Code = leader!.Mssv!,
+                        Email = leader!.Email
+                    }
+                };
+                result.Add(data);
+            }
+
+            return result;
         }
 
         /*public async Task<int> AcceptTeamProjectrequest(Guid teamId)
