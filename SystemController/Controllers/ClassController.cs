@@ -61,7 +61,7 @@ namespace SystemController.Controllers
         }
 
         [HttpGet("{classId}")]
-        public async Task<ActionResult<ClassResponse>> GetClassByID(Guid classId)
+        public async Task<ActionResult<ClassDetailResponse>> GetClassByID(Guid classId)
         {
             var role = Utils.GetUserRoleFromHttpContext(HttpContext);
             var userId = new Guid(Utils.GetUserIdFromHttpContext(HttpContext)!);
@@ -87,7 +87,7 @@ namespace SystemController.Controllers
         }
 
         [HttpGet, Authorize]
-        public async Task<ActionResult<IEnumerable<ClassResponse>>> SearchClass(Guid? courseId = null, string? searchText = null)
+        public async Task<ActionResult<IEnumerable<ClassListResponse>>> SearchClass(Guid? courseId = null, string? searchText = null)
         {
             var role = Utils.GetUserRoleFromHttpContext(HttpContext);
             var userId = Utils.GetUserIdFromHttpContext(HttpContext);
@@ -98,7 +98,7 @@ namespace SystemController.Controllers
         }
 
         [HttpPost, Authorize]
-        public async Task<ActionResult<IEnumerable<ClassResponse>>> EnrollClass(EnrollClassRequest request)
+        public async Task<ActionResult<string>> EnrollClass(EnrollClassRequest request)
         {
             var role = Utils.GetUserRoleFromHttpContext(HttpContext);
 
@@ -134,7 +134,7 @@ namespace SystemController.Controllers
         }
 
         [HttpGet, Authorize]
-        public async Task<ActionResult<IEnumerable<ClassResponse>>> GetAllClasses(Guid? courseId = null, string? searchText = null)
+        public async Task<ActionResult<IEnumerable<ClassListResponse>>> GetAllClasses(Guid? courseId = null, string? searchText = null)
         {
             var role = Utils.GetUserRoleFromHttpContext(HttpContext);
             var userId = Utils.GetUserIdFromHttpContext(HttpContext);
@@ -158,7 +158,7 @@ namespace SystemController.Controllers
 
         [HttpPost]
         public async Task<ActionResult> UnassignClass(AssignClassRequest request)
-        {     
+        {
             if (request == null) return BadRequest(new ResponseCodeAndMessageModel(2, "Không tìm thấy dữ liệu."));
             try
             {

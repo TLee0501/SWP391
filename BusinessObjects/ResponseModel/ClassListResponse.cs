@@ -1,6 +1,6 @@
 ﻿namespace BusinessObjects.ResponseModel
 {
-    public class ClassResponse
+    public class ClassListResponse
     {
         public Guid ClassId { get; set; }
         public Guid UserId { get; set; }
@@ -12,3 +12,4 @@
         public bool? Enrolled { get; set; }
     }
 }
+
