@@ -55,7 +55,9 @@ namespace Service.ProjectTeamService
             }
 
             //compare 2 list
-            var duplicateList = userIds.Intersect(request.Users).ToList();
+            var memberInRequest = request.Users;
+            memberInRequest.Add(leaderId);
+            var duplicateList = userIds.Intersect(memberInRequest).ToList();
             if (!duplicateList.IsNullOrEmpty()) return 3;
 
             //Tên nhóm
