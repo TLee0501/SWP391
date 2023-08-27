@@ -1,11 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using BusinessObjects.Models;
-using Service.ProjectTeamService;
+﻿using BusinessObjects.Models;
 using BusinessObjects.RequestModel;
 using BusinessObjects.ResponseModel;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Service.ProjectTeamService;
+using System.Security.Claims;
 
 namespace SystemController.Controllers
 {
@@ -46,18 +47,32 @@ namespace SystemController.Controllers
         public async Task<ActionResult<ProjectTeam>> getProjectTeamInClass(Guid classId)
         {
             var result = await _projectTeamServise.getProjectTeamInClass(classId);
-            if (result.IsNullOrEmpty()) return NotFound("Không tìm thấy ProjectTeam!");
+            if (result.IsNullOrEmpty()) return NotFound(new ResponseCodeAndMessageModel(10, "Không tìm thấy nhóm!"));
             return Ok(result);
         }
 
         // DELETE: api/ProjectTeams/5
-        [HttpDelete("{projectTeamId}")]
+        /*[HttpDelete("{projectTeamId}")]
         public async Task<IActionResult> DeleteProjectTeam(Guid projectTeamId)
         {
             var result = await _projectTeamServise.DeleteProjectTeam(projectTeamId);
             if (result == 0) return BadRequest("Không tìm thấy nhóm!");
             else if (result == 2) return Ok("Thành công!");
             else return BadRequest("Thất bại!");
+        }*/
+
+        [HttpPost, Authorize]
+        public async Task<ActionResult<ProjectTeam>> RegisterTeam(ProjectTeamCreateRequest request)
+        {
+            var roleClaim = User?.FindAll(ClaimTypes.Name);
+            var userID = new Guid(roleClaim?.Select(c => c.Value).SingleOrDefault().ToString());
+
+            var result = await _projectTeamServise.CreateTeam(userID, request);
+            if (result == 1) return NotFound(new ResponseCodeAndMessageModel(7, "Không tìm thấy dự án!"));
+            else if (result == 2) return BadRequest(new ResponseCodeAndMessageModel(8, "Có thành viên bị lặp!"));
+            else if (result == 3) return BadRequest(new ResponseCodeAndMessageModel(9, "Có thành viên đã tham gia nhóm khác!"));
+            else if (result == 4) return Ok(result);
+            else return BadRequest(new ResponseCodeAndMessageModel(99, "Thất bại!"));
         }
     }
 }

@@ -16,6 +16,106 @@ namespace Service.ProjectTeamService
             _context = context;
         }
 
+        public async Task<int> CreateTeam(Guid leaderId, ProjectTeamCreateRequest request)
+        {
+            var checkProject = await _context.Projects.FindAsync(request.ProjectId);
+            if (checkProject == null) return 1;
+
+            var checkdup = request.Users.Distinct().ToList();
+            if (checkdup.Count != request.Users.Count) return 2;
+            foreach (var item in request.Users)
+            {
+                if (leaderId == item) return 2;
+            }
+
+            var classId = checkProject.ClassId;
+            var projects = await _context.Projects.Where(a => a.ClassId == classId && a.IsDeleted == false).ToListAsync();
+
+            //projectTeam
+            var projectTeamId = new List<Guid>();
+            var projectTeam = new List<ProjectTeam>();
+            foreach (var item in projects)
+            {
+                projectTeam = await _context.ProjectTeams.Where(a => a.ProjectId == item.ProjectId && a.Status == 1).ToListAsync();
+                foreach (var item1 in projectTeam)
+                {
+                    projectTeamId.Add(item1.ProjectTeamId);
+                }
+            }
+
+            //userId in db
+            var userIds = new List<Guid>();
+            foreach (var item in projectTeamId)
+            {
+                var tm = await _context.TeamMembers.Where(a => a.ProjectTeamId == item).ToListAsync();
+                foreach (var item1 in tm)
+                {
+                    userIds.Add(item1.UserId);
+                }
+            }
+
+            //compare 2 list
+            var duplicateList = userIds.Intersect(request.Users).ToList();
+            if (!duplicateList.IsNullOrEmpty()) return 3;
+
+            //Tên nhóm
+            string newName;
+            if (projectTeam.IsNullOrEmpty())
+            {
+                newName = "G01";
+            }
+            else
+            {
+                var nameMax = projectTeam.MaxBy(a => a.TeamName).TeamName;
+                string digits = new string(nameMax.Where(char.IsDigit).ToArray());
+                string letters = new string(nameMax.Where(char.IsLetter).ToArray());
+
+                int number;
+                if (!int.TryParse(digits, out number)) //int.Parse would do the job since only digits are selected
+                {
+                    Console.WriteLine("Something weired happened");
+                }
+
+                newName = letters + (++number).ToString("D2");
+            }
+
+            try
+            {
+                var ptId = Guid.NewGuid();
+                var projectTeamModel = new ProjectTeam()
+                {
+                    ProjectTeamId = ptId,
+                    ProjectId = request.ProjectId,
+                    TeamName = newName,
+                    Status = 1,
+                    LeaderId = leaderId
+                };
+                await _context.ProjectTeams.AddAsync(projectTeamModel);
+
+                foreach (var item in request.Users)
+                {
+                    var tmp = new TeamMember()
+                    {
+                        TeamMemberId = Guid.NewGuid(),
+                        ProjectTeamId = ptId,
+                        UserId = item
+                    };
+                    await _context.TeamMembers.AddAsync(tmp);
+                }
+
+                var tmpLeader = new TeamMember()
+                {
+                    TeamMemberId = Guid.NewGuid(),
+                    ProjectTeamId = ptId,
+                    UserId = leaderId
+                };
+                await _context.TeamMembers.AddAsync(tmpLeader);
+
+                await _context.SaveChangesAsync();
+                return 4;
+            } catch (Exception ex) { return 0; }
+        }
+
         /*public async Task<int> AcceptTeamProjectrequest(Guid teamId)
         {
             //check student 
@@ -109,7 +209,7 @@ namespace Service.ProjectTeamService
             }
         }*/
 
-        public async Task<int> DeleteProjectTeam(Guid projectTeamId)
+        /*public async Task<int> DeleteProjectTeam(Guid projectTeamId)
         {
             var pt = await _context.ProjectTeams.FindAsync(projectTeamId);
             if (pt == null) return 0;
@@ -130,7 +230,7 @@ namespace Service.ProjectTeamService
                 return 2;
             }
             catch (Exception ex) { return 1; }
-        }
+        }*/
 
         /*public async Task<int> DenyTeamProjectrequest(Guid teamId)
         {
@@ -163,17 +263,33 @@ namespace Service.ProjectTeamService
 
             var members = await _context.TeamMembers.Where(a => a.ProjectTeamId == pt.ProjectTeamId).ToListAsync();
 
-            var team = new List<UserBasicResponse>();
+            var team = new List<TeamMemberResponse>();
             foreach (var m in members)
             {
-                var userTmp = await _context.Users.FindAsync(m.UserId);
-                var tmp = new UserBasicResponse
+                if (m.UserId == pt.LeaderId)
                 {
-                    UserId = userTmp.UserId,
-                    FullName = userTmp.FullName,
-                    Mssv = userTmp.Mssv
-                };
-                team.Add(tmp);
+                    var userTmp = await _context.Users.FindAsync(m.UserId);
+                    var tmp = new TeamMemberResponse
+                    {
+                        UserId = userTmp.UserId,
+                        FullName = userTmp.FullName,
+                        IsLeader = true,
+                        Mssv = userTmp.Mssv
+                    };
+                    team.Add(tmp);
+                }
+                else
+                {
+                    var userTmp = await _context.Users.FindAsync(m.UserId);
+                    var tmp = new TeamMemberResponse
+                    {
+                        UserId = userTmp.UserId,
+                        FullName = userTmp.FullName,
+                        IsLeader = false,
+                        Mssv = userTmp.Mssv
+                    };
+                    team.Add(tmp);
+                }
             }
 
             var result = new ProjectTeamResponse
@@ -200,17 +316,33 @@ namespace Service.ProjectTeamService
                 {
                     var members = await _context.TeamMembers.Where(a => a.ProjectTeamId == pt.ProjectTeamId).ToListAsync();
 
-                    var team = new List<UserBasicResponse>();
+                    var team = new List<TeamMemberResponse>();
                     foreach (var m in members)
                     {
-                        var userTmp = await _context.Users.FindAsync(m.UserId);
-                        var tmp = new UserBasicResponse
+                        if (m.UserId == pt.LeaderId)
                         {
-                            UserId = userTmp.UserId,
-                            FullName = userTmp.FullName,
-                            Mssv = userTmp.Mssv
-                        };
-                        team.Add(tmp);
+                            var userTmp = await _context.Users.FindAsync(m.UserId);
+                            var tmp = new TeamMemberResponse
+                            {
+                                UserId = userTmp.UserId,
+                                FullName = userTmp.FullName,
+                                IsLeader = true,
+                                Mssv = userTmp.Mssv
+                            };
+                            team.Add(tmp);
+                        }
+                        else
+                        {
+                            var userTmp = await _context.Users.FindAsync(m.UserId);
+                            var tmp = new TeamMemberResponse
+                            {
+                                UserId = userTmp.UserId,
+                                FullName = userTmp.FullName,
+                                IsLeader = false,
+                                Mssv = userTmp.Mssv
+                            };
+                            team.Add(tmp);
+                        }
                     }
                     var project = await _context.Projects.FindAsync(pt.ProjectId);
                     var status = "Đang làm";

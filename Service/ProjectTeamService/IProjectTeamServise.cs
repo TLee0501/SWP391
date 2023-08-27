@@ -1,4 +1,5 @@
-﻿using BusinessObjects.ResponseModel;
+﻿using BusinessObjects.RequestModel;
+using BusinessObjects.ResponseModel;
 
 namespace Service.ProjectTeamService
 {
@@ -11,6 +12,7 @@ namespace Service.ProjectTeamService
         //Task<int> DenyTeamProjectrequest(Guid teamId);
         //Task<int> CancelProjectrequest(Guid teamId);
         Task<List<ProjectTeamResponse>> getProjectTeamInClass(Guid classId);
-        Task<int> DeleteProjectTeam(Guid projectTeamId);
+        //Task<int> DeleteProjectTeam(Guid projectTeamId);
+        Task<int> CreateTeam(Guid leaderId, ProjectTeamCreateRequest request);
     }
 }
