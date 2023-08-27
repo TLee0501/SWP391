@@ -218,5 +218,47 @@ namespace Service.ClassService
             }
             return list;
         }
+
+        public async Task<int> AssignClass(AssignClassRequest request)
+        {
+            var check = await _context.UserClasses.SingleOrDefaultAsync(x => x.UserId == request.UserID && x.ClassId == request.ClassID);
+            if (check != null) return 1;
+            else if(check == null) return 5;    
+            else if (check.ClassId.Equals(0)) return 3;
+            else if (check.UserId.Equals(0)) return 4;
+            var id = Guid.NewGuid();
+            var userClass = new UserClass
+            {
+                UserClassId = id,
+                ClassId = request.ClassID,
+                UserId = request.UserID,
+            };
+            try
+            {
+                await _context.UserClasses.AddAsync(userClass);
+                await _context.SaveChangesAsync();
+                return 2;
+            }
+            catch (Exception ex)
+            {
+                return 0;
+            }
+        }
+
+        public async Task<int> UnassignClass(AssignClassRequest request)
+        {
+            var check = await _context.UserClasses.SingleOrDefaultAsync(x => x.UserId == request.UserID && x.ClassId == request.ClassID);
+            if (check == null) return 1;
+            try
+            {
+                _context.UserClasses.Remove(check);
+                _context.SaveChangesAsync();
+                return 2;
+            }
+            catch (Exception ex)
+            {
+                return 0;
+            }
+        }
     }
 }

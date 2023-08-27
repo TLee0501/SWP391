@@ -9,8 +9,6 @@
         public string CourseName { get; set; } = null!;
         public string ClassName { get; set; } = null!;
         public string EnrollCode { get; set; } = null!;
-        public DateTime StartTime { get; set; }
-        public DateTime? EndTime { get; set; }
         public bool? Enrolled { get; set; }
     }
 }
