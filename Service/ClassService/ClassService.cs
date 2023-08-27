@@ -95,10 +95,14 @@ namespace Service.ClassService
             return result == 1;
         }
 
-        public async Task<ClassResponse?> GetClassByID(Guid classId, Guid? userId, string? role)
+        public async Task<ClassDetailResponse?> GetClassByID(Guid classId, Guid? userId, string? role)
         {
             var isStudent = role!.Equals(Roles.STUDENT);
-            var query = _context.Classes.Include(item => item.User).Include(item => item.Course).Where(item => item.ClassId == classId);
+            var query = _context.Classes
+                .Include(x => x.User)
+                .Include(x => x.Course)
+                .Include(x => x.Projects)
+                .Where(x => x.ClassId == classId);
             var result = await query.SingleOrDefaultAsync();
             if (result == null) return null;
 
@@ -108,8 +112,40 @@ namespace Service.ClassService
                 enrolledClasses = await _context.StudentClasses.Where(_ => _.UserId == userId).ToListAsync();
             }
 
+            var studentClasses = await _context.StudentClasses
+                .Include(x => x.User)
+                .Where(x => x.ClassId == classId)
+                .ToListAsync();
 
-            return new ClassResponse
+            var projectTeamQuery = _context.ProjectTeams
+                .Include(x => x.Project)
+                .Include(x => x.TeamMembers)
+                    .ThenInclude(x => x.User)
+                .Where(x => x.Project.ClassId == classId);
+            if (isStudent)
+            {
+                projectTeamQuery = projectTeamQuery
+                    .Where(x => x.TeamMembers.SingleOrDefault(_ => _.UserId == userId) != null);
+            }
+
+            var projectTeams = await projectTeamQuery.ToListAsync();
+            var teamLeaders = new List<ClassDetailResponseStudent>();
+            foreach (var team in projectTeams)
+            {
+                var leader = await _context.Users.FindAsync(team.LeaderId);
+                if (leader != null)
+                {
+                    teamLeaders.Add(new ClassDetailResponseStudent
+                    {
+                        Id = leader.UserId,
+                        FullName = leader.FullName,
+                        Code = leader.Mssv!,
+                        Email = leader.Email,
+                    });
+                }
+            }
+
+            return new ClassDetailResponse
             {
                 ClassId = classId,
                 ClassName = result.ClassName,
@@ -119,10 +155,45 @@ namespace Service.ClassService
                 CourseName = result.Course.CourseName,
                 TeacherName = result.User.FullName,
                 Enrolled = isStudent ? enrolledClasses!.Find(_ => _.ClassId == classId) != null : null,
+                Projects = result.Projects.Select(x => new ClassDetailResponseProject
+                {
+                    Id = x.ProjectId,
+                    Name = x.ProjectName,
+                    Description = x.Description,
+                    FunctionalReq = x.FunctionalReq,
+                    NonfunctionalReq = x.NonfunctionalReq
+                }).ToList(),
+                Students = studentClasses.Select(x => new ClassDetailResponseStudent
+                {
+                    Id = x.User.UserId,
+                    FullName = x.User.FullName,
+                    Email = x.User.Email,
+                    Code = x.User.Mssv!
+                }).ToList(),
+                Teams = projectTeams.Select(x => new ClassDetailResponseTeam
+                {
+                    Id = x.ProjectTeamId,
+                    Project = new ClassDetailResponseProject
+                    {
+                        Id = x.Project.ProjectId,
+                        Name = x.Project.ProjectName,
+                        Description = x.Project.Description,
+                        FunctionalReq = x.Project.FunctionalReq,
+                        NonfunctionalReq = x.Project.NonfunctionalReq,
+                    },
+                    Members = x.TeamMembers.Select(x => new ClassDetailResponseStudent
+                    {
+                        Id = x.User.UserId,
+                        FullName = x.User.FullName,
+                        Code = x.User.Mssv!,
+                        Email = x.User.Email
+                    }).ToList(),
+                    Leader = teamLeaders.Single(item => item.Id == x.LeaderId)
+                }).ToList(),
             }; ;
         }
 
-        public async Task<List<ClassResponse>> GetClasses(Guid userID, string? role, Guid? courseId = null, string? searchText = null)
+        public async Task<List<ClassListResponse>> GetClasses(Guid userID, string? role, Guid? courseId = null, string? searchText = null)
         {
             var isStudent = role!.Equals(Roles.STUDENT);
             IQueryable<Class> query = _context.Classes.Include(item => item.Course).Include(item => item.User).Where(_ => !_.IsDeleted);
@@ -149,7 +220,7 @@ namespace Service.ClassService
             }
 
             var classes = await query.ToListAsync();
-            var classResponses = classes.Select(item => new ClassResponse
+            var classResponses = classes.Select(item => new ClassListResponse
             {
                 ClassId = item.ClassId,
                 ClassName = item.ClassName,
@@ -223,7 +294,7 @@ namespace Service.ClassService
         {
             var check = await _context.UserClasses.SingleOrDefaultAsync(x => x.UserId == request.UserID && x.ClassId == request.ClassID);
             if (check != null) return 1;
-            else if(check == null) return 5;    
+            else if (check == null) return 5;
             else if (check.ClassId.Equals(0)) return 3;
             else if (check.UserId.Equals(0)) return 4;
             var id = Guid.NewGuid();
