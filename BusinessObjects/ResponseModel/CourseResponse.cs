@@ -13,6 +13,7 @@ namespace BusinessObjects.ResponseModel
         public string createdBy { get; set; }
         public string CourseCode { get; set; } = null!;
         public string CourseName { get; set; } = null!;
+        public Guid SemesterId { get; set; }
         public DateTime TimeCreated { get; set; }
     }
 }
