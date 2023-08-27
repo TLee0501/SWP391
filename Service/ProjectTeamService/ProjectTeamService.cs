@@ -33,13 +33,14 @@ namespace Service.ProjectTeamService
 
             //projectTeam
             var projectTeamId = new List<Guid>();
-            var projectTeam = new List<ProjectTeam>();
+            var projectTeams = new List<ProjectTeam>();
             foreach (var item in projects)
             {
-                projectTeam = await _context.ProjectTeams.Where(a => a.ProjectId == item.ProjectId && a.Status == 1).ToListAsync();
+                var projectTeam = await _context.ProjectTeams.Where(a => a.ProjectId == item.ProjectId && a.Status == 1).ToListAsync();
                 foreach (var item1 in projectTeam)
                 {
                     projectTeamId.Add(item1.ProjectTeamId);
+                    projectTeams.Add(item1);
                 }
             }
 
@@ -62,13 +63,13 @@ namespace Service.ProjectTeamService
 
             //Tên nhóm
             string newName;
-            if (projectTeam.IsNullOrEmpty())
+            if (projectTeams.IsNullOrEmpty())
             {
                 newName = "G01";
             }
             else
             {
-                var nameMax = projectTeam.MaxBy(a => a.TeamName).TeamName;
+                var nameMax = projectTeams.MaxBy(a => a.TeamName).TeamName;
                 string digits = new string(nameMax.Where(char.IsDigit).ToArray());
                 string letters = new string(nameMax.Where(char.IsLetter).ToArray());
 
@@ -94,7 +95,7 @@ namespace Service.ProjectTeamService
                 };
                 await _context.ProjectTeams.AddAsync(projectTeamModel);
 
-                foreach (var item in request.Users)
+                foreach (var item in memberInRequest)
                 {
                     var tmp = new TeamMember()
                     {
@@ -104,14 +105,6 @@ namespace Service.ProjectTeamService
                     };
                     await _context.TeamMembers.AddAsync(tmp);
                 }
-
-                var tmpLeader = new TeamMember()
-                {
-                    TeamMemberId = Guid.NewGuid(),
-                    ProjectTeamId = ptId,
-                    UserId = leaderId
-                };
-                await _context.TeamMembers.AddAsync(tmpLeader);
 
                 await _context.SaveChangesAsync();
                 return 4;
