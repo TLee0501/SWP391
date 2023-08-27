@@ -37,11 +37,13 @@ public partial class Swp391onGoingReportContext : DbContext
 
     public virtual DbSet<User> Users { get; set; }
 
+    public virtual DbSet<UserClass> UserClasses { get; set; }
+
     public virtual DbSet<UserCourse> UserCourses { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=(local); Database=SWP391OnGoingReport; Uid=sa; Pwd=12345;TrustServerCertificate=True");
+        => optionsBuilder.UseSqlServer("Server=(local); Database=SWP391OnGoingReport; Uid=sa; Pwd=1234567890;TrustServerCertificate=True");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -293,6 +295,17 @@ public partial class Swp391onGoingReportContext : DbContext
                 .HasForeignKey(d => d.RoleId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_User_Role");
+        });
+
+        modelBuilder.Entity<UserClass>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToTable("UserClass");
+
+            entity.Property(e => e.ClassId).HasColumnName("classID");
+            entity.Property(e => e.UserClassId).HasColumnName("userClassID");
+            entity.Property(e => e.UserId).HasColumnName("userID");
         });
 
         modelBuilder.Entity<UserCourse>(entity =>

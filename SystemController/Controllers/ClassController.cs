@@ -76,7 +76,7 @@ namespace SystemController.Controllers
             try
             {
                 var result = await _classService.DeleteClass(classId);
-                if (result == 0) return BadRequest("Không thành công!");
+                if (result == 0) return BadRequest("Không thành công.");
                 else if (result == 1) return BadRequest("Không tìm thấy lớp học.");
                 else return Ok("Thành công!");
             }
@@ -142,6 +142,35 @@ namespace SystemController.Controllers
 
             var result = await _classService.GetClasses(userGuid, role, courseId, searchText);
             return result;
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> AssignClass(AssignClassRequest request)
+        {
+            var result = await _classService.AssignClass(request);
+            if (request == null) return BadRequest(new ResponseCodeAndMessageModel(2, "Không tìm thấy dữ liệu."));
+            else if (result == 1) return BadRequest(new ResponseCodeAndMessageModel(1, "Trùng lớp học."));
+            else if (result == 2) return BadRequest(new ResponseCodeAndMessageModel(100, "Thành công."));
+            else if (result == 3) return BadRequest(new ResponseCodeAndMessageModel(3, "Không tìm thấy lớp."));
+            else if (result == 4) return BadRequest(new ResponseCodeAndMessageModel(4, "Không tìm thấy giảng viên."));
+            else return BadRequest(new ResponseCodeAndMessageModel(99, "Không thành công."));
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> UnassignClass(AssignClassRequest request)
+        {     
+            if (request == null) return BadRequest(new ResponseCodeAndMessageModel(2, "Không tìm thấy dữ liệu."));
+            try
+            {
+                var result = await _classService.UnassignClass(request);
+                if (result == 0) return BadRequest("Không thành công.");
+                else if (result == 1) return BadRequest("Giảng viên đã được bỏ khỏi lớp học.");
+                else return Ok("Thành công!");
+            }
+            catch (DbUpdateException)
+            {
+                return BadRequest("Không thành công.");
+            }
         }
     }
 }
