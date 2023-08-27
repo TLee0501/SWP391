@@ -46,15 +46,15 @@ namespace SystemController.Controllers
         [HttpPost]
         public async Task<ActionResult> CreateProject(ProjectCreateRequest request)
         {
-            if (request.ClassId == Guid.Empty) return BadRequest(new ResponseCodeAndMessageModel(400, "Không nhận được ClassId!"));
-            if (request.ProjectName.IsNullOrEmpty()) return BadRequest(new ResponseCodeAndMessageModel(400, "Không nhận được ProjectName!"));
-            if (request.Description.IsNullOrEmpty()) return BadRequest(new ResponseCodeAndMessageModel(400, "Không nhận được Description!"));
+            if (request.ClassId == Guid.Empty) return BadRequest(new ResponseCodeAndMessageModel(11, "Không nhận được ClassId!"));
+            if (request.ProjectName.IsNullOrEmpty()) return BadRequest(new ResponseCodeAndMessageModel(12, "Không nhận được ProjectName!"));
+            if (request.Description.IsNullOrEmpty()) return BadRequest(new ResponseCodeAndMessageModel(13, "Không nhận được Description!"));
             
             var result = await _projectService.CreateProject(request);
             
-            if (result == 0) return BadRequest(new ResponseCodeAndMessageModel(424, "Không nhận được dữ liệu!"));
-            else if (result == 2) return BadRequest(new ResponseCodeAndMessageModel(409, "Tên dự án đã tồn tại!"));
-            return Ok(new ResponseCodeAndMessageModel(200, "Thành công!"));
+            if (result == 0) return BadRequest(new ResponseCodeAndMessageModel(14, "Không nhận được dữ liệu!"));
+            else if (result == 2) return BadRequest(new ResponseCodeAndMessageModel(15, "Tên dự án đã tồn tại!"));
+            return Ok(new ResponseCodeAndMessageModel(100, "Thành công!"));
         }
 
         // PUT: api/Projects/5
@@ -63,9 +63,9 @@ namespace SystemController.Controllers
         public async Task<IActionResult> UpdateProject(ProjectUpdateRequest request)
         {
             var result = await _projectService.UpdateProject(request);
-            if (result == 1) return BadRequest("Project không tồn tại!");
-            else if (result == 0) return BadRequest("Thất bại!");
-            else return Ok("Thành công!");
+            if (result == 1) return BadRequest(new ResponseCodeAndMessageModel(7, "Không tìm thấy dự án!"));
+            else if (result == 0) return BadRequest(new ResponseCodeAndMessageModel(99, "Thất bại!"));
+            else return Ok(new ResponseCodeAndMessageModel(100, "Thành công!"));
         }
 
         /*[HttpGet("{classId}")]
@@ -83,9 +83,9 @@ namespace SystemController.Controllers
             var roleClaim = User?.FindAll(ClaimTypes.Name);
             var userID = new Guid(roleClaim?.Select(c => c.Value).SingleOrDefault().ToString());
 
-            if (classId == Guid.Empty) return BadRequest("Không nhận được dữ liệu!");
+            if (classId == Guid.Empty) return BadRequest(new ResponseCodeAndMessageModel(14, "Không nhận được dữ liệu!"));
             var result = await _projectService.GetProjectsAndStatusByClassIDandUserID(classId, userID);
-            if (result.IsNullOrEmpty()) return BadRequest("Không tìm thấy Project!");
+            if (result.IsNullOrEmpty()) return BadRequest(new ResponseCodeAndMessageModel(7, "Không tìm thấy dự án!"));
             return Ok(result);
         }
 
@@ -104,9 +104,9 @@ namespace SystemController.Controllers
             var roleClaim = User?.FindAll(ClaimTypes.Name);
             var userID = new Guid(roleClaim?.Select(c => c.Value).SingleOrDefault().ToString());
 
-            if (classId == Guid.Empty || classId == null) return BadRequest("Không nhận được dữ liệu!");
+            if (classId == Guid.Empty || classId == null) return BadRequest(new ResponseCodeAndMessageModel(14, "Không nhận được dữ liệu!"));
             var result = await _projectService.GetProjectsByFilter(classId, userID, searchName, hasUserId);
-            if (result == null || result.Count == 0) return BadRequest("Không tìm thấy Project!");
+            if (result == null || result.Count == 0) return BadRequest(new ResponseCodeAndMessageModel(7, "Không tìm thấy dự án!"));
             return Ok(result);
         }
 
