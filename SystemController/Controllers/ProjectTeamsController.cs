@@ -39,7 +39,7 @@ namespace SystemController.Controllers
         public async Task<ActionResult<ProjectTeam>> GetProjectTeamById(Guid ProjectTeamId)
         {
             var result = await _projectTeamServise.getProjectTeamById(ProjectTeamId);
-            if (result == null) return NotFound("Không tìm thấy ProjectTeam!");
+            if (result == null) return NotFound(new ResponseCodeAndMessageModel(10, "Không tìm thấy nhóm!"));
             return Ok(result);
         }
 
@@ -71,7 +71,7 @@ namespace SystemController.Controllers
             if (result == 1) return NotFound(new ResponseCodeAndMessageModel(7, "Không tìm thấy dự án!"));
             else if (result == 2) return BadRequest(new ResponseCodeAndMessageModel(8, "Có thành viên bị lặp!"));
             else if (result == 3) return BadRequest(new ResponseCodeAndMessageModel(9, "Có thành viên đã tham gia nhóm khác!"));
-            else if (result == 4) return Ok(result);
+            else if (result == 4) return Ok(new ResponseCodeAndMessageModel(100, "Thành công!"));
             else return BadRequest(new ResponseCodeAndMessageModel(99, "Thất bại!"));
         }
     }
