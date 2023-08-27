@@ -70,6 +70,7 @@ namespace Service.CourseService
                 CourseId = id,
                 CourseCode = request.CourseCode,
                 CourseName = request.CourseName,
+                SemesterId = request.SemesterId,
                 UserId = userId,
                 TimeCreated = DateTime.Now,
                 IsActive = true,
@@ -165,6 +166,7 @@ namespace Service.CourseService
         public async Task<CourseResponse> GetCourseByID(Guid courseId)
         {
             var course = await _context.Courses.FindAsync(courseId);
+            var semester = await _context.Semesters.FindAsync(course.SemesterId);
             if (course == null) return null;
             var user = await _context.Users.FindAsync(course.UserId);
             var courseResponse = new CourseResponse
@@ -173,6 +175,7 @@ namespace Service.CourseService
                 CourseCode = course.CourseCode,
                 CourseName = course.CourseName,
                 TimeCreated = course.TimeCreated,
+                SemesterId = semester.SemesterId,
                 UserId = course.UserId,
                 createdBy = user.FullName
             };
@@ -182,7 +185,7 @@ namespace Service.CourseService
         public async Task<List<CourseResponse>> SearchCourse(string? searchText)
         {
             var result = new List<CourseResponse>();
-            var courses = await _context.Courses.Where(a => a.IsDelete ==  false).ToListAsync();
+            var courses = await _context.Courses.Where(a => a.IsDelete == false).ToListAsync();
             if (courses == null || courses.Count == 0) return null;
 
             if (!searchText.IsNullOrEmpty())
@@ -190,13 +193,15 @@ namespace Service.CourseService
                 foreach (var item in courses)
                 {
                     if (item.CourseName.ToLower().Contains(searchText.ToLower()) || item.CourseCode.ToLower().Contains(searchText.ToLower()))
-                    {
+                    {                       
                         var creator = await _context.Users.FindAsync(item.UserId);
+                        var semester = await _context.Semesters.FindAsync(item.SemesterId);
                         var tmp = new CourseResponse
                         {
                             CourseId = item.CourseId,
                             CourseName = item.CourseName,
                             CourseCode = item.CourseCode,
+                            SemesterId = semester.SemesterId,
                             UserId = item.UserId,
                             createdBy = creator.FullName,
                             TimeCreated = item.TimeCreated,
@@ -211,11 +216,13 @@ namespace Service.CourseService
                 foreach (var item in courses)
                 {
                     var creator = await _context.Users.FindAsync(item.UserId);
+                    var semester = await _context.Semesters.FindAsync(item.SemesterId);
                     var tmp = new CourseResponse
                     {
                         CourseId = item.CourseId,
                         CourseName = item.CourseName,
                         CourseCode = item.CourseCode,
+                        SemesterId = semester.SemesterId,
                         UserId = item.UserId,
                         createdBy = creator.FullName,
                         TimeCreated = item.TimeCreated,
@@ -232,12 +239,13 @@ namespace Service.CourseService
             var course = await _context.Courses.FindAsync(request.CourseId);
             course.CourseCode = request.CourseCode;
             course.CourseName = request.CourseName;
+            course.SemesterId = request.SemesterId;
             try
             {
                 await _context.SaveChangesAsync();
                 return 1;
             }
-            catch {  return 0; }
+            catch { return 0; }
         }
     }
 }

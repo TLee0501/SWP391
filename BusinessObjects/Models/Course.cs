@@ -13,6 +13,8 @@ public partial class Course
 
     public string CourseName { get; set; } = null!;
 
+    public Guid? SemesterId { get; set; }
+
     public DateTime TimeCreated { get; set; }
 
     public bool IsActive { get; set; }
