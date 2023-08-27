@@ -35,25 +35,28 @@ namespace Service.SemesterService
                 {
                     SemesterId = Guid.NewGuid(),
                     SemeterName = request.SemeterName,
+                    SemesterTypeId = request.SemesterTypeId,
                     StartTime = request.StartTime.Date,
                     EndTime = request.EndTime.Date
                 };
                 await _context.Semesters.AddAsync(semester);
                 await _context.SaveChangesAsync();
                 return 4;
-            } catch (Exception ex) { return 0; }
+            }
+            catch (Exception ex) { return 0; }
         }
 
         public async Task<SemesterResponse> GetSemester(Guid semesterId)
         {
             var result = await _context.Semesters.FindAsync(semesterId);
             if (result == null) return null;
+            var type = await _context.SemesterTypes.FindAsync(result.SemesterTypeId);
             var model = new SemesterResponse()
             {
                 SemesterId = result.SemesterId,
                 SemeterName = result.SemeterName,
-                StartTime = result.StartTime,
-                EndTime = result.EndTime
+                SemesterTypeId = result.SemesterTypeId,
+                SemeterTypeName = type.SemesterTypeName
             };
             return model;
         }
@@ -64,16 +67,46 @@ namespace Service.SemesterService
             var inDB = await _context.Semesters.ToListAsync();
             foreach (var item in inDB)
             {
+                var type = await _context.SemesterTypes.FindAsync(item.SemesterTypeId);
                 var tmp = new SemesterResponse()
                 {
                     SemesterId = item.SemesterId,
                     SemeterName = item.SemeterName,
-                    StartTime = item.StartTime,
-                    EndTime = item.EndTime
+                    SemesterTypeId = type.SemesterTypeId,
+                    SemeterTypeName = type.SemesterTypeName
                 };
                 list.Add(tmp);
             }
             return list;
+        }
+
+        public async Task<SemesterTypeResponse> GetSemesterType(Guid semesterTypeId)
+        {
+            var inDB = await _context.SemesterTypes.FindAsync(semesterTypeId);
+            if (inDB == null) return null;
+            var model = new SemesterTypeResponse()
+            {
+                SemesterTypeId = semesterTypeId,
+                SemesterTypeName = inDB.SemesterTypeName
+            };
+            return model;
+        }
+
+        public async Task<List<SemesterTypeResponse>> GetSemesterTypes()
+        {
+            var result = new List<SemesterTypeResponse>();
+            var inDB = await _context.SemesterTypes.ToListAsync();
+            if (inDB.IsNullOrEmpty()) return null;
+            foreach (var item in inDB)
+            {
+                var model = new SemesterTypeResponse()
+                {
+                    SemesterTypeId = item.SemesterTypeId,
+                    SemesterTypeName = item.SemesterTypeName
+                };
+                result.Add(model);
+            }
+            return result;
         }
 
         public async Task<int> UpdateSemester(Guid semesterId, SemesterCreateRequest request)
@@ -81,7 +114,7 @@ namespace Service.SemesterService
             var semester = await _context.Semesters.FindAsync(semesterId);
             if (semester == null) return 1;
 
-            if(request.SemeterName != semester.SemeterName)
+            if (request.SemeterName != semester.SemeterName)
             {
                 var checkname = await _context.Semesters.Where(a => a.SemeterName == request.SemeterName).ToListAsync();
                 if (!checkname.IsNullOrEmpty()) return 2;
@@ -105,7 +138,10 @@ namespace Service.SemesterService
                 semester.EndTime = request.EndTime;
                 await _context.SaveChangesAsync();
                 return 5;
-            } catch (Exception ex) { return 0; }
+            }
+            catch (Exception ex) { return 0; }
         }
+
+
     }
 }

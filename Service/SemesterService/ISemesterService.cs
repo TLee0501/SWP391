@@ -9,5 +9,7 @@ namespace Service.SemesterService
         Task<List<SemesterResponse>> GetSemesterList();
         Task<SemesterResponse> GetSemester(Guid semesterId);
         Task<int> UpdateSemester(Guid semesterId, SemesterCreateRequest request);
+        Task<SemesterTypeResponse> GetSemesterType(Guid semesterTypeId);
+        Task<List<SemesterTypeResponse>> GetSemesterTypes();
     }
 }

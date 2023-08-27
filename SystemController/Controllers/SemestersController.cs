@@ -12,12 +12,10 @@ namespace SystemController.Controllers
     [ApiController]
     public class SemestersController : ControllerBase
     {
-        private readonly Swp391onGoingReportContext _context;
         private readonly ISemesterService _semesterService;
 
-        public SemestersController(Swp391onGoingReportContext context, ISemesterService semesterService)
+        public SemestersController(ISemesterService semesterService)
         {
-            _context = context;
             _semesterService = semesterService;
         }
 
@@ -81,6 +79,24 @@ namespace SystemController.Controllers
                 return Ok(new ResponseCodeAndMessageModel(100, "Thành công!"));
             else
                 return BadRequest(new ResponseCodeAndMessageModel(99, "Thất bại!"));
+        }
+
+        [HttpGet("{semesterTypeId}")]
+        public async Task<ActionResult<Semester>> GetSemesterType(Guid semesterTypeId)
+        {
+            var result = await _semesterService.GetSemesterType(semesterTypeId);
+            if (result == null) return NotFound(new ResponseCodeAndMessageModel(16, "Không tìm thấy loại học kỳ!"));
+            else
+                return Ok(result);
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<Semester>> GetSemesterTypes()
+        {
+            var result = await _semesterService.GetSemesterTypes();
+            if (result == null) return NotFound(new ResponseCodeAndMessageModel(16, "Không tìm thấy loại học kỳ!"));
+            else
+                return Ok(result);
         }
 
         // DELETE: api/Semesters/5
