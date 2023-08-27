@@ -223,6 +223,7 @@ namespace Service.ClassService
         {
             var check = await _context.UserClasses.SingleOrDefaultAsync(x => x.UserId == request.UserID && x.ClassId == request.ClassID);
             if (check != null) return 1;
+            else if(check == null) return 5;    
             else if (check.ClassId.Equals(0)) return 3;
             else if (check.UserId.Equals(0)) return 4;
             var id = Guid.NewGuid();
