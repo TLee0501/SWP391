@@ -200,6 +200,19 @@ namespace Service.TaskService
             return list;
         }
 
+        public async Task<bool> UpdateTaskStatus(Guid taskId, ProjectTaskStatus status)
+        {
+            var task = await _context.Tasks.FindAsync(taskId);
+            if (task == null)
+            {
+                return false;
+            }
 
+            task.Status = status;
+
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
     }
 }
