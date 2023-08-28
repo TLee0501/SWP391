@@ -159,6 +159,75 @@ namespace Service.ProjectTeamService
             catch (Exception ex) { return 0; }
         }
 
+        public async Task<ProjectTeamDetailResponse?> GetJoinedProjectTeamById(Guid userId, Guid teamId)
+        {
+            var query = _context.ProjectTeams
+                .Include(x => x.TeamMembers)
+                    .ThenInclude(x => x.User)
+                .Include(x => x.Project)
+                .Where(x => x.ProjectTeamId == teamId)
+                .Where(x => x.TeamMembers.SingleOrDefault(_ => _.UserId == userId) != null);
+
+            var team = await query.SingleOrDefaultAsync();
+            if (team == null) return null;
+
+            var leader = await _context.Users.FindAsync(team.LeaderId);
+            var members = team.TeamMembers.Select(x => new ProjectTeamMember
+            {
+                Id = x.UserId,
+                FullName = x.User.FullName,
+                Code = x.User.Mssv!,
+                Email = x.User.Email
+            }).ToList();
+            var project = new ProjectInfo
+            {
+                Id = team.Project.ProjectId,
+                Name = team.Project.ProjectName,
+                Description = team.Project.Description,
+                FunctionalReq = team.Project.FunctionalReq,
+                NonfunctionalReq = team.Project.NonfunctionalReq
+            };
+
+            var tasks = await _context.Tasks
+                .Include(x => x.StudentTasks)
+                    .ThenInclude(x => x.User)
+                .Where(x => x.ProjectId == project.Id)
+                .Where(x => !x.IsDeleted)
+                .ToListAsync();
+
+            return new ProjectTeamDetailResponse
+            {
+                Id = team!.ProjectTeamId,
+                Members = members,
+                Project = project,
+                Leader = new ProjectTeamMember
+                {
+                    Id = leader!.UserId,
+                    FullName = leader!.FullName,
+                    Code = leader!.Mssv!,
+                    Email = leader!.Email
+                },
+                Tasks = tasks.Select(x => new ProjectTask
+                {
+                    Id = x.TaskId,
+                    Name = x.TaskName,
+                    Description = x.Description,
+                    StartTime = x.StartTime,
+                    EndTime = x.EndTime,
+                    Status = x.Status,
+                    Members = x.StudentTasks.Select(item => new ProjectTeamMember
+                    {
+                        Id = item.User.UserId,
+                        FullName = item.User.FullName,
+                        Code = item.User.Mssv!,
+                        Email = item.User.Email
+                    }).ToList(),
+
+                }).ToList()
+            };
+
+        }
+
         public async Task<List<ProjectTeamListResponse>> GetJoinedProjectTeams(Guid userId, Guid classId)
         {
             var query = _context.ProjectTeams
