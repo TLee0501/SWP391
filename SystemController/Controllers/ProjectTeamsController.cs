@@ -51,16 +51,6 @@ namespace SystemController.Controllers
             return Ok(result);
         }
 
-        // DELETE: api/ProjectTeams/5
-        /*[HttpDelete("{projectTeamId}")]
-        public async Task<IActionResult> DeleteProjectTeam(Guid projectTeamId)
-        {
-            var result = await _projectTeamServise.DeleteProjectTeam(projectTeamId);
-            if (result == 0) return BadRequest("Không tìm thấy nhóm!");
-            else if (result == 2) return Ok("Thành công!");
-            else return BadRequest("Thất bại!");
-        }*/
-
         [HttpPost, Authorize]
         public async Task<ActionResult<ProjectTeam>> RegisterTeam(ProjectTeamCreateRequest request)
         {
@@ -89,6 +79,23 @@ namespace SystemController.Controllers
             var userId = Utils.GetUserIdFromHttpContext(HttpContext);
             var result = await _projectTeamServise.GetJoinedProjectTeamById(new Guid(userId!), teamId);
             return Ok(result);
+        [HttpPut("{projectTeamId}")]
+        public async Task<IActionResult> RemoveMemberFromTeam(Guid projectTeamId, Guid memberId)
+        {
+            var result = await _projectTeamServise.RemoveMember(projectTeamId, memberId);
+            if (result == 1) return NotFound(new ResponseCodeAndMessageModel(10, "Không tìm thấy nhóm!"));
+            else if (result == 2) return Ok(new ResponseCodeAndMessageModel(100, "Thành công!"));
+            else if (result == 3) return Ok(new ResponseCodeAndMessageModel(17, "Không thể xóa nhóm trưởng khỏi nhóm!"));
+            else return BadRequest(new ResponseCodeAndMessageModel(99, "Thất bại!"));
+        }
+
+        [HttpPut("{projectTeamId}")]
+        public async Task<IActionResult> AddMemberToTeam(Guid projectTeamId, Guid memberId)
+        {
+            var result = await _projectTeamServise.AddMember(projectTeamId, memberId);
+            if (result == 1) return BadRequest(new ResponseCodeAndMessageModel(9, "Có thành viên đã tham gia nhóm khác!"));
+            else if (result == 2) return Ok(new ResponseCodeAndMessageModel(100, "Thành công!"));
+            else return BadRequest(new ResponseCodeAndMessageModel(99, "Thất bại!"));
         }
     }
 }
