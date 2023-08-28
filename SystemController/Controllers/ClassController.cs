@@ -63,9 +63,8 @@ namespace SystemController.Controllers
         [HttpGet("{classId}")]
         public async Task<ActionResult<ClassDetailResponse>> GetClassByID(Guid classId)
         {
-            var role = Utils.GetUserRoleFromHttpContext(HttpContext);
             var userId = new Guid(Utils.GetUserIdFromHttpContext(HttpContext)!);
-            var result = await _classService.GetClassByID(classId, userId, role);
+            var result = await _classService.GetClassByID(classId, userId);
             return Ok(result);
         }
 
@@ -87,13 +86,12 @@ namespace SystemController.Controllers
         }
 
         [HttpGet, Authorize]
-        public async Task<ActionResult<IEnumerable<ClassListResponse>>> SearchClass(Guid? courseId = null, string? searchText = null)
+        public async Task<ActionResult<IEnumerable<ClassListResponse>>> SearchClass(Guid? semesterId, Guid? courseId, string? searchText)
         {
-            var role = Utils.GetUserRoleFromHttpContext(HttpContext);
             var userId = Utils.GetUserIdFromHttpContext(HttpContext);
             var userGuid = new Guid(userId!);
 
-            var result = await _classService.GetClasses(userGuid, role, courseId, searchText);
+            var result = await _classService.GetClasses(userGuid, semesterId, courseId, searchText);
             return result;
         }
 
@@ -134,13 +132,12 @@ namespace SystemController.Controllers
         }
 
         [HttpGet, Authorize]
-        public async Task<ActionResult<IEnumerable<ClassListResponse>>> GetAllClasses(Guid? courseId = null, string? searchText = null)
+        public async Task<ActionResult<IEnumerable<ClassListResponse>>> GetAllClasses(Guid? semesterId, Guid? courseId, string? searchText)
         {
-            var role = Utils.GetUserRoleFromHttpContext(HttpContext);
             var userId = Utils.GetUserIdFromHttpContext(HttpContext);
             var userGuid = new Guid(userId!);
 
-            var result = await _classService.GetClasses(userGuid, role, courseId, searchText);
+            var result = await _classService.GetClasses(userGuid, semesterId, courseId, searchText);
             return result;
         }
 

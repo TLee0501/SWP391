@@ -1,5 +1,4 @@
-﻿using BusinessObjects;
-using BusinessObjects.Models;
+﻿using BusinessObjects.Models;
 using BusinessObjects.RequestModel;
 using BusinessObjects.ResponseModel;
 using Microsoft.EntityFrameworkCore;
@@ -17,22 +16,23 @@ namespace Service.ClassService
 
         public async Task<int> CreateClass(CreateClassRequest request)
         {
-            var classes = await _context.Classes.SingleOrDefaultAsync(x => x.ClassName.ToLower() == request.ClassName.ToLower() && x.IsDeleted == false);
-            if (classes != null) return 1;
-
-            var id = Guid.NewGuid();
-            var newclass = new Class
-            {
-                ClassId = id,
-                UserId = request.UserId,
-                CourseId = request.CourseId,
-                ClassName = request.ClassName,
-                EnrollCode = request.EnrollCode,
-                IsDeleted = false,
-            };
             try
             {
-                await _context.Classes.AddAsync(newclass);
+                var existingClass = await _context.Classes.SingleOrDefaultAsync(x => x.ClassName.ToLower() == request.ClassName.ToLower() && x.IsDeleted == false);
+                if (existingClass != null) return 1;
+
+                var newClass = new Class
+                {
+                    ClassId = Guid.NewGuid(),
+                    UserId = request.TeacherId,
+                    CourseId = request.CourseId,
+                    ClassName = request.ClassName,
+                    EnrollCode = request.EnrollCode,
+                    IsDeleted = false,
+                    SemesterId = request.SemesterId,
+                };
+
+                await _context.Classes.AddAsync(newClass);
                 await _context.SaveChangesAsync();
                 return 2;
             }
@@ -95,22 +95,18 @@ namespace Service.ClassService
             return result == 1;
         }
 
-        public async Task<ClassDetailResponse?> GetClassByID(Guid classId, Guid? userId, string? role)
+        public async Task<ClassDetailResponse?> GetClassByID(Guid classId, Guid? userId)
         {
-            var isStudent = role!.Equals(Roles.STUDENT);
             var query = _context.Classes
                 .Include(x => x.User)
                 .Include(x => x.Course)
                 .Include(x => x.Projects)
+                .Include(x => x.Semester)
                 .Where(x => x.ClassId == classId);
             var result = await query.SingleOrDefaultAsync();
             if (result == null) return null;
 
-            List<StudentClass>? enrolledClasses = null;
-            if (isStudent)
-            {
-                enrolledClasses = await _context.StudentClasses.Where(_ => _.UserId == userId).ToListAsync();
-            }
+            var enrolledClasses = await _context.StudentClasses.Where(_ => _.UserId == userId).ToListAsync();
 
             var studentClasses = await _context.StudentClasses
                 .Include(x => x.User)
@@ -122,11 +118,6 @@ namespace Service.ClassService
                 .Include(x => x.TeamMembers)
                     .ThenInclude(x => x.User)
                 .Where(x => x.Project.ClassId == classId);
-            if (isStudent)
-            {
-                projectTeamQuery = projectTeamQuery
-                    .Where(x => x.TeamMembers.SingleOrDefault(_ => _.UserId == userId) != null);
-            }
 
             var projectTeams = await projectTeamQuery.ToListAsync();
             var teamLeaders = new List<ClassDetailResponseStudent>();
@@ -149,12 +140,12 @@ namespace Service.ClassService
             {
                 ClassId = classId,
                 ClassName = result.ClassName,
-                UserId = result.UserId,
+                TeacherId = result.UserId,
                 EnrollCode = result.EnrollCode,
                 CourseCode = result.Course.CourseCode,
                 CourseName = result.Course.CourseName,
                 TeacherName = result.User.FullName,
-                Enrolled = isStudent ? enrolledClasses!.Find(_ => _.ClassId == classId) != null : null,
+                Enrolled = enrolledClasses!.Find(_ => _.ClassId == classId) != null,
                 Projects = result.Projects.Select(x => new ClassDetailResponseProject
                 {
                     Id = x.ProjectId,
@@ -190,24 +181,25 @@ namespace Service.ClassService
                     }).ToList(),
                     Leader = teamLeaders.Single(item => item.Id == x.LeaderId)
                 }).ToList(),
+                Semester = new ClassDetailResponseSemester
+                {
+                    Id = result.Semester.SemesterId,
+                    Name = result.Semester.SemeterName,
+                    StartTime = result.Semester.StartTime,
+                    EndTime = result.Semester.EndTime,
+                },
             }; ;
         }
 
-        public async Task<List<ClassListResponse>> GetClasses(Guid userID, string? role, Guid? courseId = null, string? searchText = null)
+        public async Task<List<ClassListResponse>> GetClasses(Guid userId, Guid? semesterId, Guid? courseId, string? searchText)
         {
-            var isStudent = role!.Equals(Roles.STUDENT);
-            IQueryable<Class> query = _context.Classes.Include(item => item.Course).Include(item => item.User).Where(_ => !_.IsDeleted);
-            List<StudentClass>? enrolledClasses = null;
+            var query = _context.Classes
+                .Include(x => x.Course)
+                .Include(x => x.User)
+                .Include(x => x.Semester)
+                .Where(x => !x.IsDeleted);
 
-            // Allow students to get all classes
-            if (!isStudent)
-            {
-                query = query.Where(item => item.UserId == userID);
-            }
-            else
-            {
-                enrolledClasses = await _context.StudentClasses.Where(_ => _.UserId == userID).ToListAsync();
-            }
+            var enrolledClasses = await _context.StudentClasses.Where(_ => _.UserId == userId).ToListAsync();
 
             if (courseId != null)
             {
@@ -227,9 +219,11 @@ namespace Service.ClassService
                 CourseCode = item.Course.CourseCode,
                 CourseName = item.Course.CourseName,
                 EnrollCode = item.EnrollCode,
-                UserId = item.UserId,
-                TeacherName = item.User.FullName,
-                Enrolled = isStudent ? enrolledClasses!.Find(_ => _.ClassId == item.ClassId) != null : null,
+                TeacherId = item.UserId,
+                TeacherName = item.User!.FullName,
+                Enrolled = enrolledClasses!.Find(_ => _.ClassId == item.ClassId) != null,
+                SemesterId = item.Semester.SemesterId,
+                SemesterName = item.Semester.SemeterName,
             });
 
             return classResponses.ToList();

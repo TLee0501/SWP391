@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace BusinessObjects.Models;
+﻿namespace BusinessObjects.Models;
 
 public partial class Semester
 {
@@ -12,4 +9,6 @@ public partial class Semester
     public DateTime StartTime { get; set; }
 
     public DateTime EndTime { get; set; }
+
+    public virtual ICollection<Class> Classes { get; set; } = new List<Class>();
 }
