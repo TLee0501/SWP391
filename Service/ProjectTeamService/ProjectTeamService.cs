@@ -4,6 +4,7 @@ using BusinessObjects.ResponseModel;
 using BusinessObjects.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Azure.Core;
 
 namespace Service.ProjectTeamService
 {
@@ -14,6 +15,52 @@ namespace Service.ProjectTeamService
         public ProjectTeamService(Swp391onGoingReportContext context)
         {
             _context = context;
+        }
+
+        public async Task<int> AddMember(Guid projectTeamId, Guid userId)
+        {
+            var pt = await _context.ProjectTeams.FindAsync(projectTeamId);
+
+            var project = await _context.Projects.SingleOrDefaultAsync(a => a.ProjectId == pt.ProjectId);
+            var projects = await _context.Projects.Where(a => a.ClassId == project.ClassId && a.IsDeleted == false).ToListAsync();
+
+            //projectTeam
+            //var projectTeamId = new List<Guid>();
+            var projectTeams = new List<ProjectTeam>();
+            foreach (var item in projects)
+            {
+                var projectTeam = await _context.ProjectTeams.Where(a => a.ProjectId == item.ProjectId && a.Status == 1).ToListAsync();
+                foreach (var item1 in projectTeam)
+                {
+                    //projectTeamId.Add(item1.ProjectTeamId);
+                    projectTeams.Add(item1);
+                }
+            }
+
+            //check user dup
+            var users = new List<TeamMember>();
+            foreach (var item in projectTeams)
+            {
+                var tm = await _context.TeamMembers.Where(a => a.ProjectTeamId == item.ProjectTeamId).ToListAsync();
+                foreach (var item1 in tm)
+                {
+                    if (item1.UserId == userId) return 1;
+                    users.Add(item1);
+                }
+            }
+
+            try
+            {
+                var model = new TeamMember()
+                {
+                    TeamMemberId = Guid.NewGuid(),
+                    ProjectTeamId = projectTeamId,
+                    UserId = userId
+                };
+                await _context.TeamMembers.AddAsync(model);
+                await _context.SaveChangesAsync();
+                return 2;
+            } catch (Exception ex) { return 0; }
         }
 
         public async Task<int> CreateTeam(Guid leaderId, ProjectTeamCreateRequest request)
@@ -404,6 +451,21 @@ namespace Service.ProjectTeamService
                 }
             }
             return result;
+        }
+
+        public async Task<int> RemoveMember(Guid projectTeamId, Guid userId)
+        {
+            var member = await _context.TeamMembers.SingleOrDefaultAsync(a => a.ProjectTeamId ==  projectTeamId && a.UserId == userId);
+            if (member == null) return 1;
+
+            var checkLeader = await _context.ProjectTeams.SingleOrDefaultAsync(a => a.ProjectTeamId == projectTeamId && a.LeaderId == userId && a.Status != 3);
+            if (checkLeader != null) return 3;
+            try
+            {
+                _context.TeamMembers.Remove(member);
+                await _context.SaveChangesAsync();
+                return 2;
+            } catch (Exception ex) { return 0; }
         }
 
         /*public async Task<List<TeamRequestResponse>> GetTeamProjectRequests(Guid? userId, Guid classId)

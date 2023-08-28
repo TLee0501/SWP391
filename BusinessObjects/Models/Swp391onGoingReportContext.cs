@@ -27,8 +27,6 @@ public partial class Swp391onGoingReportContext : DbContext
 
     public virtual DbSet<Semester> Semesters { get; set; }
 
-    public virtual DbSet<SemesterType> SemesterTypes { get; set; }
-
     public virtual DbSet<StudentClass> StudentClasses { get; set; }
 
     public virtual DbSet<StudentTask> StudentTasks { get; set; }
@@ -163,23 +161,12 @@ public partial class Swp391onGoingReportContext : DbContext
             entity.Property(e => e.EndTime)
                 .HasColumnType("datetime")
                 .HasColumnName("endTime");
-            entity.Property(e => e.SemesterTypeId).HasColumnName("semesterTypeId");
             entity.Property(e => e.SemeterName)
                 .HasMaxLength(50)
                 .HasColumnName("semeterName");
             entity.Property(e => e.StartTime)
                 .HasColumnType("datetime")
                 .HasColumnName("startTime");
-        });
-
-        modelBuilder.Entity<SemesterType>(entity =>
-        {
-            entity.ToTable("SemesterType");
-
-            entity.Property(e => e.SemesterTypeId)
-                .ValueGeneratedNever()
-                .HasColumnName("semesterTypeId");
-            entity.Property(e => e.SemesterTypeName).HasColumnName("semesterTypeName");
         });
 
         modelBuilder.Entity<StudentClass>(entity =>

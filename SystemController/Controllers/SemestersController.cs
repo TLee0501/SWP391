@@ -81,7 +81,7 @@ namespace SystemController.Controllers
                 return BadRequest(new ResponseCodeAndMessageModel(99, "Thất bại!"));
         }
 
-        [HttpGet("{semesterTypeId}")]
+        /*[HttpGet("{semesterTypeId}")]
         public async Task<ActionResult<Semester>> GetSemesterType(Guid semesterTypeId)
         {
             var result = await _semesterService.GetSemesterType(semesterTypeId);
@@ -97,7 +97,7 @@ namespace SystemController.Controllers
             if (result == null) return NotFound(new ResponseCodeAndMessageModel(16, "Không tìm thấy loại học kỳ!"));
             else
                 return Ok(result);
-        }
+        }*/
 
         // DELETE: api/Semesters/5
         /*[HttpDelete("{id}")]
