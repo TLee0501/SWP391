@@ -184,54 +184,24 @@ namespace Service.CourseService
 
         public async Task<List<CourseResponse>> SearchCourse(string? searchText)
         {
-            var result = new List<CourseResponse>();
-            var courses = await _context.Courses.Where(a => a.IsDelete == false).ToListAsync();
-            if (courses == null || courses.Count == 0) return null;
-
+            var query = _context.Courses.Where(a => a.IsDelete == false);
             if (!searchText.IsNullOrEmpty())
             {
-                foreach (var item in courses)
-                {
-                    if (item.CourseName.ToLower().Contains(searchText.ToLower()) || item.CourseCode.ToLower().Contains(searchText.ToLower()))
-                    {                       
-                        var creator = await _context.Users.FindAsync(item.UserId);
-                        var semester = await _context.Semesters.FindAsync(item.SemesterId);
-                        var tmp = new CourseResponse
-                        {
-                            CourseId = item.CourseId,
-                            CourseName = item.CourseName,
-                            CourseCode = item.CourseCode,
-                            SemesterId = semester.SemesterId,
-                            UserId = item.UserId,
-                            createdBy = creator.FullName,
-                            TimeCreated = item.TimeCreated,
-                        };
-                        result.Add(tmp);
-                    }
-                }
-                return result;
-            }
-            else
-            {
-                foreach (var item in courses)
-                {
-                    var creator = await _context.Users.FindAsync(item.UserId);
-                    var semester = await _context.Semesters.FindAsync(item.SemesterId);
-                    var tmp = new CourseResponse
-                    {
-                        CourseId = item.CourseId,
-                        CourseName = item.CourseName,
-                        CourseCode = item.CourseCode,
-                        SemesterId = semester.SemesterId,
-                        UserId = item.UserId,
-                        createdBy = creator.FullName,
-                        TimeCreated = item.TimeCreated,
-                    };
-                    result.Add(tmp);
-                }
-                return result;
+                query = query
+                    .Where(x => x.CourseName.ToLower().Contains(searchText!.ToLower()) || x.CourseCode.Contains(searchText!.ToLower()));
             }
 
+            var courses = await query.ToListAsync();
+            var result = new List<CourseResponse>();
+
+            return courses.Select(item => new CourseResponse
+            {
+                CourseId = item.CourseId,
+                CourseName = item.CourseName,
+                CourseCode = item.CourseCode,
+                UserId = item.UserId,
+                TimeCreated = item.TimeCreated,
+            }).ToList();
         }
 
         public async Task<int> UpdateCourse(CoursceUpdateRequest request)
