@@ -10,6 +10,7 @@ namespace BusinessObjects.RequestModel
     {
         public Guid ClassId { get; set; }
         public string ClassName { get; set; }
+        public Guid SemesterId { get; set; }
         public string EnrollCode { get; set; }
         public DateTime TimeStart { get; set; }
         public DateTime? TimeEnd { get; set; }

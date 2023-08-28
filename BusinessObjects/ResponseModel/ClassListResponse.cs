@@ -8,6 +8,7 @@
         public string CourseCode { get; set; } = null!;
         public string CourseName { get; set; } = null!;
         public string ClassName { get; set; } = null!;
+        public Guid SemesterId { get; set; }
         public string EnrollCode { get; set; } = null!;
         public bool? Enrolled { get; set; }
     }

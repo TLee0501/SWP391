@@ -11,6 +11,7 @@ namespace BusinessObjects.RequestModel
         public Guid CourseId { get; set; }
         public Guid UserId { get; set; }
         public string ClassName { get; set; } = null!;
+        public Guid SemesterId { get; set; }
         public string EnrollCode { get; set; } = null!;
     }
 }

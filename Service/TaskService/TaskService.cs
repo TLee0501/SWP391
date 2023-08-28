@@ -17,24 +17,43 @@ namespace Service.TaskService
         }
         public async Task<int> CreateTask(Guid userId, CreateTaskRequest request)
         {
-            var id = Guid.NewGuid();
-            var newTask = new Task
+            var newTask = new Task();
+            var check = await _context.ProjectTeams.Where(x => x.ProjectId == request.ProjectId).FirstOrDefaultAsync();
+            if (check == null) return 1;
+            else if (check != null)
             {
-                TaskId = id,
-                UserId = userId,
-                ProjectId = request.ProjectId,
-                TaskName = request.TaskName,
-                Description = request?.TaskDescription ?? "",
-                StartTime = request?.StartTime,
-                EndTime = request?.EndTime,
-                Status = (int)ProjectTaskStatus.New,
-                IsDeleted = false,
-            };
+                var leader = await _context.ProjectTeams.Include(x => x.LeaderId == userId).SingleOrDefaultAsync();
+                var checkdup = await _context.Tasks.FindAsync(request.TaskName);
+                if (checkdup != null)
+                {
+                    return 4;
+                }
+                if (leader.LeaderId != userId)
+                {
+                    return 2;
+                }
+                else
+                {
+                    var id = Guid.NewGuid();
+                    newTask = new Task
+                    {
+                        TaskId = id,
+                        UserId = userId,
+                        ProjectId = request.ProjectId,
+                        TaskName = request.TaskName,
+                        Description = request?.TaskDescription ?? "",
+                        StartTime = request?.StartTime,
+                        EndTime = request?.EndTime,
+                        Status = (int)ProjectTaskStatus.New,
+                        IsDeleted = false,
+                    };
+                }
+            }
             try
             {
                 await _context.AddAsync(newTask);
                 await _context.SaveChangesAsync();
-                return 2;
+                return 3;
             }
             catch (DbException e)
             {

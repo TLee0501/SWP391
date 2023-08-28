@@ -35,7 +35,8 @@ namespace SystemController.Controllers
                 var userId = Utils.GetUserIdFromHttpContext(HttpContext);
                 var result = await _taskService.CreateTask(new Guid(userId!), request);
                 if (result == 0) return BadRequest("Không thành công.");
-                else if (result == 1) return BadRequest("Task đã tồn tại.");
+                else if (result == 2) return BadRequest(new ResponseCodeAndMessageModel(2, "Bạn không phải trưởng nhóm."));
+                else if (result == 4) return BadRequest(new ResponseCodeAndMessageModel(2, "Task đã tồn tại."));
                 else return Ok("Task đã được tạo thành công.");
             }
             catch (DbUpdateException)
@@ -107,8 +108,11 @@ namespace SystemController.Controllers
         public async Task<ActionResult<IEnumerable<TaskResponse>>> GetAllTask(Guid projectId)
         {
             var tasks = await _taskService.GetAllTask(projectId);
-            // Just returning empty task list in the case of no data
-            return tasks;
+            if (tasks == null || tasks.Count == 0)
+            {
+                return BadRequest(new ResponseCodeAndMessageModel(1, "Không có task nào tồn tại."));
+            }
+            else return tasks;
         }
     }
 }

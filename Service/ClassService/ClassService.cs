@@ -27,6 +27,7 @@ namespace Service.ClassService
                 UserId = request.UserId,
                 CourseId = request.CourseId,
                 ClassName = request.ClassName,
+                SemesterId = request.SemesterId,
                 EnrollCode = request.EnrollCode,
                 IsDeleted = false,
             };
@@ -48,6 +49,7 @@ namespace Service.ClassService
             if (check == null) return 1;
             check.ClassName = request.ClassName;
             check.EnrollCode = request.EnrollCode;
+            check.SemesterId = request.SemesterId;
             try
             {
                 await _context.SaveChangesAsync();
@@ -153,6 +155,7 @@ namespace Service.ClassService
                 EnrollCode = result.EnrollCode,
                 CourseCode = result.Course.CourseCode,
                 CourseName = result.Course.CourseName,
+                SemesterId = result.SemesterId,
                 TeacherName = result.User.FullName,
                 Enrolled = isStudent ? enrolledClasses!.Find(_ => _.ClassId == classId) != null : null,
                 Projects = result.Projects.Select(x => new ClassDetailResponseProject
@@ -227,6 +230,7 @@ namespace Service.ClassService
                 CourseCode = item.Course.CourseCode,
                 CourseName = item.Course.CourseName,
                 EnrollCode = item.EnrollCode,
+                SemesterId = item.SemesterId,
                 UserId = item.UserId,
                 TeacherName = item.User.FullName,
                 Enrolled = isStudent ? enrolledClasses!.Find(_ => _.ClassId == item.ClassId) != null : null,
