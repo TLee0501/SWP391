@@ -35,7 +35,6 @@ namespace Service.SemesterService
                 {
                     SemesterId = Guid.NewGuid(),
                     SemeterName = request.SemeterName,
-                    SemesterTypeId = request.SemesterTypeId,
                     StartTime = request.StartTime.Date,
                     EndTime = request.EndTime.Date
                 };
@@ -50,13 +49,10 @@ namespace Service.SemesterService
         {
             var result = await _context.Semesters.FindAsync(semesterId);
             if (result == null) return null;
-            var type = await _context.SemesterTypes.FindAsync(result.SemesterTypeId);
             var model = new SemesterResponse()
             {
                 SemesterId = result.SemesterId,
-                SemeterName = result.SemeterName,
-                SemesterTypeId = result.SemesterTypeId,
-                SemeterTypeName = type.SemesterTypeName
+                SemeterName = result.SemeterName
             };
             return model;
         }
@@ -67,20 +63,17 @@ namespace Service.SemesterService
             var inDB = await _context.Semesters.ToListAsync();
             foreach (var item in inDB)
             {
-                var type = await _context.SemesterTypes.FindAsync(item.SemesterTypeId);
                 var tmp = new SemesterResponse()
                 {
                     SemesterId = item.SemesterId,
-                    SemeterName = item.SemeterName,
-                    SemesterTypeId = type.SemesterTypeId,
-                    SemeterTypeName = type.SemesterTypeName
+                    SemeterName = item.SemeterName
                 };
                 list.Add(tmp);
             }
             return list;
         }
 
-        public async Task<SemesterTypeResponse> GetSemesterType(Guid semesterTypeId)
+        /*public async Task<SemesterTypeResponse> GetSemesterType(Guid semesterTypeId)
         {
             var inDB = await _context.SemesterTypes.FindAsync(semesterTypeId);
             if (inDB == null) return null;
@@ -90,9 +83,9 @@ namespace Service.SemesterService
                 SemesterTypeName = inDB.SemesterTypeName
             };
             return model;
-        }
+        }*/
 
-        public async Task<List<SemesterTypeResponse>> GetSemesterTypes()
+        /*public async Task<List<SemesterTypeResponse>> GetSemesterTypes()
         {
             var result = new List<SemesterTypeResponse>();
             var inDB = await _context.SemesterTypes.ToListAsync();
@@ -107,7 +100,7 @@ namespace Service.SemesterService
                 result.Add(model);
             }
             return result;
-        }
+        }*/
 
         public async Task<int> UpdateSemester(Guid semesterId, SemesterCreateRequest request)
         {
