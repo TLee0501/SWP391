@@ -12,4 +12,9 @@ namespace BusinessObjects.RequestModel
         public ProjectTaskStatus Status { get; set; }
         public List<Guid> Assignees { get; set; } = null!;
     }
+
+    public class UpdateTaskStatusRequest
+    {
+        public ProjectTaskStatus Status { get; set; }
+    }
 }
