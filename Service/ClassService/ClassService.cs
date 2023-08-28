@@ -44,12 +44,15 @@ namespace Service.ClassService
 
         public async Task<int> UpdateClass(UpdateClassRequest request)
         {
-            var check = await _context.Classes.FindAsync(request.ClassId);
-            if (check == null) return 1;
-            check.ClassName = request.ClassName;
-            check.EnrollCode = request.EnrollCode;
             try
             {
+                var existingClass = await _context.Classes.FindAsync(request.ClassId);
+                if (existingClass == null) return 1;
+
+                existingClass.ClassName = request.ClassName;
+                existingClass.EnrollCode = request.EnrollCode;
+                existingClass.UserId = request.TeacherId;
+
                 await _context.SaveChangesAsync();
                 return 2;
             }
@@ -144,7 +147,7 @@ namespace Service.ClassService
                 EnrollCode = result.EnrollCode,
                 CourseCode = result.Course.CourseCode,
                 CourseName = result.Course.CourseName,
-                TeacherName = result.User.FullName,
+                TeacherName = result.User?.FullName,
                 Enrolled = enrolledClasses!.Find(_ => _.ClassId == classId) != null,
                 Projects = result.Projects.Select(x => new ClassDetailResponseProject
                 {
@@ -220,7 +223,7 @@ namespace Service.ClassService
                 CourseName = item.Course.CourseName,
                 EnrollCode = item.EnrollCode,
                 TeacherId = item.UserId,
-                TeacherName = item.User!.FullName,
+                TeacherName = item.User?.FullName,
                 Enrolled = enrolledClasses!.Find(_ => _.ClassId == item.ClassId) != null,
                 SemesterId = item.Semester.SemesterId,
                 SemesterName = item.Semester.SemeterName,

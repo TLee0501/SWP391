@@ -36,7 +36,7 @@
     {
         public Guid ClassId { get; set; }
         public Guid? TeacherId { get; set; }
-        public string TeacherName { get; set; } = null!;
+        public string? TeacherName { get; set; }
         public string CourseCode { get; set; } = null!;
         public string CourseName { get; set; } = null!;
         public string ClassName { get; set; } = null!;
