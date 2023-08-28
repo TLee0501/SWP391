@@ -1,5 +1,12 @@
 ﻿namespace BusinessObjects.ResponseModel
 {
+    public class ClassDetailResponseSemester
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; } = null!;
+        public DateTime StartTime { get; set; }
+        public DateTime EndTime { get; set; }
+    }
     public class ClassDetailResponseProject
     {
         public Guid Id { get; set; }
@@ -28,7 +35,7 @@
     public class ClassDetailResponse
     {
         public Guid ClassId { get; set; }
-        public Guid UserId { get; set; }
+        public Guid? TeacherId { get; set; }
         public string TeacherName { get; set; } = null!;
         public string CourseCode { get; set; } = null!;
         public string CourseName { get; set; } = null!;
@@ -38,5 +45,6 @@
         public List<ClassDetailResponseProject> Projects { get; set; } = null!;
         public List<ClassDetailResponseStudent> Students { get; set; } = null!;
         public List<ClassDetailResponseTeam> Teams { get; set; } = null!;
+        public ClassDetailResponseSemester Semester { get; set; } = null!;
     }
 }

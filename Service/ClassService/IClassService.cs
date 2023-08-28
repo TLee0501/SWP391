@@ -6,12 +6,12 @@ namespace Service.ClassService
     public interface IClassService
     {
         Task<int> CreateClass(CreateClassRequest request);
-        Task<ClassDetailResponse?> GetClassByID(Guid classId, Guid? userId, string? role);
+        Task<ClassDetailResponse?> GetClassByID(Guid classId, Guid? userId);
         Task<int> UpdateClass(UpdateClassRequest request);
         Task<int> DeleteClass(Guid classId);
         Task<int> AssignClass(AssignClassRequest request);
         Task<int> UnassignClass(AssignClassRequest request);
-        Task<List<ClassListResponse>> GetClasses(Guid userID, string? role, Guid? courseID, string? searchText);
+        Task<List<ClassListResponse>> GetClasses(Guid userId, Guid? semesterId, Guid? courseId, string? searchText);
         Task<bool> EnrollClass(Guid userId, Guid classId, string enrollCode);
         Task<List<UserListResponse>> GetUsersInClass(Guid classId);
         Task<List<UserListResponse>> GetStudentsNotInProjectInClass(Guid classId);
