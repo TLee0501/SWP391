@@ -79,6 +79,8 @@ namespace SystemController.Controllers
             var userId = Utils.GetUserIdFromHttpContext(HttpContext);
             var result = await _projectTeamServise.GetJoinedProjectTeamById(new Guid(userId!), teamId);
             return Ok(result);
+        }
+
         [HttpPut("{projectTeamId}")]
         public async Task<IActionResult> RemoveMemberFromTeam(Guid projectTeamId, Guid memberId)
         {
