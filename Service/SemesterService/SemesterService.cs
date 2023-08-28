@@ -52,7 +52,9 @@ namespace Service.SemesterService
             var model = new SemesterResponse()
             {
                 SemesterId = result.SemesterId,
-                SemeterName = result.SemeterName
+                SemeterName = result.SemeterName,
+                StartTime = result.StartTime,
+                EndTime = result.EndTime
             };
             return model;
         }
@@ -66,7 +68,9 @@ namespace Service.SemesterService
                 var tmp = new SemesterResponse()
                 {
                     SemesterId = item.SemesterId,
-                    SemeterName = item.SemeterName
+                    SemeterName = item.SemeterName,
+                    StartTime = item.StartTime,
+                    EndTime = item.EndTime
                 };
                 list.Add(tmp);
             }
