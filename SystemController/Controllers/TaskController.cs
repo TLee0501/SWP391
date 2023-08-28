@@ -1,4 +1,5 @@
-﻿using BusinessObjects.Models;
+﻿using BusinessObjects.Enums;
+using BusinessObjects.Models;
 using BusinessObjects.RequestModel;
 using BusinessObjects.ResponseModel;
 using Microsoft.AspNetCore.Authorization;
@@ -109,6 +110,13 @@ namespace SystemController.Controllers
             var tasks = await _taskService.GetAllTask(projectId);
             // Just returning empty task list in the case of no data
             return tasks;
+        }
+
+        [HttpPut("{taskId}")]
+        public async Task<ActionResult> UpdateTaskStatus(Guid taskId, UpdateTaskStatusRequest request)
+        {
+            var success = await _taskService.UpdateTaskStatus(taskId, request.Status);
+            return Ok(success);
         }
     }
 }

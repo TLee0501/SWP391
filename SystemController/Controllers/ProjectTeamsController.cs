@@ -73,6 +73,14 @@ namespace SystemController.Controllers
             return Ok(teams);
         }
 
+        [HttpGet("{teamId}"), Authorize]
+        public async Task<ActionResult<ProjectTeam>> GetJoinedProjectTeamsById(Guid teamId)
+        {
+            var userId = Utils.GetUserIdFromHttpContext(HttpContext);
+            var result = await _projectTeamServise.GetJoinedProjectTeamById(new Guid(userId!), teamId);
+            return Ok(result);
+        }
+
         [HttpPut("{projectTeamId}")]
         public async Task<IActionResult> RemoveMemberFromTeam(Guid projectTeamId, Guid memberId)
         {

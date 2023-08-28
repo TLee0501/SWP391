@@ -1,4 +1,5 @@
-﻿using BusinessObjects.RequestModel;
+﻿using BusinessObjects.Enums;
+using BusinessObjects.RequestModel;
 using BusinessObjects.ResponseModel;
 using System;
 using System.Collections.Generic;
@@ -16,5 +17,6 @@ namespace Service.TaskService
         Task<int> AssignTask(AssignTaskRequest request);
         Task<int> UnAssignTask(AssignTaskRequest request);
         Task<List<TaskResponse>> GetAllTask(Guid projectId);
+        Task<bool> UpdateTaskStatus(Guid taskId, ProjectTaskStatus status);
     }
 }

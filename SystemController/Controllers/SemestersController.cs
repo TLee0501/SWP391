@@ -63,11 +63,6 @@ namespace SystemController.Controllers
         [HttpPost]
         public async Task<ActionResult<Semester>> CreateSemester(SemesterCreateRequest request)
         {
-            if (request.StartTime.Date <= DateTime.Now.Date)
-                return BadRequest(new ResponseCodeAndMessageModel(4, "Ngày bắt đầu nhỏ hơn hiện tại"));
-            if (request.EndTime.Date <= request.StartTime.Date)
-                return BadRequest(new ResponseCodeAndMessageModel(5, "Ngày bắt đầu lớn hơn ngày kết thúc!"));
-
             var result = await _semesterService.CreateSemester(request);
             if (result.Equals(1))
                 return BadRequest(new ResponseCodeAndMessageModel(1, "Tên học kỳ bị trùng!"));

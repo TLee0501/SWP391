@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.ComponentModel.DataAnnotations;
+using BusinessObjects.Enums;
 
 namespace BusinessObjects.Models;
 
@@ -11,6 +11,7 @@ public partial class Task
 
     public Guid ProjectId { get; set; }
 
+    [MaxLength(255)]
     public string TaskName { get; set; } = null!;
 
     public string Description { get; set; } = null!;
@@ -19,7 +20,7 @@ public partial class Task
 
     public DateTime? EndTime { get; set; }
 
-    public int Status { get; set; }
+    public ProjectTaskStatus Status { get; set; }
 
     public bool IsDeleted { get; set; }
 

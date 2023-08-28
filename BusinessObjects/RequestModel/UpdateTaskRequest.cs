@@ -10,5 +10,11 @@ namespace BusinessObjects.RequestModel
         public DateTime? StartTime { get; set; }
         public DateTime? EndTime { get; set; }
         public ProjectTaskStatus Status { get; set; }
+        public List<Guid> Assignees { get; set; } = null!;
+    }
+
+    public class UpdateTaskStatusRequest
+    {
+        public ProjectTaskStatus Status { get; set; }
     }
 }
