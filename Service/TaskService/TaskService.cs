@@ -17,6 +17,9 @@ namespace Service.TaskService
         }
         public async Task<int> CreateTask(Guid userId, CreateTaskRequest request)
         {
+            var startTime = Utils.ConvertUTCToLocalDateTime(request.StartTime);
+            var endTime = Utils.ConvertUTCToLocalDateTime(request.EndTime);
+
             var id = Guid.NewGuid();
             var newTask = new Task
             {
@@ -25,14 +28,26 @@ namespace Service.TaskService
                 ProjectId = request.ProjectId,
                 TaskName = request.TaskName,
                 Description = request?.TaskDescription ?? "",
-                StartTime = request?.StartTime,
-                EndTime = request?.EndTime,
-                Status = ProjectTaskStatus.New,
+                StartTime = startTime,
+                EndTime = endTime,
+                Status = request!.Status,
                 IsDeleted = false,
             };
+
             try
             {
                 await _context.AddAsync(newTask);
+
+                foreach (var asignee in request.Assignees)
+                {
+                    await _context.StudentTasks.AddAsync(new StudentTask
+                    {
+                        StudentTaskId = Guid.NewGuid(),
+                        TaskId = id,
+                        UserId = new Guid(asignee)
+                    });
+                }
+
                 await _context.SaveChangesAsync();
                 return 2;
             }
@@ -44,18 +59,49 @@ namespace Service.TaskService
 
         public async Task<int> UpdateTask(UpdateTaskRequest request)
         {
-            var check = await _context.Tasks.FindAsync(request.TaskId);
-            if (check == null)
-            {
-                return 1;
-            }
-            check.TaskName = request.TaskName;
-            check.Description = request.Description;
-            check.StartTime = request.StartTime;
-            check.EndTime = request.EndTime;
-            check.Status = request.Status;
             try
             {
+                var taskId = request.TaskId;
+
+                var check = await _context.Tasks.FindAsync(taskId);
+                if (check == null)
+                {
+                    return 1;
+                }
+                var startTime = Utils.ConvertUTCToLocalDateTime(request.StartTime);
+                var endTime = Utils.ConvertUTCToLocalDateTime(request.EndTime);
+
+                check.TaskName = request.TaskName;
+                check.Description = request.Description;
+                check.StartTime = request.StartTime;
+                check.EndTime = request.EndTime;
+                check.Status = request.Status;
+                check.StartTime = startTime;
+                check.EndTime = endTime;
+
+                // Remove all old student tasks
+                var currentStudentTasks = await _context.StudentTasks
+                    .Where(x => x.TaskId == taskId)
+                    .ToListAsync();
+                if (currentStudentTasks != null && currentStudentTasks.Count > 0)
+                {
+                    _context.StudentTasks.RemoveRange(currentStudentTasks);
+                }
+
+                // Set new student tasks
+                var studentTasks = new List<StudentTask>();
+                foreach (var assignee in request.Assignees)
+                {
+                    studentTasks.Add(new StudentTask
+                    {
+                        StudentTaskId = Guid.NewGuid(),
+                        TaskId = taskId,
+                        UserId = assignee
+                    });
+                }
+
+                await _context.StudentTasks.AddRangeAsync(studentTasks);
+
                 await _context.SaveChangesAsync();
                 return 2;
             }

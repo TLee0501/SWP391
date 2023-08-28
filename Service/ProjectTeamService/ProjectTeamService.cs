@@ -145,6 +145,7 @@ namespace Service.ProjectTeamService
                 .Include(x => x.StudentTasks)
                     .ThenInclude(x => x.User)
                 .Where(x => x.ProjectId == project.Id)
+                .Where(x => !x.IsDeleted)
                 .ToListAsync();
 
             return new ProjectTeamDetailResponse
