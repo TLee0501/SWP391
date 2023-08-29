@@ -13,6 +13,7 @@ using Service.RoleService;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text;
 using Service.SemesterService;
+using Service.TeamReportService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,6 +38,7 @@ builder.Services.AddScoped<ITaskService, TaskService>();
 builder.Services.AddScoped<IProjectTeamServise, ProjectTeamService>();
 builder.Services.AddScoped<IOnGoingReportService, OnGoingReportService>();
 builder.Services.AddScoped<ISemesterService, SemesterService>();
+builder.Services.AddScoped<ITeamReportService, TeamReportService>();
 
 //swagger
 builder.Services.AddEndpointsApiExplorer();

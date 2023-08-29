@@ -28,4 +28,6 @@ public partial class User
     public virtual ICollection<StudentTask> StudentTasks { get; set; } = new List<StudentTask>();
 
     public virtual ICollection<TeamMember> TeamMembers { get; set; } = new List<TeamMember>();
+
+    public virtual ICollection<TeamReportFeedback> TeamReportFeedbacks { get; set; } = null!;
 }
