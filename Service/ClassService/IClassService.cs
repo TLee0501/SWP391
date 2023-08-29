@@ -1,4 +1,5 @@
-﻿using BusinessObjects.RequestModel;
+﻿using BusinessObjects.Models;
+using BusinessObjects.RequestModel;
 using BusinessObjects.ResponseModel;
 
 namespace Service.ClassService
@@ -14,6 +15,7 @@ namespace Service.ClassService
         Task<List<ClassListResponse>> GetClasses(Guid userId, Guid? semesterId, Guid? courseId, string? searchText);
         Task<bool> EnrollClass(Guid userId, Guid classId, string enrollCode);
         Task<List<UserListResponse>> GetUsersInClass(Guid classId);
+        Task<List<ClassListResponse>> GetClassForTeacher(Guid teacherId);
         Task<List<UserListResponse>> GetStudentsNotInProjectInClass(Guid classId);
     }
 }
