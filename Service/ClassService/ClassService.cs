@@ -328,5 +328,32 @@ namespace Service.ClassService
                 return 0;
             }
         }
+        public async Task<List<ClassListResponse>> GetClassForTeacher(Guid teacherId)
+        {
+            var checkClass = await _context.Classes.Where(x => x.UserId == teacherId).ToListAsync();         
+            var list = new List<ClassListResponse>();
+            if (checkClass == null)
+            {
+                return null;
+            }
+            else
+            {
+                foreach (var c in checkClass)
+                {                    
+                    var teacherClass = new ClassListResponse
+                    {
+                        ClassId = c.ClassId,
+                        ClassName = c.ClassName,
+                        CourseCode = c.Course.CourseCode,
+                        CourseName = c.Course.CourseName,
+                        EnrollCode = c.EnrollCode,
+                        SemesterId = c.SemesterId,
+                        TeacherId = teacherId,
+                    };
+                    list.Add(teacherClass);
+                }
+            }
+            return list;
+        }
     }
 }

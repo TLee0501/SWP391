@@ -169,5 +169,15 @@ namespace SystemController.Controllers
                 return BadRequest("Không thành công.");
             }
         }
+        [HttpGet]
+        public async Task<ActionResult> GetClassForTeacher(Guid teacherId)
+        {
+            var result = await _classService.GetClassForTeacher(teacherId);
+            if (result == null)
+            {
+                return BadRequest(new ResponseCodeAndMessageModel(1, "Không có lớp học nào."));
+            }
+            else return Ok(result);
+        }
     }
 }
