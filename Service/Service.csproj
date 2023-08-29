@@ -13,9 +13,11 @@
   <ItemGroup>
     <None Remove="RoleService\" />
     <None Remove="Utils\" />
+    <None Remove="TeamReportService\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="RoleService\" />
     <Folder Include="Utils\" />
+    <Folder Include="TeamReportService\" />
   </ItemGroup>
 </Project>
