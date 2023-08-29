@@ -6,6 +6,8 @@
         Error = 100,
         // Semester
         SemesterOverlapTime = 1001,
+        SemesterStartTimeEqualEndTime = 1002,
+        SemesterMinDays = 1003,
         // Project
         ProjectDuplicatedName = 15,
         // Team

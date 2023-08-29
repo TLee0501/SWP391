@@ -91,7 +91,11 @@ namespace Service.SemesterService
                 };
                 list.Add(tmp);
             }
-            return list;
+            var sortedList = list
+                .OrderBy(x => x.StartTime)
+                    .ThenBy(x => x.EndTime)
+                .ToList();
+            return sortedList;
         }
 
         public async Task<int> UpdateSemester(Guid semesterId, SemesterCreateRequest request)
@@ -127,16 +131,12 @@ namespace Service.SemesterService
                 .Where(x => x.SemesterId != semester.SemesterId)
                 .ToListAsync();
 
-            foreach (var existingSemester in existingSemesters)
-            {
-                if (semester.StartTime <= existingSemester.EndTime && semester.EndTime >= existingSemester.StartTime)
-                {
-                    // The start time or end time may be overlaped with other semesters
-                    return false;
-                }
-            }
+            bool isValid = existingSemesters.All(x =>
+                semester.StartTime > x.EndTime ||
+                semester.EndTime < x.StartTime
+            );
 
-            return true;
+            return isValid;
         }
     }
 }
