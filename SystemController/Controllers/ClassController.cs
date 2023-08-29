@@ -60,7 +60,7 @@ namespace SystemController.Controllers
             else { return Ok("Cập nhật lớp học thành công."); }
         }
 
-        [HttpGet("{classId}")]
+        [HttpGet("{classId}"), Authorize]
         public async Task<ActionResult<ClassDetailResponse>> GetClassByID(Guid classId)
         {
             var userId = new Guid(Utils.GetUserIdFromHttpContext(HttpContext)!);
