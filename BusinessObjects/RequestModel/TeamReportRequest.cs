@@ -1,4 +1,6 @@
-﻿namespace BusinessObjects.RequestModel
+﻿using BusinessObjects.Enums;
+
+namespace BusinessObjects.RequestModel
 {
     public class CreateTeamReportRequest
     {
@@ -9,6 +11,13 @@
         public string DoingReport { get; set; } = null!;
         public string? TodoReport { get; set; }
         public int Period { get; set; }
+    }
+
+    public class CreateTeamReportFeedback
+    {
+        public Guid ReportId { get; set; }
+        public string Content { get; set; } = null!;
+        public TeamReportFeedbackGrade Grade { get; set; }
     }
 }
 

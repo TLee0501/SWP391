@@ -59,6 +59,7 @@ namespace SystemController.Controllers
 
             var result = await _projectTeamServise.CreateTeam(userID, request);
             if (result == 1) return NotFound(new ResponseCodeAndMessageModel(7, "Không tìm thấy dự án!"));
+            else if (result == 20) return BadRequest(new ResponseCodeAndMessageModel(20, "Chưa thể đăng ký nhóm vào lúc này"));
             else if (result == 2) return BadRequest(new ResponseCodeAndMessageModel(8, "Có thành viên bị lặp!"));
             else if (result == 3) return BadRequest(new ResponseCodeAndMessageModel(9, "Có thành viên đã tham gia nhóm khác!"));
             else if (result == 4) return Ok(new ResponseCodeAndMessageModel(100, "Thành công!"));
@@ -71,6 +72,21 @@ namespace SystemController.Controllers
             var userId = Utils.GetUserIdFromHttpContext(HttpContext);
             var teams = await _projectTeamServise.GetJoinedProjectTeams(new Guid(userId!), classId);
             return Ok(teams);
+        }
+
+        [HttpGet, Authorize]
+        public async Task<ActionResult<ProjectTeam>> GetProjectTeamsByTeacher()
+        {
+            var userId = Utils.GetUserIdFromHttpContext(HttpContext);
+            var teams = await _projectTeamServise.GetProjectTeamsByTeacher(new Guid(userId!));
+            return Ok(teams);
+        }
+
+        [HttpGet("{teamId}"), Authorize]
+        public async Task<ActionResult<ProjectTeam>> GetProjectTeamByTeacher(Guid teamId)
+        {
+            var result = await _projectTeamServise.GetProjectTeamDetailByTeacher(teamId);
+            return Ok(result);
         }
 
         [HttpGet("{teamId}"), Authorize]

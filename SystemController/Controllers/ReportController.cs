@@ -1,4 +1,5 @@
-﻿using BusinessObjects.RequestModel;
+﻿using System.Composition;
+using BusinessObjects.RequestModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Service.TeamReportService;
@@ -19,13 +20,17 @@ namespace SystemController.Controllers
         public async Task<ActionResult> SendReport(CreateTeamReportRequest request)
         {
             var reporterId = Utils.GetUserIdFromHttpContext(HttpContext);
-            var success = await _teamReportService.CreateTeamReport(new Guid(reporterId!), request);
-            if (success)
+            var result = await _teamReportService.CreateTeamReport(new Guid(reporterId!), request);
+            if (result == 1)
             {
-                return Ok("Gửi báo cáo thành công");
+                return BadRequest("Nhóm không hợp lệ");
+            }
+            if (result == 2)
+            {
+                return BadRequest("Chưa thề gửi báo cáo vào lúc này");
             }
 
-            return BadRequest("Có lỗi xảy ra");
+            return Ok("Gửi báo cáo thành công");
         }
 
         [HttpGet, Authorize]
@@ -40,6 +45,18 @@ namespace SystemController.Controllers
         {
             var report = await _teamReportService.GetTeamReport(reportId);
             return Ok(report);
+        }
+
+        [HttpPost, Authorize]
+        public async Task<ActionResult> SendReportFeedback(CreateTeamReportFeedback request)
+        {
+            var success = await _teamReportService.CreateTeamReportFeedback(request);
+            if (success)
+            {
+                return Ok("Thành công");
+            }
+
+            return BadRequest("Có lỗi xảy ra");
         }
     }
 }

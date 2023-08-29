@@ -191,18 +191,27 @@ namespace Service.ClassService
                     StartTime = result.Semester.StartTime,
                     EndTime = result.Semester.EndTime,
                 },
+                RegisterTeamStartDate = result.RegisterTeamStartDate,
+                RegisterTeamEndDate = result.RegisterTeamEndDate,
+                ReportStartDate = result.ReportStartDate,
+                ReportEndDate = result.ReportEndDate,
             }; ;
         }
 
-        public async Task<List<ClassListResponse>> GetClasses(Guid userId, Guid? semesterId, Guid? courseId, string? searchText)
+        public async Task<List<ClassListResponse>> GetClasses(Guid userId, Guid? teacherId, Guid? semesterId, Guid? courseId, string? searchText)
         {
+            var enrolledClasses = await _context.StudentClasses.Where(_ => _.UserId == userId).ToListAsync();
+
             var query = _context.Classes
                 .Include(x => x.Course)
                 .Include(x => x.User)
                 .Include(x => x.Semester)
                 .Where(x => !x.IsDeleted);
 
-            var enrolledClasses = await _context.StudentClasses.Where(_ => _.UserId == userId).ToListAsync();
+            if (teacherId != null)
+            {
+                query = query.Where(x => x.UserId == teacherId);
+            }
 
             if (courseId != null)
             {
@@ -359,6 +368,59 @@ namespace Service.ClassService
                 }
             }
             return list;
+        }
+
+        public async Task<bool> UpdateTeamRegisterDeadline(UpdateClassDeadlineRequest request)
+        {
+            var existingClass = await _context.Classes.FindAsync(request.ClassId);
+            if (existingClass == null)
+            {
+                return false;
+            }
+
+            var startTime = Utils.ConvertUTCToLocalDateTime(request.StartTime);
+            var endTime = Utils.ConvertUTCToLocalDateTime(request.EndTime);
+
+            existingClass.RegisterTeamStartDate = startTime;
+            existingClass.RegisterTeamEndDate = endTime;
+
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<bool> UpdateReportDeadline(UpdateClassDeadlineRequest request)
+        {
+            var existingClass = await _context.Classes.FindAsync(request.ClassId);
+            if (existingClass == null)
+            {
+                return false;
+            }
+
+            var startTime = Utils.ConvertUTCToLocalDateTime(request.StartTime);
+            var endTime = Utils.ConvertUTCToLocalDateTime(request.EndTime);
+
+            existingClass.ReportStartDate = startTime;
+            existingClass.ReportEndDate = endTime;
+
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<bool> UpdateEnrollCode(UpdateEnrollCodeRequest request)
+        {
+            var existingClass = await _context.Classes.FindAsync(request.ClassId);
+            if (existingClass == null)
+            {
+                return false;
+            }
+
+            existingClass.EnrollCode = request.EnrollCode;
+
+            await _context.SaveChangesAsync();
+
+            return true;
         }
     }
 }
