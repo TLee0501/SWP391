@@ -170,9 +170,9 @@ namespace SystemController.Controllers
             }
         }
         [HttpGet, Authorize]
-        public async Task<ActionResult> GetClassForTeacher(Guid teacherId)
+        public async Task<ActionResult> GetTeacherClassList(Guid teacherId)
         {
-            var result = await _classService.GetClassForTeacher(teacherId);
+            var result = await _classService.GetTeacherClassList(teacherId);
             if (teacherId.Equals(0)) return BadRequest(new ResponseCodeAndMessageModel(2, "Thông tin giảng viên trống."));
             if (result == null)
             {
