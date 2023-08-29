@@ -42,6 +42,26 @@ namespace SystemController.Controllers
         [HttpPut("{semesterId}")]
         public async Task<IActionResult> UpdateSemester(Guid semesterId, SemesterCreateRequest request)
         {
+            if (request.StartTime == request.EndTime)
+            {
+                return BadRequest(new ResponseCodeAndMessageModel
+                {
+                    Code = (int)ErrorCode.SemesterStartTimeEqualEndTime,
+                    Message = "Ngày bắt đầu và kết thúc không được trùng nhau"
+                });
+            }
+
+            var duration = request.EndTime - request.StartTime;
+            var days = duration.Days;
+            if (days < 20)
+            {
+                return BadRequest(new ResponseCodeAndMessageModel
+                {
+                    Code = (int)ErrorCode.SemesterMinDays,
+                    Message = "Học kỳ phải có khoảng thời gian tối thiểu là 20 ngày"
+                });
+            }
+
             var result = await _semesterService.UpdateSemester(semesterId, request);
             if (result.Equals(1))
             {
@@ -68,6 +88,26 @@ namespace SystemController.Controllers
         [HttpPost]
         public async Task<ActionResult<Semester>> CreateSemester(SemesterCreateRequest request)
         {
+            if (request.StartTime == request.EndTime)
+            {
+                return BadRequest(new ResponseCodeAndMessageModel
+                {
+                    Code = (int)ErrorCode.SemesterStartTimeEqualEndTime,
+                    Message = "Ngày bắt đầu và kết thúc không được trùng nhau"
+                });
+            }
+
+            var duration = request.EndTime - request.StartTime;
+            var days = duration.Days;
+            if (days < 20)
+            {
+                return BadRequest(new ResponseCodeAndMessageModel
+                {
+                    Code = (int)ErrorCode.SemesterMinDays,
+                    Message = "Học kỳ phải có khoảng thời gian tối thiểu là 20 ngày"
+                });
+            }
+
             var result = await _semesterService.CreateSemester(request);
             if (result.Equals(1))
             {
