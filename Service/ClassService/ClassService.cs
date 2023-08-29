@@ -330,7 +330,7 @@ namespace Service.ClassService
         }
         public async Task<List<ClassListResponse>> GetClassForTeacher(Guid teacherId)
         {
-            var checkClass = await _context.Classes.Where(x => x.UserId == teacherId).ToListAsync();         
+            var checkClass = await _context.Classes.Where(x => x.UserId == teacherId).ToListAsync();
             var list = new List<ClassListResponse>();
             if (checkClass == null)
             {
@@ -339,16 +339,21 @@ namespace Service.ClassService
             else
             {
                 foreach (var c in checkClass)
-                {                    
+                {
+                    var courses = await _context.Courses.FindAsync(c.CourseId);
+                    var users = await _context.Users.FindAsync(c.UserId);
+                    var semesters = await _context.Semesters.FindAsync(c.SemesterId);
                     var teacherClass = new ClassListResponse
                     {
                         ClassId = c.ClassId,
                         ClassName = c.ClassName,
-                        CourseCode = c.Course.CourseCode,
-                        CourseName = c.Course.CourseName,
+                        CourseCode = courses.CourseCode,
+                        CourseName = courses.CourseName,
                         EnrollCode = c.EnrollCode,
                         SemesterId = c.SemesterId,
                         TeacherId = teacherId,
+                        TeacherName = users.FullName,
+                        SemesterName = semesters.SemeterName,
                     };
                     list.Add(teacherClass);
                 }
