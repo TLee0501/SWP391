@@ -170,15 +170,11 @@ namespace SystemController.Controllers
             }
         }
         [HttpGet, Authorize]
-        public async Task<ActionResult> GetTeacherClassList(Guid teacherId)
+        public async Task<ActionResult> GetTeacherClassList()
         {
-            var result = await _classService.GetTeacherClassList(teacherId);
-            if (teacherId.Equals(0)) return BadRequest(new ResponseCodeAndMessageModel(2, "Thông tin giảng viên trống."));
-            if (result == null)
-            {
-                return BadRequest(new ResponseCodeAndMessageModel(1, "Không có lớp học nào."));
-            }
-            else return Ok(result);
+            var userId = Utils.GetUserIdFromHttpContext(HttpContext);
+            var result = await _classService.GetTeacherClassList(new Guid(userId));
+            return Ok(result);
         }
     }
 }
