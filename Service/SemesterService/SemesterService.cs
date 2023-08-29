@@ -46,16 +46,32 @@ namespace Service.SemesterService
             }
         }
 
-        public async Task<SemesterResponse> GetSemester(Guid semesterId)
+        public async Task<SemesterDetailResponse?> GetSemester(Guid semesterId)
         {
             var result = await _context.Semesters.FindAsync(semesterId);
             if (result == null) return null;
-            var model = new SemesterResponse()
+
+            var classes = await _context.Classes
+                .Include(x => x.User)
+                .Include(x => x.Course)
+                .Where(x => x.SemesterId == semesterId)
+                .ToListAsync();
+
+            var model = new SemesterDetailResponse
             {
-                SemesterId = result.SemesterId,
-                SemesterName = result.SemeterName,
+                Id = result.SemesterId,
+                Name = result.SemeterName,
                 StartTime = result.StartTime,
-                EndTime = result.EndTime
+                EndTime = result.EndTime,
+                Classes = classes.Select(x => new ClassSemesterDetailResponse
+                {
+                    Id = x.ClassId,
+                    Name = x.ClassName,
+                    TeacherId = x.UserId,
+                    TeacherName = x.User?.FullName,
+                    CourseId = x.CourseId,
+                    CourseName = x.Course.CourseName,
+                }).ToList()
             };
             return model;
         }

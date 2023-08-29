@@ -32,10 +32,9 @@ namespace SystemController.Controllers
 
         // GET: api/Semesters/5
         [HttpGet("{semesterId}")]
-        public async Task<ActionResult<SemesterResponse>> GetSemester(Guid semesterId)
+        public async Task<ActionResult<SemesterDetailResponse?>> GetSemester(Guid semesterId)
         {
             var result = await _semesterService.GetSemester(semesterId);
-            if (result == null) return NotFound(new ResponseCodeAndMessageModel(6, "Không tìm thấy học kỳ!"));
             return Ok(result);
         }
 
