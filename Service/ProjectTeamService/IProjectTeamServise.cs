@@ -19,5 +19,7 @@ namespace Service.ProjectTeamService
         Task<ProjectTeamDetailResponse?> GetJoinedProjectTeamById(Guid userId, Guid teamId);
         Task<int> RemoveMember(Guid projectTeamId, Guid userId);
         Task<int> AddMember(Guid projectTeamId, Guid userId);
+        Task<List<ProjectTeamListResponse>> GetProjectTeamsByTeacher(Guid teacherId);
+        Task<ProjectTeamDetailResponse> GetProjectTeamDetailByTeacher(Guid teamId);
     }
 }

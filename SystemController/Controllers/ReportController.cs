@@ -1,4 +1,5 @@
-﻿using BusinessObjects.RequestModel;
+﻿using System.Composition;
+using BusinessObjects.RequestModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Service.TeamReportService;
@@ -44,6 +45,18 @@ namespace SystemController.Controllers
         {
             var report = await _teamReportService.GetTeamReport(reportId);
             return Ok(report);
+        }
+
+        [HttpPost, Authorize]
+        public async Task<ActionResult> SendReportFeedback(CreateTeamReportFeedback request)
+        {
+            var success = await _teamReportService.CreateTeamReportFeedback(request);
+            if (success)
+            {
+                return Ok("Thành công");
+            }
+
+            return BadRequest("Có lỗi xảy ra");
         }
     }
 }

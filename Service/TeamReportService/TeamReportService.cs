@@ -51,6 +51,28 @@ namespace Service.TeamReportService
             return 0;
         }
 
+        public async Task<bool> CreateTeamReportFeedback(CreateTeamReportFeedback request)
+        {
+            var existingReport = await _context.TeamReports
+                .Include(x => x.TeacherFeedback)
+                .SingleOrDefaultAsync();
+
+            if (existingReport == null || existingReport.TeacherFeedback != null) return false;
+
+            var feedback = new TeamReportFeedback
+            {
+                Id = Guid.NewGuid(),
+                Content = request.Content,
+                Grade = request.Grade,
+                CreatedDate = DateTime.Now,
+                TeamReportId = request.ReportId,
+            };
+            await _context.TeamReportFeedbacks.AddAsync(feedback);
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
         public async Task<TeamReportDetailResponse?> GetTeamReport(Guid reportId)
         {
             var teamReport = await _context.TeamReports
@@ -113,6 +135,8 @@ namespace Service.TeamReportService
         public async Task<List<TeamReportDetailResponse>> GetTeamReports(Guid teamId)
         {
             var teamReports = await _context.TeamReports
+                .Include(x => x.Reporter)
+                .Include(x => x.TeacherFeedback)
                 .Where(x => x.TeamId == teamId)
                 .ToListAsync();
 
@@ -131,6 +155,20 @@ namespace Service.TeamReportService
                 TodoReport = teamReport.TodoReport,
                 CreatedDate = teamReport.CreatedDate,
                 Period = teamReport.Period,
+                Reporter = new TeamReporter
+                {
+                    Id = teamReport.Reporter.UserId,
+                    FullName = teamReport.Reporter.FullName,
+                    Code = teamReport.Reporter.Mssv!,
+                    Email = teamReport.Reporter.Email,
+                },
+                Feedback = new TeamReportDetailResponseFeedback
+                {
+                    Id = teamReport.TeacherFeedback.Id,
+                    Content = teamReport.TeacherFeedback.Content!,
+                    Grade = teamReport.TeacherFeedback.Grade,
+                    CreatedDate = teamReport.TeacherFeedback.CreatedDate,
+                }
             }).ToList();
             var sortedList = list.OrderBy(x => x.Period).ToList();
             return sortedList;

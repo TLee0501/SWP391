@@ -74,6 +74,21 @@ namespace SystemController.Controllers
             return Ok(teams);
         }
 
+        [HttpGet, Authorize]
+        public async Task<ActionResult<ProjectTeam>> GetProjectTeamsByTeacher()
+        {
+            var userId = Utils.GetUserIdFromHttpContext(HttpContext);
+            var teams = await _projectTeamServise.GetProjectTeamsByTeacher(new Guid(userId!));
+            return Ok(teams);
+        }
+
+        [HttpGet("{teamId}"), Authorize]
+        public async Task<ActionResult<ProjectTeam>> GetProjectTeamByTeacher(Guid teamId)
+        {
+            var result = await _projectTeamServise.GetProjectTeamDetailByTeacher(teamId);
+            return Ok(result);
+        }
+
         [HttpGet("{teamId}"), Authorize]
         public async Task<ActionResult<ProjectTeam>> GetJoinedProjectTeamsById(Guid teamId)
         {
