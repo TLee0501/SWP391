@@ -5,11 +5,7 @@
         Success = 99,
         Error = 100,
         // Semester
-        SemesterDuplicatedName = 1,
-        SemesterDuplicatedStartDate = 2,
-        SemesterDuplicatedEndDate = 3,
-        SemesterStartDateLessThanEndDate = 4,
-        SemesterStartDateGreaterThanEndDate = 5,
+        SemesterOverlapTime = 1001,
         // Project
         ProjectDuplicatedName = 15,
         // Team

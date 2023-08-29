@@ -1,4 +1,5 @@
-﻿using BusinessObjects.Models;
+﻿using System.ComponentModel.DataAnnotations;
+using BusinessObjects.Models;
 using BusinessObjects.RequestModel;
 using BusinessObjects.ResponseModel;
 using Microsoft.EntityFrameworkCore;
@@ -17,32 +18,32 @@ namespace Service.SemesterService
 
         public async Task<int> CreateSemester(SemesterCreateRequest request)
         {
-            var checkname = await _context.Semesters.Where(a => a.SemeterName == request.SemeterName).ToListAsync();
-            if (!checkname.IsNullOrEmpty()) return 1;
-
-            var semesters = await _context.Semesters.ToListAsync();
-            foreach (var item in semesters)
-            {
-                if (item.StartTime.Date <= request.StartTime.Date && item.EndTime.Date >= request.StartTime.Date)
-                    return 2;
-                else if (item.StartTime.Date <= request.EndTime.Date && item.EndTime.Date >= request.EndTime.Date)
-                    return 3;
-            }
-
             try
             {
+                var startTime = Utils.ConvertUTCToLocalDateTime(request.StartTime);
+                var endTime = Utils.ConvertUTCToLocalDateTime(request.EndTime);
                 var semester = new Semester
                 {
                     SemesterId = Guid.NewGuid(),
-                    SemeterName = request.SemeterName,
-                    StartTime = request.StartTime.Date,
-                    EndTime = request.EndTime.Date
+                    SemeterName = request.SemesterName,
+                    StartTime = (DateTime)startTime!,
+                    EndTime = (DateTime)endTime!,
                 };
+
+                var isValid = await IsValidSemester(semester);
+                if (!isValid)
+                {
+                    return 1;
+                }
+
                 await _context.Semesters.AddAsync(semester);
                 await _context.SaveChangesAsync();
-                return 4;
+                return 0;
             }
-            catch (Exception ex) { return 0; }
+            catch (Exception ex)
+            {
+                return -1;
+            }
         }
 
         public async Task<SemesterResponse> GetSemester(Guid semesterId)
@@ -52,7 +53,7 @@ namespace Service.SemesterService
             var model = new SemesterResponse()
             {
                 SemesterId = result.SemesterId,
-                SemeterName = result.SemeterName,
+                SemesterName = result.SemeterName,
                 StartTime = result.StartTime,
                 EndTime = result.EndTime
             };
@@ -68,7 +69,7 @@ namespace Service.SemesterService
                 var tmp = new SemesterResponse()
                 {
                     SemesterId = item.SemesterId,
-                    SemeterName = item.SemeterName,
+                    SemesterName = item.SemeterName,
                     StartTime = item.StartTime,
                     EndTime = item.EndTime
                 };
@@ -77,68 +78,49 @@ namespace Service.SemesterService
             return list;
         }
 
-        /*public async Task<SemesterTypeResponse> GetSemesterType(Guid semesterTypeId)
-        {
-            var inDB = await _context.SemesterTypes.FindAsync(semesterTypeId);
-            if (inDB == null) return null;
-            var model = new SemesterTypeResponse()
-            {
-                SemesterTypeId = semesterTypeId,
-                SemesterTypeName = inDB.SemesterTypeName
-            };
-            return model;
-        }*/
-
-        /*public async Task<List<SemesterTypeResponse>> GetSemesterTypes()
-        {
-            var result = new List<SemesterTypeResponse>();
-            var inDB = await _context.SemesterTypes.ToListAsync();
-            if (inDB.IsNullOrEmpty()) return null;
-            foreach (var item in inDB)
-            {
-                var model = new SemesterTypeResponse()
-                {
-                    SemesterTypeId = item.SemesterTypeId,
-                    SemesterTypeName = item.SemesterTypeName
-                };
-                result.Add(model);
-            }
-            return result;
-        }*/
-
         public async Task<int> UpdateSemester(Guid semesterId, SemesterCreateRequest request)
         {
-            var semester = await _context.Semesters.FindAsync(semesterId);
-            if (semester == null) return 1;
-
-            if (request.SemeterName != semester.SemeterName)
-            {
-                var checkname = await _context.Semesters.Where(a => a.SemeterName == request.SemeterName).ToListAsync();
-                if (!checkname.IsNullOrEmpty()) return 2;
-            }
-
-            var semesters = await _context.Semesters.ToListAsync();
-            foreach (var item in semesters)
-            {
-                if (request.StartTime.Date != semester.StartTime.Date)
-                    if (item.StartTime.Date <= request.StartTime.Date && item.EndTime.Date >= request.StartTime.Date)
-                        return 3;
-                if (request.EndTime.Date != semester.EndTime.Date)
-                    if (item.StartTime.Date <= request.EndTime.Date && item.EndTime.Date >= request.EndTime.Date)
-                        return 4;
-            }
-
             try
             {
-                semester.SemeterName = request.SemeterName;
-                semester.StartTime = request.StartTime;
-                semester.EndTime = request.EndTime;
+                var semester = await _context.Semesters.FindAsync(semesterId);
+                if (semester == null) return 1;
+
+                var startTime = Utils.ConvertUTCToLocalDateTime(request.StartTime);
+                var endTime = Utils.ConvertUTCToLocalDateTime(request.EndTime);
+
+                semester.SemeterName = request.SemesterName;
+                semester.StartTime = (DateTime)startTime!;
+                semester.EndTime = (DateTime)endTime!;
+
+                var isValid = await IsValidSemester(semester);
+
+                if (!isValid)
+                {
+                    return 1;
+                }
+
                 await _context.SaveChangesAsync();
-                return 5;
+                return 0;
             }
-            catch (Exception ex) { return 0; }
+            catch (Exception ex) { return -1; }
         }
 
+        private async Task<bool> IsValidSemester(Semester semester)
+        {
+            var existingSemesters = await _context.Semesters
+                .Where(x => x.SemesterId != semester.SemesterId)
+                .ToListAsync();
 
+            foreach (var existingSemester in existingSemesters)
+            {
+                if (semester.StartTime <= existingSemester.EndTime && semester.EndTime >= existingSemester.StartTime)
+                {
+                    // The start time or end time may be overlaped with other semesters
+                    return false;
+                }
+            }
+
+            return true;
+        }
     }
 }
