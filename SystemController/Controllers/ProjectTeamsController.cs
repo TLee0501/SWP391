@@ -59,6 +59,7 @@ namespace SystemController.Controllers
 
             var result = await _projectTeamServise.CreateTeam(userID, request);
             if (result == 1) return NotFound(new ResponseCodeAndMessageModel(7, "Không tìm thấy dự án!"));
+            else if (result == 20) return BadRequest(new ResponseCodeAndMessageModel(20, "Chưa thể đăng ký nhóm vào lúc này"));
             else if (result == 2) return BadRequest(new ResponseCodeAndMessageModel(8, "Có thành viên bị lặp!"));
             else if (result == 3) return BadRequest(new ResponseCodeAndMessageModel(9, "Có thành viên đã tham gia nhóm khác!"));
             else if (result == 4) return Ok(new ResponseCodeAndMessageModel(100, "Thành công!"));

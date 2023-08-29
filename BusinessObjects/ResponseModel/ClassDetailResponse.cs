@@ -46,5 +46,9 @@
         public List<ClassDetailResponseStudent> Students { get; set; } = null!;
         public List<ClassDetailResponseTeam> Teams { get; set; } = null!;
         public ClassDetailResponseSemester Semester { get; set; } = null!;
+        public DateTime? RegisterTeamStartDate { get; set; }
+        public DateTime? RegisterTeamEndDate { get; set; }
+        public DateTime? ReportStartDate { get; set; }
+        public DateTime? ReportEndDate { get; set; }
     }
 }

@@ -86,12 +86,12 @@ namespace SystemController.Controllers
         }
 
         [HttpGet, Authorize]
-        public async Task<ActionResult<IEnumerable<ClassListResponse>>> SearchClass(Guid? semesterId, Guid? courseId, string? searchText)
+        public async Task<ActionResult<IEnumerable<ClassListResponse>>> SearchClass(Guid? semesterId, Guid? teacherId, Guid? courseId, string? searchText)
         {
             var userId = Utils.GetUserIdFromHttpContext(HttpContext);
             var userGuid = new Guid(userId!);
 
-            var result = await _classService.GetClasses(userGuid, semesterId, courseId, searchText);
+            var result = await _classService.GetClasses(userGuid, teacherId, semesterId, courseId, searchText);
             return result;
         }
 
@@ -132,12 +132,12 @@ namespace SystemController.Controllers
         }
 
         [HttpGet, Authorize]
-        public async Task<ActionResult<IEnumerable<ClassListResponse>>> GetAllClasses(Guid? semesterId, Guid? courseId, string? searchText)
+        public async Task<ActionResult<IEnumerable<ClassListResponse>>> GetAllClasses(Guid? semesterId, Guid? teacherId, Guid? courseId, string? searchText)
         {
             var userId = Utils.GetUserIdFromHttpContext(HttpContext);
             var userGuid = new Guid(userId!);
 
-            var result = await _classService.GetClasses(userGuid, semesterId, courseId, searchText);
+            var result = await _classService.GetClasses(userGuid, teacherId, semesterId, courseId, searchText);
             return result;
         }
 
@@ -175,6 +175,42 @@ namespace SystemController.Controllers
             var userId = Utils.GetUserIdFromHttpContext(HttpContext);
             var result = await _classService.GetTeacherClassList(new Guid(userId));
             return Ok(result);
+        }
+
+        [HttpPut, Authorize]
+        public async Task<ActionResult> UpdateTeamRegisterDeadline(UpdateClassDeadlineRequest request)
+        {
+            var success = await _classService.UpdateTeamRegisterDeadline(request);
+            if (!success)
+            {
+                return BadRequest("Lỗi xảy ra");
+            }
+
+            return Ok("Thành công");
+        }
+
+        [HttpPut, Authorize]
+        public async Task<ActionResult> UpdateTeamReportDeadline(UpdateClassDeadlineRequest request)
+        {
+            var success = await _classService.UpdateReportDeadline(request);
+            if (!success)
+            {
+                return BadRequest("Lỗi xảy ra");
+            }
+
+            return Ok("Thành công");
+        }
+
+        [HttpPut, Authorize]
+        public async Task<ActionResult> UpdateEnrollCode(UpdateEnrollCodeRequest request)
+        {
+            var success = await _classService.UpdateEnrollCode(request);
+            if (!success)
+            {
+                return BadRequest("Lỗi xảy ra");
+            }
+
+            return Ok("Thành công");
         }
     }
 }

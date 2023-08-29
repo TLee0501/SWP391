@@ -62,6 +62,8 @@ namespace BusinessObjects.ResponseModel
         public ProjectTeamInstructor Instructor { get; set; } = null!;
         public ProjectTeamMember Leader { get; set; } = null!;
         public List<ProjectTask> Tasks { get; set; } = null!;
+        public DateTime? ReportStartTime { get; set; }
+        public DateTime? ReportEndTime { get; set; }
     }
 }
 

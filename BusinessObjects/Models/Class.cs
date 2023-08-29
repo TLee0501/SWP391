@@ -27,4 +27,12 @@ public partial class Class
     public virtual ICollection<StudentClass> StudentClasses { get; set; } = new List<StudentClass>();
 
     public virtual User? User { get; set; } = null!;
+
+    public DateTime? RegisterTeamStartDate { get; set; }
+
+    public DateTime? RegisterTeamEndDate { get; set; }
+
+    public DateTime? ReportStartDate { get; set; }
+
+    public DateTime? ReportEndDate { get; set; }
 }

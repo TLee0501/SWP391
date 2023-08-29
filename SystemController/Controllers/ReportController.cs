@@ -19,13 +19,17 @@ namespace SystemController.Controllers
         public async Task<ActionResult> SendReport(CreateTeamReportRequest request)
         {
             var reporterId = Utils.GetUserIdFromHttpContext(HttpContext);
-            var success = await _teamReportService.CreateTeamReport(new Guid(reporterId!), request);
-            if (success)
+            var result = await _teamReportService.CreateTeamReport(new Guid(reporterId!), request);
+            if (result == 1)
             {
-                return Ok("Gửi báo cáo thành công");
+                return BadRequest("Nhóm không hợp lệ");
+            }
+            if (result == 2)
+            {
+                return BadRequest("Chưa thề gửi báo cáo vào lúc này");
             }
 
-            return BadRequest("Có lỗi xảy ra");
+            return Ok("Gửi báo cáo thành công");
         }
 
         [HttpGet, Authorize]

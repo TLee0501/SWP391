@@ -13,6 +13,7 @@ namespace BusinessObjects.ResponseModel
         public string? TodoReport { get; set; }
         public DateTime CreatedDate { get; set; }
         public TeamReportDetailResponseFeedback? Feedback { get; set; }
+        public int Period { get; set; }
     }
 
     public class TeamReportDetailResponseFeedback

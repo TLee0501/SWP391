@@ -60,13 +60,26 @@ namespace Service.ProjectTeamService
                 await _context.TeamMembers.AddAsync(model);
                 await _context.SaveChangesAsync();
                 return 2;
-            } catch (Exception ex) { return 0; }
+            }
+            catch (Exception ex) { return 0; }
         }
 
         public async Task<int> CreateTeam(Guid leaderId, ProjectTeamCreateRequest request)
         {
-            var checkProject = await _context.Projects.FindAsync(request.ProjectId);
+
+            var checkProject = await _context.Projects
+                .Include(x => x.Class)
+                .Where(x => x.ProjectId == request.ProjectId)
+                .SingleOrDefaultAsync();
+
             if (checkProject == null) return 1;
+
+            var @class = checkProject.Class;
+            var canCreateTeam = CanCreateTeam(@class);
+            if (!canCreateTeam)
+            {
+                return 20;
+            }
 
             var checkdup = request.Users.Distinct().ToList();
             if (checkdup.Count != request.Users.Count) return 2;
@@ -162,6 +175,9 @@ namespace Service.ProjectTeamService
         public async Task<ProjectTeamDetailResponse?> GetJoinedProjectTeamById(Guid userId, Guid teamId)
         {
             var query = _context.ProjectTeams
+                .Include(x => x.Project)
+                    .ThenInclude(x => x.Class)
+                        .ThenInclude(x => x.User)
                 .Include(x => x.TeamMembers)
                     .ThenInclude(x => x.User)
                 .Include(x => x.Project)
@@ -171,6 +187,8 @@ namespace Service.ProjectTeamService
             var team = await query.SingleOrDefaultAsync();
             if (team == null) return null;
 
+            var @class = team.Project.Class;
+            var teacher = team.Project.Class.User;
             var leader = await _context.Users.FindAsync(team.LeaderId);
             var members = team.TeamMembers.Select(x => new ProjectTeamMember
             {
@@ -222,8 +240,14 @@ namespace Service.ProjectTeamService
                         Code = item.User.Mssv!,
                         Email = item.User.Email
                     }).ToList(),
-
-                }).ToList()
+                }).ToList(),
+                Instructor = new ProjectTeamInstructor
+                {
+                    Id = teacher.UserId,
+                    FullName = teacher.FullName,
+                },
+                ReportStartTime = @class.ReportStartDate,
+                ReportEndTime = @class.ReportEndDate,
             };
 
         }
@@ -232,6 +256,8 @@ namespace Service.ProjectTeamService
         {
             var query = _context.ProjectTeams
                 .Include(x => x.Project)
+                    .ThenInclude(x => x.Class)
+                        .ThenInclude(x => x.User)
                 .Include(x => x.TeamMembers)
                     .ThenInclude(x => x.User)
                 .Where(x => x.Project.ClassId == classId)
@@ -241,6 +267,7 @@ namespace Service.ProjectTeamService
 
             foreach (var team in teams)
             {
+                var teacher = team.Project.Class.User;
                 var leader = await _context.Users.FindAsync(team!.LeaderId);
                 var data = new ProjectTeamListResponse
                 {
@@ -266,6 +293,11 @@ namespace Service.ProjectTeamService
                         FullName = leader!.FullName,
                         Code = leader!.Mssv!,
                         Email = leader!.Email
+                    },
+                    Instructor = new ProjectTeamInstructor
+                    {
+                        Id = teacher!.UserId,
+                        FullName = teacher.FullName,
                     }
                 };
                 result.Add(data);
@@ -273,142 +305,6 @@ namespace Service.ProjectTeamService
 
             return result;
         }
-
-        /*public async Task<int> AcceptTeamProjectrequest(Guid teamId)
-        {
-            //check student 
-            var checkStudent = await CheckStudentValid(teamId);
-            if (checkStudent == false) return 4;
-
-            var teamRequestList = await _context.TeamRequests.Where(_ => _.Team == teamId).ToListAsync();
-            if (teamRequestList.IsNullOrEmpty())
-            {
-                return 1;
-            }
-
-            var fistRequest = teamRequestList[0];
-            if (fistRequest.Status == TeamRequestStatus.Approved)
-            {
-                return 1;
-            }
-
-            //check if project already choosen
-            var checkChoosen = await _context.ProjectTeams.Where(a => a.ProjectId == teamRequestList.First().ProjectId && a.Status != 3).ToListAsync();
-            if (!checkChoosen.IsNullOrEmpty()) return 5;
-
-            var projects = await _context.Projects.Where(a => a.ClassId == teamRequestList.First().ClassId && a.IsDeleted == false).ToListAsync();
-            var pt = new List<ProjectTeam>();
-            foreach (var item in projects)
-            {
-                var ptTmp = await _context.ProjectTeams.Where(a => a.ProjectId == item.ProjectId).ToListAsync();
-                if (!ptTmp.IsNullOrEmpty())
-                {
-                    foreach (var item1 in ptTmp)
-                    {
-                        pt.Add(item1);
-                    }
-                }
-            }
-
-            //Tên nhóm
-            string newName;
-            if (pt.IsNullOrEmpty())
-            {
-                newName = "G01";
-            }
-            else
-            {
-                var nameMax = pt.MaxBy(a => a.TeamName).TeamName;
-                string digits = new string(nameMax.Where(char.IsDigit).ToArray());
-                string letters = new string(nameMax.Where(char.IsLetter).ToArray());
-
-                int number;
-                if (!int.TryParse(digits, out number)) //int.Parse would do the job since only digits are selected
-                {
-                    Console.WriteLine("Something weired happened");
-                }
-
-                newName = letters + (++number).ToString("D2");
-            }
-
-            try
-            {
-                var projectTeamId = Guid.NewGuid();
-
-                var projectTeam = new ProjectTeam
-                {
-                    ProjectTeamId = projectTeamId,
-                    ProjectId = fistRequest.ProjectId,
-                    TeamName = newName,
-                    TimeStart = DateTime.Now,
-                    Status = 1
-                };
-
-                await _context.ProjectTeams.AddAsync(projectTeam);
-
-                foreach (var request in teamRequestList)
-                {
-                    request.Status = TeamRequestStatus.Approved;
-                    var teamMember = new TeamMember
-                    {
-                        TeamMemberId = Guid.NewGuid(),
-                        ProjectTeamId = projectTeamId,
-                        UserId = request.UserId
-                    };
-                    await _context.TeamMembers.AddAsync(teamMember);
-                }
-
-                await _context.SaveChangesAsync();
-                return 3;
-            }
-            catch (Exception ex)
-            {
-                return 0;
-            }
-        }*/
-
-        /*public async Task<int> DeleteProjectTeam(Guid projectTeamId)
-        {
-            var pt = await _context.ProjectTeams.FindAsync(projectTeamId);
-            if (pt == null) return 0;
-
-            pt.Status = 3;
-
-            var tasks = await _context.Tasks.Where(a => a.ProjectId == pt.ProjectId).ToListAsync();
-            foreach (var item in tasks)
-            {
-                item.IsDeleted = true;
-            }
-
-            var project = await _context.Projects.FindAsync(pt.ProjectId);
-            project.IsSelected = false;
-            try
-            {
-                await _context.SaveChangesAsync();
-                return 2;
-            }
-            catch (Exception ex) { return 1; }
-        }*/
-
-        /*public async Task<int> DenyTeamProjectrequest(Guid teamId)
-        {
-            var pts = await _context.TeamRequests.Where(a => a.Team == teamId).ToListAsync();
-            if (pts == null) return 1;
-            foreach (var item in pts)
-            {
-                if (item.Status.Equals(TeamRequestStatus.Denied)) return 2;
-                item.Status = TeamRequestStatus.Denied;
-            }
-            try
-            {
-                await _context.SaveChangesAsync();
-                return 3;
-            }
-            catch (Exception ex)
-            {
-                return 0;
-            }
-        }*/
 
         public async Task<ProjectTeamResponse> getProjectTeamById(Guid projectTeamId)
         {
@@ -524,7 +420,7 @@ namespace Service.ProjectTeamService
 
         public async Task<int> RemoveMember(Guid projectTeamId, Guid userId)
         {
-            var member = await _context.TeamMembers.SingleOrDefaultAsync(a => a.ProjectTeamId ==  projectTeamId && a.UserId == userId);
+            var member = await _context.TeamMembers.SingleOrDefaultAsync(a => a.ProjectTeamId == projectTeamId && a.UserId == userId);
             if (member == null) return 1;
 
             var checkLeader = await _context.ProjectTeams.SingleOrDefaultAsync(a => a.ProjectTeamId == projectTeamId && a.LeaderId == userId && a.Status != 3);
@@ -534,144 +430,23 @@ namespace Service.ProjectTeamService
                 _context.TeamMembers.Remove(member);
                 await _context.SaveChangesAsync();
                 return 2;
-            } catch (Exception ex) { return 0; }
+            }
+            catch (Exception ex) { return 0; }
         }
 
-        /*public async Task<List<TeamRequestResponse>> GetTeamProjectRequests(Guid? userId, Guid classId)
+        private bool CanCreateTeam(Class @class)
         {
-            var result = new List<TeamRequestResponse>();
-            var listTeamId = new List<Guid>();
+            var startTime = @class.RegisterTeamStartDate;
+            var endTime = @class.RegisterTeamEndDate;
 
-            //Lay list team
-            var query = _context.TeamRequests.Where(a => a.ClassId == classId && a.Status != TeamRequestStatus.Cancelled);
-            if (userId != null)
+            if (startTime == null || endTime == null)
             {
-                query = query.Where(_ => _.UserId == userId);
-            }
-            var listRequest = await query.ToListAsync();
-
-            var uniqueListTeam = listRequest.DistinctBy(a => a.Team).ToList();
-
-            //Xu ly tung Team
-            foreach (var item in uniqueListTeam)
-            {
-                var listBasicMember = new List<UserBasicResponse>();
-                var listTR = await _context.TeamRequests.Where(a => a.Team == item.Team).ToListAsync();
-                var uniqueListTR = listTR.DistinctBy(a => a.Team).ToList();
-                foreach (var item1 in uniqueListTR)
-                {
-                    var members = await _context.TeamRequests.Where(a => a.Team == item1.Team).ToListAsync();
-                    foreach (var item2 in members)
-                    {
-                        var name = await _context.Users.FindAsync(item2.UserId);
-                        var tmp = new UserBasicResponse
-                        {
-                            UserId = item2.UserId,
-                            FullName = name.FullName,
-                            Mssv = name.Mssv
-                        };
-                        listBasicMember.Add(tmp);
-                    }
-                    if (item1.ProjectId != null)
-                    {
-                        var projectTmp = await _context.Projects.FindAsync(item1.ProjectId);
-                        var tmpResult = new TeamRequestResponse()
-                        {
-                            TeamId = item1.Team,
-                            ProjectId = item1.ProjectId,
-                            ProjectName = projectTmp.ProjectName,
-                            Users = listBasicMember,
-                            CreatedBy = item1.UserId,
-                            Status = item1.Status
-                        };
-                        result.Add(tmpResult);
-                    }
-                    else
-                    {
-                        var tmpResult = new TeamRequestResponse()
-                        {
-                            TeamId = item1.Team,
-                            Users = listBasicMember,
-                            CreatedBy = item1.UserId,
-                            Status = item1.Status
-                        };
-                        result.Add(tmpResult);
-                    }
-                }
-            }
-            return result;
-        }*/
-
-        /*public async Task<int> StudentCreateTeamRequest(StudentCreateTeamRequest request)
-        {
-            var checkclass = await _context.Classes.FindAsync(request.ClassId);
-            if (checkclass == null) return 1;
-
-            var team = Guid.NewGuid();
-            foreach (var item in request.ListStudent)
-            {
-                var tmp = new TeamRequest
-                {
-                    RequestId = Guid.NewGuid(),
-                    UserId = item,
-                    ClassId = request.ClassId,
-                    Team = team,
-                    //TeamName = "",
-                    ProjectId = request.ProjectId,
-                    Status = TeamRequestStatus.Pending
-                };
-                await _context.TeamRequests.AddAsync(tmp);
-            }
-            try
-            {
-                await _context.SaveChangesAsync();
-                return 2;
-            }
-            catch (Exception ex)
-            {
-                return 0;
-            }
-        }*/
-
-        /*private async Task<bool> CheckStudentValid(Guid teamId)
-        {
-            var classId = _context.TeamRequests.FirstOrDefaultAsync(a => a.Team == teamId).Result.ClassId;
-            var projects = await _context.Projects.Where(a => a.ClassId == classId && a.IsDeleted == false).ToListAsync();
-
-            //projectTeam
-            var projectTeamId = new List<Guid>();
-            foreach (var item in projects)
-            {
-                var projectTeam = await _context.ProjectTeams.Where(a => a.ProjectId == item.ProjectId && a.Status == 1).ToListAsync();
-                foreach (var item1 in projectTeam)
-                {
-                    projectTeamId.Add(item1.ProjectTeamId);
-                }
+                return false;
             }
 
-            //userId
-            var userIds = new List<Guid>();
-            foreach (var item in projectTeamId)
-            {
-                var tm = await _context.TeamMembers.Where(a => a.ProjectTeamId == item).ToListAsync();
-                foreach (var item1 in tm)
-                {
-                    userIds.Add(item1.UserId);
-                }
-            }
+            var now = DateTime.Now;
 
-            //UserId from request
-            var userIdsFromRequest = new List<Guid>();
-            var teamRequests = await _context.TeamRequests.Where(a => a.Team == teamId && a.Status == TeamRequestStatus.Pending).ToListAsync();
-            foreach (var item in teamRequests)
-            {
-                userIdsFromRequest.Add(item.UserId);
-            }
-
-            //compare 2 list
-            var duplicateList = userIds.Intersect(userIdsFromRequest).ToList();
-            if (duplicateList.IsNullOrEmpty()) return true;
-            return false;
-        }*/
+            return now >= startTime && now <= endTime;
+        }
     }
 }

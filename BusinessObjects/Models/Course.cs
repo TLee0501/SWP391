@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace BusinessObjects.Models;
+﻿namespace BusinessObjects.Models;
 
 public partial class Course
 {
@@ -18,8 +15,6 @@ public partial class Course
     public bool IsActive { get; set; }
 
     public bool IsDelete { get; set; }
-
-    public Guid SemesterId { get; set; }
 
     public virtual ICollection<Class> Classes { get; set; } = new List<Class>();
 }

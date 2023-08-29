@@ -70,7 +70,6 @@ namespace Service.CourseService
                 CourseId = id,
                 CourseCode = request.CourseCode,
                 CourseName = request.CourseName,
-                SemesterId = request.SemesterId,
                 UserId = userId,
                 TimeCreated = DateTime.Now,
                 IsActive = true,
@@ -166,18 +165,16 @@ namespace Service.CourseService
         public async Task<CourseResponse> GetCourseByID(Guid courseId)
         {
             var course = await _context.Courses.FindAsync(courseId);
-            var semester = await _context.Semesters.FindAsync(course.SemesterId);
-            if (course == null) return null;
-            var user = await _context.Users.FindAsync(course.UserId);
+            var user = await _context.Users.FindAsync(course!.UserId);
+
             var courseResponse = new CourseResponse
             {
                 CourseId = courseId,
                 CourseCode = course.CourseCode,
                 CourseName = course.CourseName,
                 TimeCreated = course.TimeCreated,
-                SemesterId = semester.SemesterId,
                 UserId = course.UserId,
-                createdBy = user.FullName
+                createdBy = user!.FullName
             };
             return courseResponse;
         }
@@ -206,12 +203,11 @@ namespace Service.CourseService
 
         public async Task<int> UpdateCourse(CoursceUpdateRequest request)
         {
-            var course = await _context.Courses.FindAsync(request.CourseId);
-            course.CourseCode = request.CourseCode;
-            course.CourseName = request.CourseName;
-            course.SemesterId = request.SemesterId;
             try
             {
+                var course = await _context.Courses.FindAsync(request.CourseId);
+                course!.CourseCode = request.CourseCode;
+                course.CourseName = request.CourseName;
                 await _context.SaveChangesAsync();
                 return 1;
             }

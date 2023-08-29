@@ -14,8 +14,24 @@ namespace Service.TeamReportService
         }
 
 
-        public async Task<bool> CreateTeamReport(Guid reporterId, CreateTeamReportRequest request)
+        public async Task<int> CreateTeamReport(Guid reporterId, CreateTeamReportRequest request)
         {
+            var team = await _context.ProjectTeams
+                .Include(x => x.Project)
+                    .ThenInclude(x => x.Class)
+                .Where(x => x.ProjectTeamId == request.TeamId)
+                .SingleOrDefaultAsync();
+            if (team == null)
+            {
+                return 1;
+            }
+
+            var canSendReport = CanSendReport(team.Project.Class);
+            if (!canSendReport)
+            {
+                return 2;
+            }
+
             var teamReport = new TeamReport
             {
                 Id = Guid.NewGuid(),
@@ -32,7 +48,7 @@ namespace Service.TeamReportService
             await _context.TeamReports.AddAsync(teamReport);
             await _context.SaveChangesAsync();
 
-            return true;
+            return 0;
         }
 
         public async Task<TeamReportDetailResponse?> GetTeamReport(Guid reportId)
@@ -89,7 +105,8 @@ namespace Service.TeamReportService
                     FullName = reporter.FullName,
                     Code = reporter.Mssv!,
                     Email = reporter.Email,
-                }
+                },
+                Period = teamReport.Period,
             };
         }
 
@@ -104,7 +121,7 @@ namespace Service.TeamReportService
                 return new List<TeamReportDetailResponse>();
             }
 
-            return teamReports.Select(teamReport => new TeamReportDetailResponse
+            var list = teamReports.Select(teamReport => new TeamReportDetailResponse
             {
                 Id = teamReport.Id,
                 Title = teamReport.Title,
@@ -113,7 +130,21 @@ namespace Service.TeamReportService
                 DoingReport = teamReport.DoingReport,
                 TodoReport = teamReport.TodoReport,
                 CreatedDate = teamReport.CreatedDate,
+                Period = teamReport.Period,
             }).ToList();
+            var sortedList = list.OrderBy(x => x.Period).ToList();
+            return sortedList;
+        }
+
+        private bool CanSendReport(Class classData)
+        {
+            if (classData.ReportStartDate == null || classData.ReportEndDate == null)
+            {
+                return false;
+            }
+
+            var now = DateTime.Now;
+            return now >= classData.ReportStartDate && now <= classData.ReportEndDate;
         }
     }
 }

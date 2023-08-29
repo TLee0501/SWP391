@@ -1,5 +1,4 @@
-﻿using BusinessObjects.Models;
-using BusinessObjects.RequestModel;
+﻿using BusinessObjects.RequestModel;
 using BusinessObjects.ResponseModel;
 
 namespace Service.ClassService
@@ -12,10 +11,13 @@ namespace Service.ClassService
         Task<int> DeleteClass(Guid classId);
         Task<int> AssignClass(AssignClassRequest request);
         Task<int> UnassignClass(AssignClassRequest request);
-        Task<List<ClassListResponse>> GetClasses(Guid userId, Guid? semesterId, Guid? courseId, string? searchText);
+        Task<List<ClassListResponse>> GetClasses(Guid userId, Guid? teacherId, Guid? semesterId, Guid? courseId, string? searchText);
         Task<bool> EnrollClass(Guid userId, Guid classId, string enrollCode);
         Task<List<UserListResponse>> GetUsersInClass(Guid classId);
         Task<List<ClassListResponse>> GetTeacherClassList(Guid teacherId);
         Task<List<UserListResponse>> GetStudentsNotInProjectInClass(Guid classId);
+        Task<bool> UpdateTeamRegisterDeadline(UpdateClassDeadlineRequest request);
+        Task<bool> UpdateReportDeadline(UpdateClassDeadlineRequest request);
+        Task<bool> UpdateEnrollCode(UpdateEnrollCodeRequest request);
     }
 }

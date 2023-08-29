@@ -95,7 +95,6 @@ public partial class Swp391onGoingReportContext : DbContext
                 .HasColumnName("courseName");
             entity.Property(e => e.IsActive).HasColumnName("isActive");
             entity.Property(e => e.IsDelete).HasColumnName("isDelete");
-            entity.Property(e => e.SemesterId).HasColumnName("semesterId");
             entity.Property(e => e.TimeCreated)
                 .HasColumnType("datetime")
                 .HasColumnName("timeCreated");
