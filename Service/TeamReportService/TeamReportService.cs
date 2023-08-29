@@ -145,6 +145,7 @@ namespace Service.TeamReportService
                 return new List<TeamReportDetailResponse>();
             }
 
+
             var list = teamReports.Select(teamReport => new TeamReportDetailResponse
             {
                 Id = teamReport.Id,
@@ -162,13 +163,13 @@ namespace Service.TeamReportService
                     Code = teamReport.Reporter.Mssv!,
                     Email = teamReport.Reporter.Email,
                 },
-                Feedback = new TeamReportDetailResponseFeedback
+                Feedback = teamReport.TeacherFeedback != null ? new TeamReportDetailResponseFeedback
                 {
                     Id = teamReport.TeacherFeedback.Id,
                     Content = teamReport.TeacherFeedback.Content!,
                     Grade = teamReport.TeacherFeedback.Grade,
                     CreatedDate = teamReport.TeacherFeedback.CreatedDate,
-                }
+                } : null,
             }).ToList();
             var sortedList = list.OrderBy(x => x.Period).ToList();
             return sortedList;
