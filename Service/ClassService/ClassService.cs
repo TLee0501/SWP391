@@ -328,7 +328,7 @@ namespace Service.ClassService
                 return 0;
             }
         }
-        public async Task<List<ClassListResponse>> GetClassForTeacher(Guid teacherId)
+        public async Task<List<ClassListResponse>> GetTeacherClassList(Guid teacherId)
         {
             var checkClass = await _context.Classes.Where(x => x.UserId == teacherId).ToListAsync();
             var list = new List<ClassListResponse>();
