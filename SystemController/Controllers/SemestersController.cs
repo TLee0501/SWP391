@@ -1,4 +1,5 @@
-﻿using BusinessObjects.Models;
+﻿using BusinessObjects.Enums;
+using BusinessObjects.Models;
 using BusinessObjects.RequestModel;
 using BusinessObjects.ResponseModel;
 using Microsoft.AspNetCore.Mvc;
@@ -39,79 +40,55 @@ namespace SystemController.Controllers
         }
 
         // PUT: api/Semesters/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{semesterId}")]
         public async Task<IActionResult> UpdateSemester(Guid semesterId, SemesterCreateRequest request)
         {
             var result = await _semesterService.UpdateSemester(semesterId, request);
             if (result.Equals(1))
-                return BadRequest(new ResponseCodeAndMessageModel(6, "Không tìm thấy học kỳ!"));
-            else if (result.Equals(2))
-                return BadRequest(new ResponseCodeAndMessageModel(1, "Tên học kỳ bị trùng!"));
-            else if (result.Equals(3))
-                return BadRequest(new ResponseCodeAndMessageModel(2, "Ngày bắt đầu bị trùng!"));
-            else if (result.Equals(4))
-                return BadRequest(new ResponseCodeAndMessageModel(3, "Ngày kết thúc bị trùng!"));
-            else if (result.Equals(5))
-                return Ok(new ResponseCodeAndMessageModel(100, "Thành công!"));
-            else
-                return BadRequest(new ResponseCodeAndMessageModel(99, "Thất bại!"));
+            {
+                return BadRequest(new ResponseCodeAndMessageModel
+                {
+                    Code = (int)ErrorCode.SemesterOverlapTime,
+                    Message = "Ngày bắt đầu hoặc kết thúc bị trùng với học kỳ khác"
+                });
+            }
+
+            if (result.Equals(-1))
+            {
+                return BadRequest(new ResponseCodeAndMessageModel
+                {
+                    Code = (int)ErrorCode.Error,
+                    Message = "Có lỗi xảy ra"
+                });
+            }
+
+            return Ok(new ResponseCodeAndMessageModel(100, "Thành công!"));
         }
 
         // POST: api/Semesters
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<Semester>> CreateSemester(SemesterCreateRequest request)
         {
             var result = await _semesterService.CreateSemester(request);
             if (result.Equals(1))
-                return BadRequest(new ResponseCodeAndMessageModel(1, "Tên học kỳ bị trùng!"));
-            else if (result.Equals(2))
-                return BadRequest(new ResponseCodeAndMessageModel(2, "Ngày bắt đầu bị trùng!"));
-            else if (result.Equals(3))
-                return BadRequest(new ResponseCodeAndMessageModel(3, "Ngày kết thúc bị trùng!"));
-            else if (result.Equals(4))
-                return Ok(new ResponseCodeAndMessageModel(100, "Thành công!"));
-            else
-                return BadRequest(new ResponseCodeAndMessageModel(99, "Thất bại!"));
-        }
-
-        /*[HttpGet("{semesterTypeId}")]
-        public async Task<ActionResult<Semester>> GetSemesterType(Guid semesterTypeId)
-        {
-            var result = await _semesterService.GetSemesterType(semesterTypeId);
-            if (result == null) return NotFound(new ResponseCodeAndMessageModel(16, "Không tìm thấy loại học kỳ!"));
-            else
-                return Ok(result);
-        }
-
-        [HttpGet]
-        public async Task<ActionResult<Semester>> GetSemesterTypes()
-        {
-            var result = await _semesterService.GetSemesterTypes();
-            if (result == null) return NotFound(new ResponseCodeAndMessageModel(16, "Không tìm thấy loại học kỳ!"));
-            else
-                return Ok(result);
-        }*/
-
-        // DELETE: api/Semesters/5
-        /*[HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteSemester(Guid id)
-        {
-            if (_context.Semesters == null)
             {
-                return NotFound();
-            }
-            var semester = await _context.Semesters.FindAsync(id);
-            if (semester == null)
-            {
-                return NotFound();
+                return BadRequest(new ResponseCodeAndMessageModel
+                {
+                    Code = (int)ErrorCode.SemesterOverlapTime,
+                    Message = "Ngày bắt đầu hoặc kết thúc bị trùng với học kỳ khác"
+                });
             }
 
-            _context.Semesters.Remove(semester);
-            await _context.SaveChangesAsync();
+            if (result.Equals(-1))
+            {
+                return BadRequest(new ResponseCodeAndMessageModel
+                {
+                    Code = (int)ErrorCode.Error,
+                    Message = "Có lỗi xảy ra"
+                });
+            }
 
-            return NoContent();
-        }*/
+            return Ok(new ResponseCodeAndMessageModel(100, "Thành công!"));
+        }
     }
 }
